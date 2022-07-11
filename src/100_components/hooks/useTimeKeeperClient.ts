@@ -14,7 +14,7 @@ export const useTimeKeeperClient = () => {
         const loadTimeKeeperVoice = async () => {
             const last5MinBlob = await resourceManagerState.fetchVoice(`${timeKeeperState.lang}/5minutes.mp3`)
             const last3MinBlob = await resourceManagerState.fetchVoice(`${timeKeeperState.lang}/3minutes.mp3`)
-            const last1MinBlob = await resourceManagerState.fetchVoice(`${timeKeeperState.lang}/5minutes.mp3`)
+            const last1MinBlob = await resourceManagerState.fetchVoice(`${timeKeeperState.lang}/1minutes.mp3`)
             const endTimeBlob = await resourceManagerState.fetchVoice(`${timeKeeperState.lang}/endtime.mp3`)
             const last5Min = await last5MinBlob.arrayBuffer()
             const last3Min = await last3MinBlob.arrayBuffer()
