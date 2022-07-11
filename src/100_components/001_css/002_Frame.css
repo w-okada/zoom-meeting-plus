@@ -180,6 +180,22 @@
         right: 10px;
         width: 50%;
     }
+    .sidebar-zoom-area-voice-text {
+        position: absolute;
+        right: 10px;
+        width: 70%;
+    }
+    .sidebar-lang-selector {
+        position: absolute;
+        left: 30%;
+        width: 20%;
+    }
+    .sidebar-speaker-selector {
+        position: absolute;
+        right: 10px;
+        width: 45%;
+    }
+
     .sidebar-zoom-area-button {
         color: #fff;
         background: #666;

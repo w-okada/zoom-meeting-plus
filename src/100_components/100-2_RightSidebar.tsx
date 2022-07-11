@@ -2,16 +2,15 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAppState } from "../003_provider/AppStateProvider";
 import { useStateControlCheckbox } from "./hooks/useStateControlCheckbox";
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./parts/002_HeaderButton";
-
-import { generateVoice } from "../001_clients_and_managers/009_ResourceLoader";
 import { PosePredictionEx } from "@dannadori/mediapipe-avatar-js/dist/MotionDetector";
 import { Side, TFace, THand, TPose } from "@dannadori/mediapipe-avatar-js/dist/kalido";
 import { useMotionPlayer } from "./hooks/useMotionPlayer";
+import { DEFAULT_VOICE_LANG, DEFAULT_VOICE_SPEAKER } from "../const";
 
 let GlobalLoopID = 0;
 
 export const RightSidebar = () => {
-    const { frontendManagerState, threeState, timeKeeperState, zoomSDKState, avatarControlState, browserProxyState } = useAppState();
+    const { frontendManagerState, threeState, timeKeeperState, zoomSDKState, avatarControlState, browserProxyState, resourceManagerState } = useAppState();
     const [voice, setVoice] = useState<Blob | null>(null);
     const sidebarAccordionZoomCheckbox = useStateControlCheckbox("sidebar-accordion-zoom-checkbox");
     const sidebarAccordionAvatarCheckbox = useStateControlCheckbox("sidebar-accordion-avatar-checkbox");
@@ -98,9 +97,18 @@ export const RightSidebar = () => {
     //// (3-2) Speak
     const speakClicked = async () => {
         const text = document.getElementById("sidebar-avatar-area-voice-text") as HTMLInputElement;
-        const speakerId = document.getElementById("sidebar-avatar-area-voice-speaker-id") as HTMLInputElement;
-        const voice = await generateVoice(Number(speakerId.value), text.value);
-        setVoice(voice);
+        const lang = document.getElementById("sidebar-lang-selector") as HTMLInputElement;
+        const speaker = document.getElementById("sidebar-speaker-selector") as HTMLInputElement;
+        console.log(text.value, lang.value, speaker.value);
+
+        if (resourceManagerState.speakersInVoiceVox[speaker.value]) {
+            const speakerId = resourceManagerState.speakersInVoiceVox[speaker.value];
+            const voice = await resourceManagerState.generateVoiceWithVoiceVox(speakerId, text.value);
+            setVoice(voice);
+        } else if (resourceManagerState.speakersInOpenTTS[lang.value]) {
+            const voice = await resourceManagerState.generateVoiceWithOpenTTS(lang.value, speaker.value, text.value);
+            setVoice(voice);
+        }
     };
 
     useEffect(() => {
@@ -112,6 +120,64 @@ export const RightSidebar = () => {
         };
         play();
     }, [voice]);
+
+    ////// (3-3-1) Speaker Setting
+    const [localLangSpeakerMap, setLocalLangSpeakerMap] = useState<{ [lang: string]: string[] }>({});
+    const [selectedLang, setSelectedLang] = useState<string>(DEFAULT_VOICE_LANG);
+    const [selectedSpeaker, setSelectedSpeaker] = useState<string>(DEFAULT_VOICE_SPEAKER);
+    useEffect(() => {
+        const langSpeakerMap = { ...resourceManagerState.speakersInOpenTTS };
+        if (!langSpeakerMap["ja"]) {
+            langSpeakerMap["ja"] = [];
+        }
+        langSpeakerMap["ja"] = [...langSpeakerMap["ja"], ...Object.keys(resourceManagerState.speakersInVoiceVox)];
+        setLocalLangSpeakerMap({ ...langSpeakerMap });
+    }, [resourceManagerState.speakersInOpenTTS, resourceManagerState.speakersInVoiceVox]);
+    const langSelector = useMemo(() => {
+        const selector = (
+            <select
+                id="sidebar-lang-selector"
+                className="sidebar-lang-selector"
+                onChange={(ev) => {
+                    setSelectedLang(ev.target.value);
+                }}
+                value={selectedLang}
+            >
+                {Object.keys(localLangSpeakerMap).map((x) => {
+                    return (
+                        <option key={x} value={x}>
+                            {x}
+                        </option>
+                    );
+                })}
+            </select>
+        );
+        return selector;
+    }, [localLangSpeakerMap, selectedLang]);
+    const speakerSelector = useMemo(() => {
+        if (!localLangSpeakerMap[selectedLang]) {
+            return <></>;
+        }
+        const selector = (
+            <select
+                id="sidebar-speaker-selector"
+                className="sidebar-speaker-selector"
+                onChange={(ev) => {
+                    setSelectedSpeaker(ev.target.value);
+                }}
+                value={selectedSpeaker}
+            >
+                {localLangSpeakerMap[selectedLang].map((x) => {
+                    return (
+                        <option key={x} value={x}>
+                            {x}
+                        </option>
+                    );
+                })}
+            </select>
+        );
+        return selector;
+    }, [localLangSpeakerMap, selectedLang, selectedSpeaker]);
 
     //// (3-3) Time Keeper
     ////// (3-3-1) Show Dialog
@@ -375,6 +441,28 @@ export const RightSidebar = () => {
                                     >
                                         remove
                                     </div>
+                                </div>
+                            </div>
+                            <div className="sidebar-avatar-area-buttons">{motionButtons}</div>
+
+                            <div className="sidebar-zoom-area-input">
+                                {langSelector}
+                                {speakerSelector}
+                                <div className="sidebar-zoom-area-label">speaker</div>
+                            </div>
+                            <div className="sidebar-zoom-area-input">
+                                <input type="text" className="sidebar-zoom-area-voice-text" id="sidebar-avatar-area-voice-text" />
+                                <div className="sidebar-zoom-area-label">text</div>
+                            </div>
+
+                            <div className="sidebar-zoom-area-input">
+                                <div
+                                    className="sidebar-zoom-area-button"
+                                    onClick={() => {
+                                        speakClicked();
+                                    }}
+                                >
+                                    speak
                                 </div>
                             </div>
                         </div>

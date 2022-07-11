@@ -5,7 +5,7 @@ import { BackendManagerStateAndMethod, useBackendManager } from "../002_hooks/00
 import { FrontendManagerStateAndMethod, useFrontendManager } from "../002_hooks/100_useFrontendManager";
 import { ThreeStateAndMethods, useThree } from "../002_hooks/110_useThree";
 import { TimeKeeperStateAndMethod, useTimeKeeper } from "../002_hooks/120_useTimeKeeper";
-import { ResourceManagerAndMethod, useResourceManager } from "../002_hooks/003_useResourceManager";
+import { ResourceManagerStateAndMethod, useResourceManager } from "../002_hooks/003_useResourceManager";
 import { AvatarControlStateAndMethod, useAvatarControl } from "../002_hooks/111_useAvatarControl";
 import { useZoomSDK, ZoomSDKStateAndMethod } from "../002_hooks/200_useZoomSDK";
 import { BrowserProxyStateAndMethod, useBrowserProxy } from "../002_hooks/300_useBrowserProxy";
@@ -17,7 +17,7 @@ type Props = {
 interface AppStateValue {
     deviceManagerState: DeviceManagerStateAndMethod;
     backendManagerState: BackendManagerStateAndMethod;
-    resourceManagerState: ResourceManagerAndMethod;
+    resourceManagerState: ResourceManagerStateAndMethod;
     threeState: ThreeStateAndMethods;
     avatarControlState: AvatarControlStateAndMethod;
     timeKeeperState: TimeKeeperStateAndMethod;
