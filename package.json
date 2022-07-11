@@ -12,7 +12,7 @@
         "webpack:start": "webpack serve --config webpack.config.js",
         "build:resource": "node script/motionLoader.js",
         "build": "run-s clean copy:resources build:resource tsc webpack:build ",
-        "build:docker": "date +%Y%m%d%H%M%S > dummy && DOCKER_BUILDKIT=1 docker build --ssh default  . -t wok/sshtest",
+        "build:docker": "date +%Y%m%d%H%M%S > dummy && DOCKER_BUILDKIT=1 docker build --ssh default  . -t zoom-meeting-plus",
         "start:backend": "node backend/server.js",
         "start": "run-p copy:resources build:resource tsc:watch webpack:start start:backend",
         "start:voicevox": "docker run --rm -it -p '127.0.0.1:50021:50021' voicevox/voicevox_engine:cpu-ubuntu20.04-latest",
