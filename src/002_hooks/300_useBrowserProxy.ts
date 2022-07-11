@@ -117,8 +117,8 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
 
             // Video
             //// Avatar Canvas をZoomのストリームに。(内部表示用)
-            const videoInput = document.getElementById("sidebar-avatar-area-video") as HTMLVideoElement;
-            videoInput.srcObject = ms;
+            // const videoInput = document.getElementById("sidebar-avatar-area-video") as HTMLVideoElement;
+            // videoInput.srcObject = ms;
 
             //// Zoom用のストリーム作成
             if (props.threeState.renderer) {

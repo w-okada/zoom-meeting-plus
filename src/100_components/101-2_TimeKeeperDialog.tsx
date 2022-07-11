@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useMemo } from "react";
+import { TimeKeeperClientLangTypes } from "../002_hooks/120_useTimeKeeper";
 import { useAppState } from "../003_provider/AppStateProvider";
 
 export const TimeKeeperDialog = () => {
@@ -45,6 +46,33 @@ export const TimeKeeperDialog = () => {
             </div>
         );
     }, []);
+
+    const setLanguage = (ev: React.ChangeEvent<HTMLSelectElement>) => {
+        timeKeeperState.setLang(ev.target.value as TimeKeeperClientLangTypes);
+    };
+    const langOptions = useMemo(() => {
+        return (
+            <div className="dialog-input-controls">
+                <div style={{ display: "flex", alignItems: "center" }}>
+                    <label htmlFor="time-keeper-language" className="time-keeper-language-label">
+                        Language(voice):
+                    </label>
+
+                    <select
+                        id="time-keeper-language"
+                        className="time-keeper-language"
+                        defaultValue={timeKeeperState.lang}
+                        onChange={(ev) => {
+                            setLanguage(ev);
+                        }}
+                    >
+                        <option value="ja">ja</option>
+                        <option value="en">en</option>
+                    </select>
+                </div>
+            </div>
+        );
+    }, [timeKeeperState.lang]);
 
     const setTimeKeeper = useMemo(() => {
         return () => {
@@ -97,6 +125,7 @@ export const TimeKeeperDialog = () => {
                         <div className="dialog-input-container">
                             {timePicker}
                             {triggers}
+                            {langOptions}
                             {buttons}
                         </div>
                     </form>

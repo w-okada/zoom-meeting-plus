@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react"
 
+
+
+export const TimeKeeperClientLangTypes = {
+    ja: "ja",
+    en: "en"
+} as const
+export type TimeKeeperClientLangTypes = typeof TimeKeeperClientLangTypes[keyof typeof TimeKeeperClientLangTypes]
+
 export type TimeKeeperProps = {
     enable: boolean,
     endTime: string,
@@ -26,15 +34,20 @@ export type TimeKeeperEvent = typeof TimeKeeperEvent[keyof typeof TimeKeeperEven
 export type TimeKeeperState = TimeKeeperProps & {
     timeKeeperEvent: TimeKeeperEvent | null
     enable: boolean
+    lang: TimeKeeperClientLangTypes
 }
 export type TimeKeeperStateAndMethod = TimeKeeperState & {
     setTimeKeeperProps: (val: TimeKeeperProps) => void
     calcRemainTime: (time: string) => number
     clearEvent: () => void
+
+    setLang: (val: TimeKeeperClientLangTypes) => void
 }
 
 
 export const useTimeKeeper = (): TimeKeeperStateAndMethod => {
+    const [lang, setLang] = useState<TimeKeeperClientLangTypes>("ja")
+
     const [timeKeeperProps, setTimeKeeperProps] = useState<TimeKeeperProps>(
         {
             enable: false,
@@ -124,10 +137,12 @@ export const useTimeKeeper = (): TimeKeeperStateAndMethod => {
 
     const returnVal: TimeKeeperStateAndMethod = {
         ...timeKeeperProps,
+        lang,
         timeKeeperEvent,
         setTimeKeeperProps,
         calcRemainTime,
         clearEvent,
+        setLang
     }
 
     return returnVal

@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAppState } from "../../003_provider/AppStateProvider";
 
+
 export const useTimeKeeperClient = () => {
+
+
     const { timeKeeperState, browserProxyState, resourceManagerState } = useAppState()
     const [last5Min, setLast5Min] = useState<ArrayBuffer | null>(null)
     const [last3Min, setLast3Min] = useState<ArrayBuffer | null>(null)
@@ -9,10 +12,10 @@ export const useTimeKeeperClient = () => {
     const [endTime, setEndTime] = useState<ArrayBuffer | null>(null)
     useEffect(() => {
         const loadTimeKeeperVoice = async () => {
-            const last5MinBlob = await resourceManagerState.fetchVoice("5minutes.mp3")
-            const last3MinBlob = await resourceManagerState.fetchVoice("3minutes.mp3")
-            const last1MinBlob = await resourceManagerState.fetchVoice("1minutes.mp3")
-            const endTimeBlob = await resourceManagerState.fetchVoice("endtime.mp3")
+            const last5MinBlob = await resourceManagerState.fetchVoice(`${timeKeeperState.lang}/5minutes.mp3`)
+            const last3MinBlob = await resourceManagerState.fetchVoice(`${timeKeeperState.lang}/3minutes.mp3`)
+            const last1MinBlob = await resourceManagerState.fetchVoice(`${timeKeeperState.lang}/5minutes.mp3`)
+            const endTimeBlob = await resourceManagerState.fetchVoice(`${timeKeeperState.lang}/endtime.mp3`)
             const last5Min = await last5MinBlob.arrayBuffer()
             const last3Min = await last3MinBlob.arrayBuffer()
             const last1Min = await last1MinBlob.arrayBuffer()
@@ -24,7 +27,7 @@ export const useTimeKeeperClient = () => {
             setEndTime(endTime)
         }
         loadTimeKeeperVoice()
-    }, [])
+    }, [timeKeeperState.lang])
 
     useEffect(() => {
         if (!last5Min || !last3Min || !last1Min || !endTime) {
@@ -42,4 +45,6 @@ export const useTimeKeeperClient = () => {
         }
         timeKeeperState.clearEvent();
     }, [timeKeeperState.timeKeeperEvent]);
+
+
 }

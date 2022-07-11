@@ -23,7 +23,7 @@ RUN apt-get -yq update && apt-get -yqq install ssh git
 
 ADD dummy /
 RUN mkdir ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
-RUN --mount=type=ssh git clone  git@github.com:w-okada/zoom-meeting-sdk-slack.git app
+RUN --mount=type=ssh git clone git@github.com:w-okada/zoom-meeting-plus.git app
 
 WORKDIR /app
 RUN npm ci

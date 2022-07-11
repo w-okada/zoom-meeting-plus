@@ -491,3 +491,10 @@
 .app-info-dialog-record-url {
     width: 30%;
 }
+
+.time-keeper-language-label {
+    margin: 3px;
+}
+.time-keeper-language {
+    border: 2px solid #000;
+}
