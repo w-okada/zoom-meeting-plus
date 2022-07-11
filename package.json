@@ -4,6 +4,20 @@
     "description": "",
     "main": ".eslintrc.js",
     "scripts": {
+        "clean": "rimraf dist/*",
+        "copy:resources": "mkdir -p dist && cp -r public/* dist/",
+        "tsc": "tsc",
+        "tsc:watch": "tsc -w",
+        "webpack:build": "webpack --config webpack.config.js",
+        "webpack:start": "webpack serve --config webpack.config.js",
+        "build:resource": "node script/motionLoader.js",
+        "build": "run-s clean copy:resources build:resource tsc webpack:build ",
+        "build:docker": "date +%Y%m%d%H%M%S > dummy && DOCKER_BUILDKIT=1 docker build --ssh default  . -t wok/sshtest",
+        "start:backend": "node backend/server.js",
+        "start": "run-p copy:resources build:resource tsc:watch webpack:start start:backend",
+        "start:voicevox": "docker run --rm -it -p '127.0.0.1:50021:50021' voicevox/voicevox_engine:cpu-ubuntu20.04-latest",
+        "deploy:backend": "git push heroku master",
+        "heroku-postbuild": "echo \"nobuild in heroku(w.o.)\"",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
@@ -19,7 +33,7 @@
     "homepage": "https://github.com/w-okada/zoom-meeting-plus#readme",
     "dependencies": {
         "@dannadori/demo-base": "^1.0.13",
-        "@dannadori/mediapipe-avatar-js": "^1.0.22",
+        "@dannadori/mediapipe-avatar-js": "^1.0.26",
         "@fortawesome/fontawesome-free": "^6.1.1",
         "@fortawesome/fontawesome-svg-core": "^6.1.1",
         "@fortawesome/free-brands-svg-icons": "^6.1.1",

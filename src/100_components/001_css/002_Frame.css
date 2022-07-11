@@ -1,0 +1,264 @@
+/** (1) Header **/
+.header {
+    position: fixed;
+    height: var(--header-height);
+    width: 100%;
+    background: var(--company-color1);
+    box-shadow: 2px 2px 2px var(--global-shadow-color);
+    display: flex;
+    z-index: 100;
+    justify-content: space-between;
+
+    .sidebar-button-area {
+        flex-grow: 0;
+        height: 100%;
+        width: 100%;
+        display: flex;
+    }
+    .status-area {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-grow: 1;
+        height: 100%;
+        width: 100%;
+        font-size: 1.5rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    .menu-item-area {
+        flex-grow: 1;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        .group {
+            display: flex;
+            margin-right: 10px;
+            .spacer {
+                margin-left: 1rem;
+            }
+        }
+    }
+}
+
+/** (2) sidebar, right-sidebar **/
+/*** (2-1) initialize ***/
+.right-sidebar {
+    position: fixed;
+    top: var(--header-height);
+    height: calc(100vh - var(--header-height));
+    display: flex;
+    flex-direction: column;
+}
+.right-sidebar {
+    width: var(--right-sidebar-width);
+    background: var(--company-color3);
+    z-index: 50;
+}
+
+.right-sidebar:before {
+    content: "";
+    position: absolute;
+    height: calc(100vh - var(--header-height));
+    width: var(--right-sidebar-width);
+    background: var(--company-color2-alpha);
+    /* clip-path: ellipse(98% 30% at 91% 90%); */
+}
+.right-sidebar:after {
+    content: "";
+    position: absolute;
+    height: calc(100vh - var(--header-height));
+    width: var(--right-sidebar-width);
+    background: var(--company-color1-alpha);
+    clip-path: ellipse(158% 41% at 60% 30%);
+}
+
+/** (3) main area **/
+.main-area {
+    position: fixed;
+    top: var(--header-height);
+    height: calc(100vh - var(--header-height));
+    z-index: 0;
+    background: rgba(200, 200, 200, 0.5);
+}
+
+/*** (4) 開閉処理 ***/
+/*** (4-2) right-sidebar の開閉***/
+.state-control-checkbox:checked + .right-sidebar {
+    right: 0;
+    transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
+}
+.state-control-checkbox + .right-sidebar {
+    right: calc(-1 * var(--right-sidebar-width));
+    transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
+}
+
+/*** (4-3) sidebar partitionの開閉 ***/
+.state-control-checkbox:checked + .sidebar-partition {
+    flex-grow: 1;
+    transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
+}
+.state-control-checkbox + .sidebar-partition {
+    height: var(--header-height);
+    transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
+}
+
+/*** (4-4) main-areaの領域決定 ***/
+.open-right-sidebar-checkbox:checked + .main-area {
+    margin-right: 0rem;
+    left: 0rem;
+    right: var(--right-sidebar-width);
+    width: calc(100vw - var(--right-sidebar-width));
+    transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
+}
+.open-right-sidebar-checkbox + .main-area {
+    margin-right: 0rem;
+    left: 0rem;
+    right: 0rem;
+    width: calc(100vw);
+    transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
+}
+
+/*** (2-2) sidebarの中身 partition -> (header, content) ※(4)で開閉処理定義 ***/
+.sidebar-partition {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    color: rgba(255, 255, 255, 1);
+    background: rgba(0, 0, 0, 0);
+    z-index: 52;
+    overflow: hidden;
+
+    .sidebar-header {
+        position: static;
+        width: 100%;
+        height: var(--header-height);
+        font-size: 1.3rem;
+        background: rgba(10, 10, 10, 0.5);
+        display: flex;
+        justify-content: space-between;
+        .title {
+            padding-left: 1rem;
+            user-select: none;
+        }
+        .caret {
+            align-items: right;
+        }
+    }
+    .sidebar-content {
+        position: static;
+        width: 100%;
+        height: calc(100% - var(--header-height));
+        background: rgba(200, 0, 0, 1);
+    }
+}
+.sidebar-zoom-area {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.sidebar-zoom-area-input {
+    /* display: flex; */
+    flex-direction: row;
+    position: relative;
+    margin-left: 4px;
+    margin-top: 3px;
+    color: #000;
+
+    .sidebar-zoom-area-label {
+        user-select: none;
+        font-weight: 800;
+        width: 50%;
+    }
+    .sidebar-zoom-area-text,
+    .sidebar-zoom-area-password {
+        position: absolute;
+        right: 10px;
+        width: 50%;
+    }
+    .sidebar-zoom-area-button {
+        color: #fff;
+        background: #666;
+        user-select: none;
+        width: 40%;
+        position: absolute;
+        right: 10px;
+        margin: 4px;
+        text-align: center;
+        cursor: pointer;
+        &:hover {
+            background: #999;
+        }
+    }
+}
+
+.sidebar-avatar-area {
+    width: 100%;
+    /* height: 100%; */
+    display: flex;
+    flex-direction: column;
+}
+.sidebar-avatar-canvas-container {
+    width: 100%;
+    /* height: 100%; */
+    display: flex;
+    flex-direction: column;
+    object-fit: contain;
+}
+.sidebar-avatar-area-video {
+    width: 100%;
+    height: 50%;
+    display: flex;
+    flex-direction: column;
+    object-fit: contain;
+}
+.sidebar-zoom-area-toggle-switch {
+    position: absolute;
+    right: 10px;
+}
+
+.sidebar-avatar-area-buttons {
+    display: flex;
+    flex-direction: row;
+}
+.sidebar-zoom-area-motion-button {
+    user-select: none;
+    cursor: pointer;
+    border: 2px solid #000;
+    margin: 2px;
+    background: #555;
+    &:hover {
+        background: #999;
+    }
+}
+
+.sidebar-avatar-area-time-keeper-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 2px;
+}
+.sidebar-avatar-area-time-keeper-label {
+    padding-left: 2px;
+    padding-right: 2px;
+    margin: 2px;
+}
+.sidebar-avatar-area-time-keeper-buttons {
+    right: 2px;
+    display: flex;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+.sidebar-avatar-area-time-keeper-button {
+    user-select: none;
+    cursor: pointer;
+    border: 2px solid #000;
+    margin: 2px;
+    background: #555;
+    &:hover {
+        background: #999;
+    }
+}
