@@ -17,7 +17,7 @@ type DeviceManagerState = {
 export type DeviceManagerStateAndMethod = DeviceManagerState & {
     reloadDevices: () => Promise<void>
     setVideoElement: (elem: HTMLVideoElement) => Promise<void>
-    setVideoInputDeviceId: (val: string) => void
+    setVideoInputDeviceId: (val: string | null) => void
 }
 export const useDeviceManager = (props: UseDeviceManagerProps): DeviceManagerStateAndMethod => {
     const [lastUpdateTime, setLastUpdateTime] = useState(0)
@@ -44,26 +44,28 @@ export const useDeviceManager = (props: UseDeviceManagerProps): DeviceManagerSta
 
     // () set video
     const setVideoElement = async (elem: HTMLVideoElement) => {
-        if (videoInputDeviceId) {
-            const ms = await props.browserProxyState.getUserMedia({
-                video: {
-                    deviceId: videoInputDeviceId
-                }
-            })
-            elem.srcObject = ms
-        }
-        _setVideoElement(elem)
+        // if (videoInputDeviceId) {
+        //     const ms = await props.browserProxyState.getUserMedia({
+        //         video: {
+        //             deviceId: videoInputDeviceId
+        //         }
+        //     })
+        //     elem.srcObject = ms
+        // }
+        // _setVideoElement(elem)
     }
-    const setVideoInputDeviceId = async (val: string) => {
-        if (val.length > 0 && videoElement) {
-            const ms = await props.browserProxyState.getUserMedia({
-                video: {
-                    deviceId: val
-                }
-            })
-            videoElement.srcObject = ms
-        }
-        _setVideoInputDeviceId(val)
+    const setVideoInputDeviceId = async (val: string | null) => {
+        // if (val && videoElement) {
+        //     const ms = await props.browserProxyState.getUserMedia({
+        //         video: {
+        //             deviceId: val
+        //         }
+        //     })
+        //     videoElement.srcObject = ms
+        // } else if (videoElement) {
+        //     videoElement.srcObject = null
+        // }
+        // _setVideoInputDeviceId(val)
     }
 
     return {

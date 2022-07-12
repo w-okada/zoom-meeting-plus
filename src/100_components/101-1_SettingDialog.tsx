@@ -142,9 +142,13 @@ export const SettingDialog = () => {
                     id="setting-dialog-audio-input-select"
                     className="select"
                     required
-                    defaultValue={browserProxyState.audioInputDeviceId || ""}
+                    defaultValue={browserProxyState.audioInputDeviceId || "none"}
                     onChange={(e) => {
-                        browserProxyState.setAudioInputDeviceId(e.target.value);
+                        if (e.target.value == "none") {
+                            browserProxyState.setAudioInputDeviceId(null);
+                        } else {
+                            browserProxyState.setAudioInputDeviceId(e.target.value);
+                        }
                     }}
                 >
                     {audioInputOptions}
@@ -205,9 +209,13 @@ export const SettingDialog = () => {
                         id="setting-dialog-video-input-select"
                         className="select"
                         required
-                        defaultValue={deviceManagerState.videoInputDeviceId || ""}
+                        defaultValue={deviceManagerState.videoInputDeviceId || "none"}
                         onChange={(e) => {
-                            deviceManagerState.setVideoInputDeviceId(e.target.value);
+                            if (e.target.value == "none") {
+                                deviceManagerState.setVideoInputDeviceId(null);
+                            } else {
+                                deviceManagerState.setVideoInputDeviceId(e.target.value);
+                            }
                         }}
                     >
                         {videoInputOptions}

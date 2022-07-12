@@ -20,7 +20,7 @@ export type BrowserProxyStateAndMethod = BrowserProxyState & {
     getUserMedia: (constraints?: MediaStreamConstraints | undefined) => Promise<MediaStream>
     enumerateDevices: () => Promise<MediaDeviceInfo[]>
 
-    setAudioInputDeviceId: (deviceId: string) => void
+    setAudioInputDeviceId: (deviceId: string | null) => void
     setAudioInputEnabled: (val: boolean) => void
 
 }
@@ -186,7 +186,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
                         msForZoom.addTrack(x);
                     });
                 }
-                console.log(params, msForZoom.getTracks())
+                console.log("VIDEOTRACKS", params, msForZoom.getTracks())
             }
             return msForZoom;
         };
@@ -211,6 +211,8 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
             } catch (e) {
                 console.warn("disconnect failed. ignore this.", e)
             }
+
+            // srcNodeAudioInputRef.current = null
 
             //再生成
             if (audioInputDeviceId && audioInputEnabled) {

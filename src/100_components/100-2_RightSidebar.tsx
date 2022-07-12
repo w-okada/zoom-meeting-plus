@@ -10,7 +10,7 @@ import { useAppSetting } from "../003_provider/AppSettingProvider";
 let GlobalLoopID = 0;
 
 export const RightSidebar = () => {
-    const { frontendManagerState, threeState, timeKeeperState, zoomSDKState, avatarControlState, browserProxyState, resourceManagerState } = useAppState();
+    const { frontendManagerState, threeState, timeKeeperState, zoomSDKState, avatarControlState, browserProxyState, resourceManagerState, deviceManagerState } = useAppState();
     const { applicationSetting } = useAppSetting();
     const voiceSetting = applicationSetting!.voice_setting;
     const [voice, setVoice] = useState<Blob | null>(null);
@@ -352,6 +352,11 @@ export const RightSidebar = () => {
         }
     };
 
+    // (5) video initialize
+    useEffect(() => {
+        // const videoElem = document.getElementById("sidebar-avatar-area-video") as HTMLVideoElement;
+        // deviceManagerState.setVideoElement(videoElem);
+    }, []);
     const motionButtons = useMemo(() => {
         const b = motions.map((m) => {
             const button = (
@@ -467,6 +472,58 @@ export const RightSidebar = () => {
                                     speak
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                {sidebarAccordionAvatarVideoCheckbox.trigger}
+                <div className="sidebar-partition">
+                    <div className="sidebar-header">
+                        <div className="title"> Avatar Control</div>
+                        <div className="caret"> {accodionButtonForAvatarVideo}</div>
+                    </div>
+                    <div className="sidebar-content">
+                        <video id="sidebar-avatar-area-video" className="sidebar-avatar-area-video" controls autoPlay></video>
+                        <audio id="sidebar-generate-voice-player"></audio>
+
+                        <div className="sidebar-zoom-area-input">
+                            <div className="sidebar-zoom-area-toggle-switch">
+                                <input
+                                    id="use-upper-body-checkbox"
+                                    className="sidebar-zoom-area-toggle-input"
+                                    type="checkbox"
+                                    onChange={(ev) => {
+                                        useMotionCapture(ev);
+                                    }}
+                                />
+                            </div>
+                            <div className="sidebar-zoom-area-label">motion capture</div>
+                        </div>
+                        <div className="sidebar-zoom-area-input">
+                            <div className="sidebar-zoom-area-toggle-switch">
+                                <input
+                                    id="use-upper-body-checkbox"
+                                    className="sidebar-zoom-area-toggle-input"
+                                    type="checkbox"
+                                    onChange={(ev) => {
+                                        useUpperBodyChanged(ev);
+                                    }}
+                                />
+                            </div>
+                            <div className="sidebar-zoom-area-label">upper body(exp.)</div>
+                        </div>
+                        <div className="sidebar-zoom-area-input">
+                            <div className="sidebar-zoom-area-toggle-switch">
+                                <input
+                                    id="use-upper-body-checkbox"
+                                    className="sidebar-zoom-area-toggle-input"
+                                    type="checkbox"
+                                    onChange={(ev) => {
+                                        setRecordingStart(ev);
+                                    }}
+                                />
+                            </div>
+                            <div className="sidebar-zoom-area-label">record motion</div>
                         </div>
                     </div>
                 </div>

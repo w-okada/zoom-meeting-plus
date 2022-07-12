@@ -33,6 +33,11 @@ export class DeviceManager {
         this.realAudioInputDevices = mediaDeviceInfos.filter(x => { return x.kind === "audioinput" }).map(x => { return { label: x.label, deviceId: x.deviceId } })
         this.realVideoInputDevices = mediaDeviceInfos.filter(x => { return x.kind === "videoinput" }).map(x => { return { label: x.label, deviceId: x.deviceId } })
         this.realAudioOutputDevices = mediaDeviceInfos.filter(x => { return x.kind === "audiooutput" }).map(x => { return { label: x.label, deviceId: x.deviceId } })
+
+        this.realAudioInputDevices.push({ label: "none", deviceId: "none" })
+        this.realVideoInputDevices.push({ label: "none", deviceId: "none" })
+
+
         this.updateListener.update()
     }
 }
