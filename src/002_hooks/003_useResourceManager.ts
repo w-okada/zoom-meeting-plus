@@ -56,11 +56,8 @@ export const useResourceManager = (): ResourceManagerStateAndMethod => {
             tmpSpeakers[lang] = names
         }
         setSpeakers({ ...tmpSpeakers })
-        console.log("SPEAKER4:", tmpSpeakers)
-
     }
     useEffect(() => {
-        console.log("SPEAKER3:")
         refreshLanguageAndSpeakersInOpenTTS()
     }, [])
 

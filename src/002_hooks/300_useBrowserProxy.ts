@@ -14,6 +14,7 @@ export type BrowserProxyState = {
 }
 export type BrowserProxyStateAndMethod = BrowserProxyState & {
     playAudio: (audioData: ArrayBuffer, callback?: ((diff: number) => void) | undefined) => Promise<void>
+    getUserMedia: (constraints?: MediaStreamConstraints | undefined) => Promise<MediaStream>
 }
 export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateAndMethod => {
 
@@ -38,6 +39,32 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
     const getUserMedia = useMemo(() => {
         return navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
     }, []);
+    const enumerateDevices = useMemo(() => {
+        return navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices)
+    }, [])
+    navigator.mediaDevices.enumerateDevices = useMemo(() => {
+        return async () => {
+            const devices = await enumerateDevices()
+            console.log("devices:", devices)
+            const newDevices = devices.filter(x => { return x.kind === "audiooutput" })
+            newDevices.push({
+                deviceId: "default_audioinput",
+                groupId: "defaul_audioinput",
+                kind: "audioinput",
+                label: "avatar voice",
+                toJSON: () => { console.warn("not implemented.") }
+            })
+            newDevices.push({
+                deviceId: "default_videoinput",
+                groupId: "defaul_videoinput",
+                kind: "videoinput",
+                label: "avatar movie",
+                toJSON: () => { console.warn("not implemented.") }
+            })
+            return newDevices
+        }
+    }, [])
+
 
     const audioContext = useMemo(() => {
         if (!props.isJoined) {
@@ -69,6 +96,21 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
     const intervalTimer = useRef<NodeJS.Timer | null>(null)
     const srcNodeRef = useRef<MediaStreamAudioSourceNode | null>(null)
 
+    const dummyAudioDevice = useMemo(() => {
+        if (!audioContext) {
+            return null
+        }
+        const dummyOutputNode = audioContext.createMediaStreamDestination();
+
+        const gainNode = audioContext.createGain();
+        gainNode.gain.value = 0.0;
+        gainNode.connect(dummyOutputNode);
+        const oscillatorNode = audioContext.createOscillator();
+        oscillatorNode.frequency.value = 440;
+        oscillatorNode.connect(gainNode);
+        oscillatorNode.start();
+        return dummyOutputNode.stream;
+    }, [audioContext])
 
     useEffect(() => {
         navigator.mediaDevices.getUserMedia = async (params) => {
@@ -77,20 +119,30 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
                 console.warn("audio context is not initialized", audioContext, dstNodeForInternal, dstNodeForZoom)
                 return msForZoom // no trakcs
             }
+            if (!dummyAudioDevice) {
+                console.warn("dummy audio device is not initialized", dummyAudioDevice)
+                return msForZoom // no trakcs
+            }
 
-            console.log("getUserMedia", params)
-            const ms = await new Promise<MediaStream>((resolve) => {
-                setTimeout(() => {
-                    console.warn("Failed to get MediaStream!?")
-                    resolve(new MediaStream())
-                }, 1000 * 10)
-                getUserMedia(params).then(ms => {
-                    resolve(ms)
-                });
-            })
+            // console.log("getUserMedia", params)
+            // const ms = await new Promise<MediaStream>((resolve) => {
+            //     setTimeout(() => {
+            //         console.warn("Failed to get MediaStream!?")
+            //         resolve(new MediaStream())
+            //     }, 1000 * 10)
+            //     getUserMedia(params).then(ms => {
+            //         resolve(ms)
+            //     });
+            // })
 
-            //// Audio
-            if (ms.getAudioTracks().length > 0) {
+            // if (params?.audio) {
+            //     dummyAudioDevice.getAudioTracks().forEach((x) => {
+            //         msForZoom.addTrack(x);
+            //     });
+            // }
+
+            // Audio
+            if (dummyAudioDevice.getAudioTracks().length > 0) {
                 // Manupilate Input Source
                 //// Disconnect from Old Source
                 if (srcNodeRef.current) {
@@ -102,7 +154,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
                     }
                 }
                 //// New Source
-                srcNodeRef.current = audioContext.createMediaStreamSource(ms);
+                srcNodeRef.current = audioContext.createMediaStreamSource(dummyAudioDevice);
 
                 //// Connect src to dest
                 srcNodeRef.current.connect(dstNodeForInternal);
@@ -114,6 +166,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
                     msForZoom.addTrack(x);
                 });
             }
+
 
             // Video
             //// Avatar Canvas をZoomのストリームに。(内部表示用)
@@ -132,7 +185,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
             console.log(params, msForZoom.getTracks())
             return msForZoom;
         };
-    }, [props.threeState.renderer, audioContext, dstNodeForInternal, dstNodeForZoom]);
+    }, [props.threeState.renderer, audioContext, dstNodeForInternal, dstNodeForZoom, dummyAudioDevice]);
 
 
     const voiceDiffRef = useRef<number>(0)
@@ -177,6 +230,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
         audioContext,
         dstNodeForInternal,
         playAudio,
+        getUserMedia,
 
         voiceDiffRef,
     }
