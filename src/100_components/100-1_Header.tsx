@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
+import { useAppSetting } from "../003_provider/AppSettingProvider";
 import { useAppState } from "../003_provider/AppStateProvider";
-import { APP_TITLE } from "../const";
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./parts/002_HeaderButton";
 
 type HeaderButtons = {
@@ -11,6 +11,8 @@ type HeaderButtons = {
 };
 export const Header = () => {
     const { frontendManagerState } = useAppState();
+    const { applicationSetting } = useAppSetting();
+    const applicationTitle = applicationSetting!.app_title;
 
     const buttons: HeaderButtons = useMemo(() => {
         //// (1) Frame
@@ -68,7 +70,7 @@ export const Header = () => {
         const header = (
             <div className="header">
                 <div className="sidebar-button-area"></div>
-                <div className="status-area">{APP_TITLE}</div>
+                <div className="status-area">{applicationTitle}</div>
                 <div className="menu-item-area">
                     <div className="group">
                         {/* {buttons.commentButton} */}

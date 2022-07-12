@@ -2,9 +2,9 @@ import { VRM } from "@pixiv/three-vrm";
 import { useEffect } from "react";
 import * as THREE from "three";
 import { useAppState } from "../../003_provider/AppStateProvider";
-import { VRM_PATH } from "../../const";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { useAppSetting } from "../../003_provider/AppSettingProvider";
 
 
 const AVATAR_AREA_WIDTH = 1280;
@@ -12,6 +12,8 @@ const AVATAR_AREA_HEIGHT = 960;
 
 export const useInitializeThree = () => {
     const { threeState, avatarControlState } = useAppState()
+    const { applicationSetting } = useAppSetting()
+    const vrmSetting = applicationSetting!.vrm_path
 
     useEffect(() => {
         const initThree = async () => {
@@ -42,7 +44,7 @@ export const useInitializeThree = () => {
             const loader = new GLTFLoader();
 
             const p = new Promise<VRM>((resolve, _reject) => {
-                loader.load(VRM_PATH, async (gltf: GLTF) => {
+                loader.load(vrmSetting, async (gltf: GLTF) => {
                     const vrm = await VRM.from(gltf);
                     resolve(vrm);
                 });

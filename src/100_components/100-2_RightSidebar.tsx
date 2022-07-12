@@ -5,12 +5,14 @@ import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./parts/002_Hea
 import { PosePredictionEx } from "@dannadori/mediapipe-avatar-js/dist/MotionDetector";
 import { Side, TFace, THand, TPose } from "@dannadori/mediapipe-avatar-js/dist/kalido";
 import { useMotionPlayer } from "./hooks/useMotionPlayer";
-import { DEFAULT_VOICE_LANG, DEFAULT_VOICE_SPEAKER } from "../const";
+import { useAppSetting } from "../003_provider/AppSettingProvider";
 
 let GlobalLoopID = 0;
 
 export const RightSidebar = () => {
     const { frontendManagerState, threeState, timeKeeperState, zoomSDKState, avatarControlState, browserProxyState, resourceManagerState } = useAppState();
+    const { applicationSetting } = useAppSetting();
+    const voiceSetting = applicationSetting!.voice_setting;
     const [voice, setVoice] = useState<Blob | null>(null);
     const sidebarAccordionZoomCheckbox = useStateControlCheckbox("sidebar-accordion-zoom-checkbox");
     const sidebarAccordionAvatarCheckbox = useStateControlCheckbox("sidebar-accordion-avatar-checkbox");
@@ -123,8 +125,8 @@ export const RightSidebar = () => {
 
     ////// (3-3-1) Speaker Setting
     const [localLangSpeakerMap, setLocalLangSpeakerMap] = useState<{ [lang: string]: string[] }>({});
-    const [selectedLang, setSelectedLang] = useState<string>(DEFAULT_VOICE_LANG);
-    const [selectedSpeaker, setSelectedSpeaker] = useState<string>(DEFAULT_VOICE_SPEAKER);
+    const [selectedLang, setSelectedLang] = useState<string>(voiceSetting.default_voice_lang);
+    const [selectedSpeaker, setSelectedSpeaker] = useState<string>(voiceSetting.default_voice_speaker);
     useEffect(() => {
         const langSpeakerMap = { ...resourceManagerState.speakersInOpenTTS };
         if (!langSpeakerMap["ja"]) {
@@ -443,8 +445,8 @@ export const RightSidebar = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="sidebar-avatar-area-buttons">{motionButtons}</div>
-
+                            {/* <div className="sidebar-avatar-area-buttons">{motionButtons}</div>
+                             */}
                             <div className="sidebar-zoom-area-input">
                                 {langSelector}
                                 {speakerSelector}

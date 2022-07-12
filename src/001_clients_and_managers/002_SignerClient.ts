@@ -1,6 +1,6 @@
+import { useAppSetting } from "../003_provider/AppSettingProvider";
 
 export const GENERATE_SIGNATURE_LOCAL_URL = "/api/generateSignature";
-import { GENERATE_SIGNATURE_URL, USE_LOCAL_SIGN_SERVER } from "../const";
 
 export type GenerateSignatureRequest = {
     meetingNumber: string;
@@ -12,12 +12,12 @@ export type GenerateSignatureResult = {
     sdkKey: string; //	Required, 0 to specify participant, 1 to specify host.
 };
 
-export const generateSignature = async (params: GenerateSignatureRequest): Promise<GenerateSignatureResult> => {
+export const generateSignature = async (useLocalSignServer: boolean, signServerUrl: string, params: GenerateSignatureRequest): Promise<GenerateSignatureResult> => {
     let url
-    if (USE_LOCAL_SIGN_SERVER) {
+    if (useLocalSignServer) {
         url = GENERATE_SIGNATURE_LOCAL_URL;
     } else {
-        url = `${GENERATE_SIGNATURE_URL}`;
+        url = `${signServerUrl}`;
     }
 
     const requestBody = JSON.stringify(params);

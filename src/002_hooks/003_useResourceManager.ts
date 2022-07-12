@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
-import { fetchMotion, fetchVoice, generateVoiceWithOpenTTS, generateVoiceWithVoiceVox, getLanguageListFromOpenTTS, getSpeakerListFromOpenTTS, getSpeakerListFromVoiceVox } from "../001_clients_and_managers/009_ResourceLoader"
-import { DEFAULT_OPEN_TTS_ENABLED, DEFAULT_VOICE_VOX_ENABLED } from "../const";
+import * as ResourceLoader from "../001_clients_and_managers/009_ResourceLoader"
+import { useAppSetting } from "../003_provider/AppSettingProvider";
+
 
 export type ResourceManagerState = {
     speakersInOpenTTS: { [lang: string]: string[]; }
@@ -22,13 +23,15 @@ export type ResourceManagerStateAndMethod = ResourceManagerState & {
     refreshLanguageAndSpeakersInOpenTTS: () => Promise<void>
 }
 export const useResourceManager = (): ResourceManagerStateAndMethod => {
-    const [voiceVoxEnabled, setVoiceVoxEnabled] = useState<boolean>(DEFAULT_VOICE_VOX_ENABLED)
-    const [openTTSEnabled, setOpenTTSEnabled] = useState<boolean>(DEFAULT_OPEN_TTS_ENABLED)
+    const { applicationSetting } = useAppSetting()
+    const [voiceVoxEnabled, setVoiceVoxEnabled] = useState<boolean>(applicationSetting!.voice_setting.default_voice_vox_enabled)
+    const [openTTSEnabled, setOpenTTSEnabled] = useState<boolean>(applicationSetting!.voice_setting.default_open_tts_enabled)
     const [speakersInOpenTTS, setSpeakers] = useState<{ [lang: string]: string[] }>({})
     const [speakersInVoiceVox, setSpeakersInVoiceVox] = useState<{ [name: string]: number }>({})
+    const voiceSetting = applicationSetting!.voice_setting
 
     const refreshSpeakersInVoiceVox = async () => {
-        const speakers = await getSpeakerListFromVoiceVox()
+        const speakers = await ResourceLoader.getSpeakerListFromVoiceVox(voiceSetting.voice_vox_url)
         const tmpSpekaers: { [name: string]: number } = {}
         speakers.map((x: any) => {
             const name = x.name as string
@@ -45,10 +48,10 @@ export const useResourceManager = (): ResourceManagerStateAndMethod => {
     }, [])
 
     const refreshLanguageAndSpeakersInOpenTTS = async () => {
-        const languages = await getLanguageListFromOpenTTS() as string[]
+        const languages = await ResourceLoader.getLanguageListFromOpenTTS(voiceSetting.open_tts_url) as string[]
         const tmpSpeakers: { [lang: string]: string[] } = {}
         for (const lang of languages) {
-            const speakers = await getSpeakerListFromOpenTTS(lang)
+            const speakers = await ResourceLoader.getSpeakerListFromOpenTTS(voiceSetting.open_tts_url, lang)
             const names = Object.keys(speakers)
             tmpSpeakers[lang] = names
         }
@@ -61,6 +64,13 @@ export const useResourceManager = (): ResourceManagerStateAndMethod => {
         refreshLanguageAndSpeakersInOpenTTS()
     }, [])
 
+    const generateVoiceWithVoiceVox = (speakerId: number, text: string) => {
+        return ResourceLoader.generateVoiceWithVoiceVox(voiceSetting.voice_vox_url, speakerId, text)
+    }
+    const generateVoiceWithOpenTTS = (lang: string, speakerId: string, text: string) => {
+        return ResourceLoader.generateVoiceWithOpenTTS(voiceSetting.open_tts_url, lang, speakerId, text)
+    }
+
     return {
         speakersInOpenTTS,
         speakersInVoiceVox,
@@ -68,8 +78,8 @@ export const useResourceManager = (): ResourceManagerStateAndMethod => {
         openTTSEnabled,
         setVoiceVoxEnabled,
         setOpenTTSEnabled,
-        fetchMotion,
-        fetchVoice,
+        fetchMotion: ResourceLoader.fetchMotion,
+        fetchVoice: ResourceLoader.fetchVoice,
         generateVoiceWithVoiceVox,
         generateVoiceWithOpenTTS,
         refreshSpeakersInVoiceVox,

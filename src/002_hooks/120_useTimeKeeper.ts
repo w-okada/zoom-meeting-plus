@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react"
 
-
-
 export const TimeKeeperClientLangTypes = {
     ja: "ja",
     en: "en"
