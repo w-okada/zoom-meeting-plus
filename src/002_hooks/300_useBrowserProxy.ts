@@ -178,14 +178,12 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
 
             if (params?.video) {
                 //// Zoom用のストリーム作成
-                if (props.threeState.renderer) {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    const avatarMediaStream = props.threeState.renderer.domElement.captureStream() as MediaStream;
-                    avatarMediaStream.getVideoTracks().forEach((x) => {
-                        msForZoom.addTrack(x);
-                    });
-                }
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                const avatarMediaStream = props.threeState.renderer.domElement.captureStream() as MediaStream;
+                avatarMediaStream.getVideoTracks().forEach((x) => {
+                    msForZoom.addTrack(x);
+                });
                 console.log("VIDEOTRACKS", params, msForZoom.getTracks())
             }
             return msForZoom;

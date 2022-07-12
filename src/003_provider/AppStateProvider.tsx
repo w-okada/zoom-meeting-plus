@@ -42,7 +42,10 @@ export const AppStateProvider = ({ children }: Props) => {
     const backendManagerState = useBackendManager();
     const resourceManagerState = useResourceManager();
     const threeState = useThree();
-    const avatarControlState = useAvatarControl();
+    const avatarControlState = useAvatarControl({
+        vrm: threeState.character,
+        scene: threeState.scene,
+    });
     const timeKeeperState = useTimeKeeper();
     const zoomSDKState = useZoomSDK({ backendManagerState });
     const browserProxyState = useBrowserProxy({

@@ -240,6 +240,12 @@ export const RightSidebar = () => {
     const motionFramesForRec = useRef<any[]>([]);
     const motionFramesForPlay = useRef<any[]>([]);
     const currentTimeRef = useRef<number>(0);
+    //// (4-0) アバター格納用div登録
+    useEffect(() => {
+        const avatarDiv = document.getElementById("sidebar-avatar-area") as HTMLDivElement;
+        threeState.setParentDiv(avatarDiv);
+    }, []);
+
     //// (4-1) メインループ
     useEffect(() => {
         console.log("Renderer Initialized");
@@ -248,9 +254,15 @@ export const RightSidebar = () => {
         GlobalLoopID = LOOP_ID;
 
         const snap = document.createElement("canvas");
+        // const snap = document.getElementById("snap") as HTMLCanvasElement;
+        const snapCtx = snap.getContext("2d")!;
+        // snapCtx.setTransform(1, 0, 0, 1, 0, 0);
+
         const input = document.getElementById("sidebar-avatar-area-video") as HTMLVideoElement;
         snap.width = 300;
         snap.height = 300;
+        // snapCtx.translate(snap.width, 0);
+        // snapCtx.scale(-1, 1);
 
         /// アバターのポーズ更新の内部関数
         const updatePose = (_poses: PosePredictionEx | null, faceRig: TFace | null, leftHandRig: THand<Side> | null, rightHandRig: THand<Side> | null, poseRig: TPose | null) => {
@@ -267,15 +279,17 @@ export const RightSidebar = () => {
                     faceRig.mouth.shape.O = 0.3;
                 }
             }
-            avatarControlState.avatar.updatePose(faceRig, poseRig, leftHandRig, rightHandRig);
-
-            // avatar.updatePoseWithRaw(faceRig, poseRig, leftHandRig, rightHandRig, poses);
+            // avatarControlState.avatar.updatePose(faceRig, poseRig, leftHandRig, rightHandRig);
+            if (avatarControlState.isInitialized) {
+                avatarControlState.avatar.isTargetVisible = false;
+                avatarControlState.avatar.updatePoseWithRaw(faceRig, poseRig, leftHandRig, rightHandRig, _poses);
+            }
         };
 
         //// レンダリングループ
+
         const render = async () => {
             if (motionCaptureEnableRef.current) {
-                const snapCtx = snap.getContext("2d")!;
                 snapCtx.drawImage(input, 0, 0, snap.width, snap.height);
                 try {
                     if (snap.width > 0 && snap.height > 0) {
@@ -310,13 +324,13 @@ export const RightSidebar = () => {
                 }
             }
 
-            threeState.controls?.update();
-            threeState.charactrer?.springBoneManager?.springBoneGroupList.forEach((element) => {
+            threeState.controls.update();
+            threeState.character?.springBoneManager?.springBoneGroupList.forEach((element) => {
                 element.forEach((node) => {
                     node.update(0.01);
                 });
             });
-            threeState.charactrer?.springBoneManager?.lateUpdate(0.1);
+            threeState.character?.springBoneManager?.lateUpdate(0.1);
 
             threeState.renderer?.render(threeState.scene!, threeState.camera!);
             if (GlobalLoopID === LOOP_ID) {
@@ -329,7 +343,7 @@ export const RightSidebar = () => {
             console.log("CANCEL", renderRequestId);
             cancelAnimationFrame(renderRequestId);
         };
-    }, [threeState, motions]);
+    }, [threeState, motions, avatarControlState.isInitialized]);
 
     //// (4-2) メインループ
     const setRecordingStart = (ev: React.ChangeEvent<HTMLInputElement>) => {
@@ -354,8 +368,8 @@ export const RightSidebar = () => {
 
     // (5) video initialize
     useEffect(() => {
-        // const videoElem = document.getElementById("sidebar-avatar-area-video") as HTMLVideoElement;
-        // deviceManagerState.setVideoElement(videoElem);
+        const videoElem = document.getElementById("sidebar-avatar-area-video") as HTMLVideoElement;
+        deviceManagerState.setVideoElement(videoElem);
     }, []);
     const motionButtons = useMemo(() => {
         const b = motions.map((m) => {
@@ -484,6 +498,7 @@ export const RightSidebar = () => {
                     </div>
                     <div className="sidebar-content">
                         <video id="sidebar-avatar-area-video" className="sidebar-avatar-area-video" controls autoPlay></video>
+                        {/* <canvas id="snap"></canvas> */}
                         <audio id="sidebar-generate-voice-player"></audio>
 
                         <div className="sidebar-zoom-area-input">

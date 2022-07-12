@@ -18,6 +18,8 @@ export type DeviceManagerStateAndMethod = DeviceManagerState & {
     reloadDevices: () => Promise<void>
     setVideoElement: (elem: HTMLVideoElement) => Promise<void>
     setVideoInputDeviceId: (val: string | null) => void
+    setVideoFileURL: (val: string) => void
+
 }
 export const useDeviceManager = (props: UseDeviceManagerProps): DeviceManagerStateAndMethod => {
     const [lastUpdateTime, setLastUpdateTime] = useState(0)
@@ -44,28 +46,34 @@ export const useDeviceManager = (props: UseDeviceManagerProps): DeviceManagerSta
 
     // () set video
     const setVideoElement = async (elem: HTMLVideoElement) => {
-        // if (videoInputDeviceId) {
-        //     const ms = await props.browserProxyState.getUserMedia({
-        //         video: {
-        //             deviceId: videoInputDeviceId
-        //         }
-        //     })
-        //     elem.srcObject = ms
-        // }
-        // _setVideoElement(elem)
+        if (videoInputDeviceId) {
+            const ms = await props.browserProxyState.getUserMedia({
+                video: {
+                    deviceId: videoInputDeviceId
+                }
+            })
+            elem.srcObject = ms
+        }
+        _setVideoElement(elem)
     }
     const setVideoInputDeviceId = async (val: string | null) => {
-        // if (val && videoElement) {
-        //     const ms = await props.browserProxyState.getUserMedia({
-        //         video: {
-        //             deviceId: val
-        //         }
-        //     })
-        //     videoElement.srcObject = ms
-        // } else if (videoElement) {
-        //     videoElement.srcObject = null
-        // }
-        // _setVideoInputDeviceId(val)
+        if (val && videoElement) {
+            const ms = await props.browserProxyState.getUserMedia({
+                video: {
+                    deviceId: val
+                }
+            })
+            videoElement.srcObject = ms
+        } else if (videoElement) {
+            videoElement.srcObject = null
+        }
+        _setVideoInputDeviceId(val)
+    }
+
+    const setVideoFileURL = (url: string) => {
+        if (videoElement) {
+            videoElement.src = url
+        }
     }
 
     return {
@@ -78,5 +86,6 @@ export const useDeviceManager = (props: UseDeviceManagerProps): DeviceManagerSta
         reloadDevices,
         setVideoElement,
         setVideoInputDeviceId,
+        setVideoFileURL
     }
 }

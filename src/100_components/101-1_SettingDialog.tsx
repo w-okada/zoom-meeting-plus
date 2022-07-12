@@ -2,10 +2,13 @@ import React, { useState } from "react";
 import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppState } from "../003_provider/AppStateProvider";
-
+import { useFileInput } from "./hooks/useFileInput";
+import { VRM } from "@pixiv/three-vrm";
+import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 const TabItems = {
     audioInput: "audioInput",
     videoInput: "videoInput",
+    avatar: "avatar",
 } as const;
 type TabItems = typeof TabItems[keyof typeof TabItems];
 
@@ -72,10 +75,21 @@ const DialogTiles = (props: DialogTilesProps) => {
         };
         const videoInputIcon = <DialogTileIcon {...videoInputIconProps}></DialogTileIcon>;
 
+        const avatarIconProps: DialogTileIconProps = {
+            tabId: TabItems.avatar,
+            onChange: () => {
+                props.onChange(TabItems.avatar);
+            },
+            selected: props.currentTab == TabItems.avatar,
+            icon: <FontAwesomeIcon icon={["fas", "user-tie"]} size="3x" />,
+            label: "avatar",
+        };
+        const avatarIcon = <DialogTileIcon {...avatarIconProps}></DialogTileIcon>;
         const tiles = (
             <div className="dialog-radio-tile-group">
                 {audioInputIcon}
                 {videoInputIcon}
+                {avatarIcon}
             </div>
         );
         return tiles;
@@ -84,11 +98,12 @@ const DialogTiles = (props: DialogTilesProps) => {
 };
 
 export const SettingDialog = () => {
-    const { deviceManagerState, frontendManagerState, browserProxyState } = useAppState();
+    const { deviceManagerState, frontendManagerState, browserProxyState, threeState, avatarControlState } = useAppState();
     // (1) States
 
     const [tab, setTab] = useState<TabItems>("audioInput");
-
+    const [showFileInputForVideo, setShowFileInputForVideo] = useState<boolean>(false);
+    const fileInputState = useFileInput();
     const close = () => {
         frontendManagerState.stateControls.settingDialogCheckbox.updateState(false);
     };
@@ -111,6 +126,8 @@ export const SettingDialog = () => {
                 return "Audio input setting.";
             case "videoInput":
                 return "Video input setting.";
+            case "avatar":
+                return "Avatar setting.";
             default:
                 console.error("unknwon state", tab);
                 return "Unknown state.";
@@ -190,6 +207,11 @@ export const SettingDialog = () => {
                 </option>
             );
         });
+        options.push(
+            <option value="file" key="file">
+                file
+            </option>
+        );
         return options;
     }, [deviceManagerState.videoInputDevices]);
 
@@ -213,8 +235,13 @@ export const SettingDialog = () => {
                         onChange={(e) => {
                             if (e.target.value == "none") {
                                 deviceManagerState.setVideoInputDeviceId(null);
+                                setShowFileInputForVideo(false);
+                            } else if (e.target.value == "file") {
+                                deviceManagerState.setVideoInputDeviceId(null);
+                                setShowFileInputForVideo(true);
                             } else {
                                 deviceManagerState.setVideoInputDeviceId(e.target.value);
+                                setShowFileInputForVideo(false);
                             }
                         }}
                     >
@@ -225,6 +252,79 @@ export const SettingDialog = () => {
             </>
         );
     }, [deviceManagerState.videoInputDevices, tab]);
+    const fileInputButtonForVideo = useMemo(() => {
+        if (!showFileInputForVideo || tab != "videoInput") {
+            return <></>;
+        }
+        // const url = await fileInputState.click("audio.*|video.*");
+        return (
+            <div className={`dialog-input-controls`}>
+                <div
+                    className="setting-dialog-normal-button"
+                    onClick={() => {
+                        const loadFile = async () => {
+                            const url = await fileInputState.click("audio.*|video.*");
+                            deviceManagerState.setVideoFileURL(url);
+                        };
+                        loadFile();
+                    }}
+                >
+                    load file
+                </div>
+            </div>
+        );
+    }, [showFileInputForVideo]);
+
+    const fileButtonForAvatar = useMemo(() => {
+        if (tab != "avatar") {
+            return <></>;
+        }
+        return (
+            <div className={`dialog-input-controls`}>
+                <div className="setting-dialog-normal-button-container">
+                    <div className="setting-dialog-normal-button-label">Load Avatar VRM File</div>
+
+                    <div
+                        className="setting-dialog-normal-button"
+                        onClick={() => {
+                            const loadFile = async () => {
+                                const url = await fileInputState.click("");
+                                await threeState.loadAvatar(url);
+                            };
+                            loadFile();
+                        }}
+                    >
+                        load file
+                    </div>
+                </div>
+            </div>
+        );
+    }, [tab]);
+    const fileButtonForAvatarMotion = useMemo(() => {
+        if (tab != "avatar") {
+            return <></>;
+        }
+        return (
+            <div className={`dialog-input-controls`}>
+                <div className="setting-dialog-normal-button-container">
+                    <div className="setting-dialog-normal-button-label">Load Avatar Motion File</div>
+
+                    <div
+                        className="setting-dialog-normal-button"
+                        onClick={() => {
+                            const loadFile = async () => {
+                                const url = await fileInputState.click("");
+                                await threeState.loadAvatar(url);
+                            };
+                            loadFile();
+                        }}
+                    >
+                        load file
+                    </div>
+                </div>
+            </div>
+        );
+    }, [tab]);
 
     const buttons = useMemo(() => {
         return (
@@ -247,16 +347,19 @@ export const SettingDialog = () => {
                     <div className="dialog-description">{description}</div>
                     <form>
                         <div className="dialog-input-container">
-                            {audioInputSelectField}
-                            {audioConnect}
+                            {/* {audioInputSelectField}
+                            {audioConnect} */}
                             {videoInputSelectField}
+                            {fileInputButtonForVideo}
+                            {fileButtonForAvatar}
+                            {/* {fileButtonForAvatarMotion} */}
                             {buttons}
                         </div>
                     </form>
                 </div>
             </div>
         );
-    }, [tab, audioInputSelectField, videoInputSelectField]);
+    }, [tab, audioInputSelectField, videoInputSelectField, fileInputButtonForVideo, fileButtonForAvatar, fileButtonForAvatarMotion]);
 
     return form;
 };

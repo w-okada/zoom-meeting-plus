@@ -41,4 +41,4 @@ RUN npm ci --omit=dev
 
 EXPOSE 8888
 
-CMD [ "npm", "run", "start:backend" ]
+CMD [ "node", "backend/server.js" ]

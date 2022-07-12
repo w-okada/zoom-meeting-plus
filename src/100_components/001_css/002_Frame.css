@@ -231,6 +231,8 @@
     display: flex;
     flex-direction: column;
     object-fit: contain;
+
+    transform: scale(-1, 1);
 }
 .sidebar-zoom-area-toggle-switch {
     position: absolute;

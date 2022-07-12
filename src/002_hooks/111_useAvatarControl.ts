@@ -1,19 +1,23 @@
 import { MediapipeAvator } from "@dannadori/mediapipe-avatar-js";
 import { MotionDetector } from "@dannadori/mediapipe-avatar-js";
 import { VRM } from "@pixiv/three-vrm";
-import { useMemo } from "react"
-
+import { useEffect, useMemo, useState } from "react"
+export type UseAvatarControlProps = {
+    vrm: VRM | null,
+    scene: THREE.Scene
+}
 export type AvatarControlState = {
     detector: MotionDetector
     avatar: MediapipeAvator
+    isInitialized: boolean
 }
 export type AvatarControlStateAndMethod = AvatarControlState & {
-    setAvatarVRM: (vrm: VRM, scene: THREE.Scene) => void
     useBodyRig: (val: boolean) => void
 }
 
 
-export const useAvatarControl = (): AvatarControlStateAndMethod => {
+export const useAvatarControl = (props: UseAvatarControlProps): AvatarControlStateAndMethod => {
+    const [isInitialized, setIsInitialzed] = useState<boolean>(false)
     const detector = useMemo(() => {
         const d = new MotionDetector();
         d.setEnableFullbodyCapture(false);
@@ -26,12 +30,17 @@ export const useAvatarControl = (): AvatarControlStateAndMethod => {
         return avatar
     }, [])
 
-    const setAvatarVRM = (vrm: VRM, scene: THREE.Scene) => {
-        avatar.initialize(vrm, scene);
+    useEffect(() => {
+        if (!props.vrm) {
+            return
+        }
+        avatar.initialize(props.vrm, props.scene);
         // avatar.enableHands = false;
         // avatar.enableLegs = false;
         avatar.enableUpperBody = true;
-    };
+        setIsInitialzed(true)
+    }, [props.vrm, props.scene])
+
 
     const useBodyRig = (val: boolean) => {
         detector.setEnableFullbodyCapture(val);
@@ -40,7 +49,7 @@ export const useAvatarControl = (): AvatarControlStateAndMethod => {
     const retVal: AvatarControlStateAndMethod = {
         detector,
         avatar,
-        setAvatarVRM,
+        isInitialized,
         useBodyRig
 
     }

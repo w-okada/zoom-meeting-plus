@@ -498,3 +498,24 @@
 .time-keeper-language {
     border: 2px solid #000;
 }
+
+.setting-dialog-normal-button-container {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+.setting-dialog-normal-button-label {
+    margin-left: 10%;
+}
+.setting-dialog-normal-button {
+    margin-right: 10%;
+    border: 2px solid #00f;
+    user-select: none;
+    cursor: pointer;
+    padding: 5px;
+    background: #fff;
+    border-radius: 5px;
+    &:hover {
+        background: #ddf;
+    }
+}
