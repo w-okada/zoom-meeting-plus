@@ -275,6 +275,7 @@ export const SettingDialog = () => {
         );
     }, [showFileInputForVideo]);
 
+    // () Avatar Input
     const fileButtonForAvatar = useMemo(() => {
         if (tab != "avatar") {
             return <></>;

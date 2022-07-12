@@ -19,7 +19,7 @@ export const useFileInput = () => {
                 console.log("file select", e.target.files[0].type);
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
-                if (regex != "" || !e.target.files[0].type.match(regex)) {
+                if (regex != "" && !e.target.files[0].type.match(regex)) {
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     //@ts-ignore
                     reject(`not target file type ${e.target.files[0].type}`);

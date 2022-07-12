@@ -40,5 +40,5 @@ WORKDIR /app
 RUN npm ci --omit=dev
 
 EXPOSE 8888
-
+ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD [ "node", "backend/server.js" ]
