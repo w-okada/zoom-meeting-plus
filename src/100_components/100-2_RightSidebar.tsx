@@ -527,7 +527,7 @@ export const RightSidebar = () => {
                             </div>
                             <div className="sidebar-zoom-area-label">upper body(exp.)</div>
                         </div>
-                        <div className="sidebar-zoom-area-input">
+                        {/* <div className="sidebar-zoom-area-input">
                             <div className="sidebar-zoom-area-toggle-switch">
                                 <input
                                     id="use-upper-body-checkbox"
@@ -539,7 +539,7 @@ export const RightSidebar = () => {
                                 />
                             </div>
                             <div className="sidebar-zoom-area-label">record motion</div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>
