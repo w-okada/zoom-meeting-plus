@@ -4,8 +4,8 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require("webpack");
 
 module.exports = {
-    mode: "development",
-    // mode: "production",
+    // mode: "development",
+    mode: "production",
     entry: path.resolve(__dirname, "src/index.tsx"),
     output: {
         path: path.resolve(__dirname, "dist"),
