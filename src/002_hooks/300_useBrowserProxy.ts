@@ -45,7 +45,6 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
     navigator.mediaDevices.enumerateDevices = useMemo(() => {
         return async () => {
             const devices = await enumerateDevices()
-            console.log("devices:", devices)
             const newDevices = devices.filter(x => { return x.kind === "audiooutput" })
             newDevices.push({
                 deviceId: "default_audioinput",
@@ -61,6 +60,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
                 label: "avatar movie",
                 toJSON: () => { console.warn("not implemented.") }
             })
+            console.log("devices:", devices)
             return newDevices
         }
     }, [])
@@ -73,19 +73,22 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
         return new AudioContext()
     }, [props.isJoined])
 
-    const dstNodeForZoom = useMemo(() => {
-        if (!audioContext) {
-            return null
-        }
-        return audioContext.createMediaStreamDestination();
-    }, [audioContext])
+    // const dstNodeForZoom = useMemo(() => {
+    //     if (!audioContext) {
+    //         return null
+    //     }
+    //     return audioContext.createMediaStreamDestination();
+    // }, [audioContext])
+    // const dstNodeForInternal = useMemo(() => {
+    //     if (!audioContext) {
+    //         return null
+    //     }
+    //     return audioContext.createMediaStreamDestination();
+    // }, [audioContext])
 
-    const dstNodeForInternal = useMemo(() => {
-        if (!audioContext) {
-            return null
-        }
-        return audioContext.createMediaStreamDestination();
-    }, [audioContext])
+    // Device選択ごとに毎回作り直す必要がある。おそらくZoomのなかでtrackがcloseされており、Nodeが持つMが無効化されるから？
+    const dstNodeForZoomRef = useRef<MediaStreamAudioDestinationNode | null>(null)
+    const dstNodeForInternalRef = useRef<MediaStreamAudioDestinationNode | null>(null)
 
     const analyzerNode = useMemo(() => {
         if (!audioContext) {
@@ -112,11 +115,13 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
         return dummyOutputNode.stream;
     }, [audioContext])
 
+
+
     useEffect(() => {
         navigator.mediaDevices.getUserMedia = async (params) => {
             const msForZoom = new MediaStream();
-            if (!audioContext || !dstNodeForInternal || !dstNodeForZoom) {
-                console.warn("audio context is not initialized", audioContext, dstNodeForInternal, dstNodeForZoom)
+            if (!audioContext) {
+                console.warn("audio context is not initialized", audioContext)
                 return msForZoom // no trakcs
             }
             if (!dummyAudioDevice) {
@@ -143,28 +148,44 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
 
             // Audio
             if (dummyAudioDevice.getAudioTracks().length > 0) {
+                // console.log("AUDIO TRACK!!")
                 // Manupilate Input Source
                 //// Disconnect from Old Source
                 if (srcNodeRef.current) {
-                    if (dstNodeForInternal) {
-                        srcNodeRef.current.disconnect(dstNodeForInternal);
+                    // if (dstNodeForInternal) {
+                    //     srcNodeRef.current.disconnect(dstNodeForInternal);
+                    // }
+                    // if (dstNodeForZoom) {
+                    //     srcNodeRef.current.disconnect(dstNodeForZoom);
+                    // }
+                    if (dstNodeForZoomRef.current) {
+                        srcNodeRef.current.disconnect(dstNodeForZoomRef.current);
                     }
-                    if (dstNodeForZoom) {
-                        srcNodeRef.current.disconnect(dstNodeForZoom);
+                    if (dstNodeForInternalRef.current) {
+                        srcNodeRef.current.disconnect(dstNodeForInternalRef.current);
                     }
                 }
                 //// New Source
                 srcNodeRef.current = audioContext.createMediaStreamSource(dummyAudioDevice);
+                dstNodeForZoomRef.current = audioContext.createMediaStreamDestination();
+                dstNodeForInternalRef.current = audioContext.createMediaStreamDestination();
 
                 //// Connect src to dest
-                srcNodeRef.current.connect(dstNodeForInternal);
-                srcNodeRef.current.connect(dstNodeForZoom);
+                // srcNodeRef.current.connect(dstNodeForInternal);
+                // srcNodeRef.current.connect(dstNodeForZoom);
+                srcNodeRef.current.connect(dstNodeForZoomRef.current);
+                srcNodeRef.current.connect(dstNodeForInternalRef.current);
 
                 //// Zoom用のノードのストリームをZoomのストリームに。
-                dstNodeForZoom.stream.getAudioTracks().forEach((x) => {
+                // dstNodeForZoom.stream.getAudioTracks().forEach((x) => {
+                //     console.log("AudioTRACK", x);
+                //     msForZoom.addTrack(x);
+                // });
+                dstNodeForZoomRef.current.stream.getAudioTracks().forEach((x) => {
                     // console.log("AudioTRACK", x);
                     msForZoom.addTrack(x);
                 });
+
             }
 
 
@@ -185,14 +206,14 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
             console.log(params, msForZoom.getTracks())
             return msForZoom;
         };
-    }, [props.threeState.renderer, audioContext, dstNodeForInternal, dstNodeForZoom, dummyAudioDevice]);
+    }, [props.threeState.renderer, audioContext, dummyAudioDevice]);
 
 
     const voiceDiffRef = useRef<number>(0)
     const playAudio = async (audioData: ArrayBuffer) => {
         // decode処理
-        if (!audioContext || !dstNodeForZoom || !analyzerNode) {
-            console.warn("audio context is not initialized (playAudio) ", audioContext, dstNodeForZoom, analyzerNode)
+        if (!audioContext || !analyzerNode || !dstNodeForZoomRef.current) {
+            console.warn("audio context is not initialized (playAudio) ", audioContext, analyzerNode, dstNodeForZoomRef.current)
             return;
         }
 
@@ -220,7 +241,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
             }
         };
         srcBufferNode.connect(analyzerNode);
-        srcBufferNode.connect(dstNodeForZoom);
+        srcBufferNode.connect(dstNodeForZoomRef.current);
         srcBufferNode.start();
     };
 
@@ -228,7 +249,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
     const retVal: BrowserProxyStateAndMethod = {
         referableAudios,
         audioContext,
-        dstNodeForInternal,
+        dstNodeForInternal: dstNodeForInternalRef.current,
         playAudio,
         getUserMedia,
 
