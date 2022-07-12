@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { ReactNode } from "react";
-import { DeviceManagerStateAndMethod, useDeviceManager } from "../002_hooks/001_useDeviceManager";
+import { DeviceManagerStateAndMethod, useDeviceManager } from "../002_hooks/301_useDeviceManager";
 import { BackendManagerStateAndMethod, useBackendManager } from "../002_hooks/002_useBackendManager";
 import { FrontendManagerStateAndMethod, useFrontendManager } from "../002_hooks/100_useFrontendManager";
 import { ThreeStateAndMethods, useThree } from "../002_hooks/110_useThree";
@@ -9,13 +9,12 @@ import { ResourceManagerStateAndMethod, useResourceManager } from "../002_hooks/
 import { AvatarControlStateAndMethod, useAvatarControl } from "../002_hooks/111_useAvatarControl";
 import { useZoomSDK, ZoomSDKStateAndMethod } from "../002_hooks/200_useZoomSDK";
 import { BrowserProxyStateAndMethod, useBrowserProxy } from "../002_hooks/300_useBrowserProxy";
-import { useVosk, VoskStateAndMethod } from "../002_hooks/301_useVosk";
+import { useVosk, VoskStateAndMethod } from "../002_hooks/302_useVosk";
 type Props = {
     children: ReactNode;
 };
 
 interface AppStateValue {
-    deviceManagerState: DeviceManagerStateAndMethod;
     backendManagerState: BackendManagerStateAndMethod;
     resourceManagerState: ResourceManagerStateAndMethod;
     threeState: ThreeStateAndMethods;
@@ -24,6 +23,7 @@ interface AppStateValue {
 
     zoomSDKState: ZoomSDKStateAndMethod;
     browserProxyState: BrowserProxyStateAndMethod;
+    deviceManagerState: DeviceManagerStateAndMethod;
     voskState: VoskStateAndMethod;
 
     frontendManagerState: FrontendManagerStateAndMethod;
@@ -39,7 +39,6 @@ export const useAppState = (): AppStateValue => {
 };
 
 export const AppStateProvider = ({ children }: Props) => {
-    const deviceManagerState = useDeviceManager();
     const backendManagerState = useBackendManager();
     const resourceManagerState = useResourceManager();
     const threeState = useThree();
@@ -50,6 +49,7 @@ export const AppStateProvider = ({ children }: Props) => {
         isJoined: zoomSDKState.isJoined,
         threeState,
     });
+    const deviceManagerState = useDeviceManager({ browserProxyState });
     const voskState = useVosk({
         audioContext: browserProxyState.audioContext,
         dstNodeForInternal: browserProxyState.dstNodeForInternal,

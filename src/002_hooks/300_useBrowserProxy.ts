@@ -11,10 +11,18 @@ export type BrowserProxyState = {
     audioContext: AudioContext | null
     dstNodeForInternal: MediaStreamAudioDestinationNode | null
     voiceDiffRef: React.MutableRefObject<number>
+
+    audioInputDeviceId: string | null
+    audioInputEnabled: boolean
 }
 export type BrowserProxyStateAndMethod = BrowserProxyState & {
     playAudio: (audioData: ArrayBuffer, callback?: ((diff: number) => void) | undefined) => Promise<void>
     getUserMedia: (constraints?: MediaStreamConstraints | undefined) => Promise<MediaStream>
+    enumerateDevices: () => Promise<MediaDeviceInfo[]>
+
+    setAudioInputDeviceId: (deviceId: string) => void
+    setAudioInputEnabled: (val: boolean) => void
+
 }
 export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateAndMethod => {
 
@@ -30,6 +38,9 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
             referableAudioAdded(this);
         }
     }
+
+    const [audioInputDeviceId, setAudioInputDeviceId] = useState<string | null>(null)
+    const [audioInputEnabled, setAudioInputEnabled] = useState<boolean>(false)
 
     useEffect(() => {
         global.Audio = ReferableAudio;
@@ -66,6 +77,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
     }, [])
 
 
+    // Audio Context
     const audioContext = useMemo(() => {
         if (!props.isJoined) {
             return null
@@ -73,33 +85,8 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
         return new AudioContext()
     }, [props.isJoined])
 
-    // const dstNodeForZoom = useMemo(() => {
-    //     if (!audioContext) {
-    //         return null
-    //     }
-    //     return audioContext.createMediaStreamDestination();
-    // }, [audioContext])
-    // const dstNodeForInternal = useMemo(() => {
-    //     if (!audioContext) {
-    //         return null
-    //     }
-    //     return audioContext.createMediaStreamDestination();
-    // }, [audioContext])
-
-    // Device選択ごとに毎回作り直す必要がある。おそらくZoomのなかでtrackがcloseされており、Nodeが持つMが無効化されるから？
-    const dstNodeForZoomRef = useRef<MediaStreamAudioDestinationNode | null>(null)
-    const dstNodeForInternalRef = useRef<MediaStreamAudioDestinationNode | null>(null)
-
-    const analyzerNode = useMemo(() => {
-        if (!audioContext) {
-            return null
-        }
-        return audioContext.createAnalyser()
-    }, [audioContext])
-    const intervalTimer = useRef<NodeJS.Timer | null>(null)
-    const srcNodeRef = useRef<MediaStreamAudioSourceNode | null>(null)
-
-    const dummyAudioDevice = useMemo(() => {
+    // Dummy Audio Input
+    const dummyMediaStream = useMemo(() => {
         if (!audioContext) {
             return null
         }
@@ -115,114 +102,186 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
         return dummyOutputNode.stream;
     }, [audioContext])
 
+    // source node
+    // dummy, audio, zoom-incomming, avatarの4つ
+    //// (1) dummy はimmutableで作成
+    const srcNodeDummyInput = useMemo(() => {
+        if (!dummyMediaStream || !audioContext) {
+            return null
+        }
+        return audioContext.createMediaStreamSource(dummyMediaStream);
+    }, [dummyMediaStream])
+
+    //// (2) audioは可変
+    const srcNodeAudioInputRef = useRef<MediaStreamAudioSourceNode | null>(null)
+    //// (3) zoom-incomingは可変
+    const srcNodeZoomIncommintRef = useRef<MediaStreamAudioSourceNode | null>(null)
+    //// (4) avatarはオンデマンド。管理しない。
+
+    // destination node
+    // zoom-outgoing, internal, analyzer
+    //// (1) zoom-out はデバイス選択時にTrackが閉じられるので可変
+    const dstNodeForZoomRef = useRef<MediaStreamAudioDestinationNode | null>(null)
+    //// (2) internalは不変。
+    const dstNodeForInternal = useMemo(() => {
+        if (!audioContext) {
+            return null
+        }
+        return audioContext.createMediaStreamDestination();
+    }, [audioContext])
+    //// (3) Analizer Nodeは不変。
+    const analyzerNode = useMemo(() => {
+        if (!audioContext) {
+            return null
+        }
+        return audioContext.createAnalyser()
+    }, [audioContext])
 
 
+    const intervalTimerAvatar = useRef<NodeJS.Timer | null>(null)
+    const intervalTimerAudioInput = useRef<NodeJS.Timer | null>(null)
+
+    // getUserMedia の上書き
+    // getUserMedia を呼ばれるときには、Zoomに渡していたMediaStreamと、
+    // 取得元のDestNodeは壊されるようなので、DestNodeを再生成する必要がある。
+    // 関連して周囲のNode Chainも再構成
     useEffect(() => {
         navigator.mediaDevices.getUserMedia = async (params) => {
             const msForZoom = new MediaStream();
-            if (!audioContext) {
-                console.warn("audio context is not initialized", audioContext)
-                return msForZoom // no trakcs
-            }
-            if (!dummyAudioDevice) {
-                console.warn("dummy audio device is not initialized", dummyAudioDevice)
-                return msForZoom // no trakcs
-            }
-
-            // console.log("getUserMedia", params)
-            // const ms = await new Promise<MediaStream>((resolve) => {
-            //     setTimeout(() => {
-            //         console.warn("Failed to get MediaStream!?")
-            //         resolve(new MediaStream())
-            //     }, 1000 * 10)
-            //     getUserMedia(params).then(ms => {
-            //         resolve(ms)
-            //     });
-            // })
-
-            // if (params?.audio) {
-            //     dummyAudioDevice.getAudioTracks().forEach((x) => {
-            //         msForZoom.addTrack(x);
-            //     });
-            // }
-
-            // Audio
-            if (dummyAudioDevice.getAudioTracks().length > 0) {
-                // console.log("AUDIO TRACK!!")
-                // Manupilate Input Source
-                //// Disconnect from Old Source
-                if (srcNodeRef.current) {
-                    // if (dstNodeForInternal) {
-                    //     srcNodeRef.current.disconnect(dstNodeForInternal);
-                    // }
-                    // if (dstNodeForZoom) {
-                    //     srcNodeRef.current.disconnect(dstNodeForZoom);
-                    // }
-                    if (dstNodeForZoomRef.current) {
-                        srcNodeRef.current.disconnect(dstNodeForZoomRef.current);
-                    }
-                    if (dstNodeForInternalRef.current) {
-                        srcNodeRef.current.disconnect(dstNodeForInternalRef.current);
-                    }
+            if (params?.audio) {
+                if (!audioContext) {
+                    console.warn("audio context is not initialized", audioContext)
+                    return msForZoom // no trakcs
                 }
-                //// New Source
-                srcNodeRef.current = audioContext.createMediaStreamSource(dummyAudioDevice);
+                if (!srcNodeDummyInput) {
+                    console.warn("dummy audio device is not initialized", srcNodeDummyInput)
+                    return msForZoom // no trakcs
+                }
+
+                // zoom-outgoingから切断
+                if (dstNodeForZoomRef.current) {
+                    srcNodeDummyInput.disconnect(dstNodeForZoomRef.current)
+                    srcNodeAudioInputRef.current?.disconnect(dstNodeForZoomRef.current)
+                }
+
+                // zoom-outgoing再生成
                 dstNodeForZoomRef.current = audioContext.createMediaStreamDestination();
-                dstNodeForInternalRef.current = audioContext.createMediaStreamDestination();
+                // zoom-outgoingへ再接続
+                srcNodeDummyInput.connect(dstNodeForZoomRef.current)
+                srcNodeAudioInputRef.current?.connect(dstNodeForZoomRef.current)
 
-                //// Connect src to dest
-                // srcNodeRef.current.connect(dstNodeForInternal);
-                // srcNodeRef.current.connect(dstNodeForZoom);
-                srcNodeRef.current.connect(dstNodeForZoomRef.current);
-                srcNodeRef.current.connect(dstNodeForInternalRef.current);
-
-                //// Zoom用のノードのストリームをZoomのストリームに。
-                // dstNodeForZoom.stream.getAudioTracks().forEach((x) => {
-                //     console.log("AudioTRACK", x);
-                //     msForZoom.addTrack(x);
-                // });
+                // AudioのMediaTrackを追加
                 dstNodeForZoomRef.current.stream.getAudioTracks().forEach((x) => {
-                    // console.log("AudioTRACK", x);
-                    msForZoom.addTrack(x);
-                });
-
-            }
-
-
-            // Video
-            //// Avatar Canvas をZoomのストリームに。(内部表示用)
-            // const videoInput = document.getElementById("sidebar-avatar-area-video") as HTMLVideoElement;
-            // videoInput.srcObject = ms;
-
-            //// Zoom用のストリーム作成
-            if (props.threeState.renderer) {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                const avatarMediaStream = props.threeState.renderer.domElement.captureStream() as MediaStream;
-                avatarMediaStream.getVideoTracks().forEach((x) => {
                     msForZoom.addTrack(x);
                 });
             }
-            console.log(params, msForZoom.getTracks())
+
+            if (params?.video) {
+                //// Zoom用のストリーム作成
+                if (props.threeState.renderer) {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    const avatarMediaStream = props.threeState.renderer.domElement.captureStream() as MediaStream;
+                    avatarMediaStream.getVideoTracks().forEach((x) => {
+                        msForZoom.addTrack(x);
+                    });
+                }
+                console.log(params, msForZoom.getTracks())
+            }
             return msForZoom;
         };
-    }, [props.threeState.renderer, audioContext, dummyAudioDevice]);
+    }, [props.threeState.renderer, audioContext, srcNodeDummyInput]);
+
+    // Audio Inputが更新されたとき
+    useEffect(() => {
+        const reconstructAudioInputNode = async () => {
+            if (!audioContext || !dstNodeForZoomRef.current || !dstNodeForInternal || !analyzerNode) {
+                console.warn("audio node is not initialized")
+                return
+            }
+            // 切断処理
+            try {
+                if (intervalTimerAudioInput.current) {
+                    clearInterval(intervalTimerAudioInput.current)
+                    intervalTimerAudioInput.current = null
+                }
+                srcNodeAudioInputRef.current?.disconnect(dstNodeForZoomRef.current)
+                srcNodeAudioInputRef.current?.disconnect(dstNodeForInternal)
+                srcNodeAudioInputRef.current?.disconnect(analyzerNode)
+            } catch (e) {
+                console.warn("disconnect failed. ignore this.", e)
+            }
+
+            //再生成
+            if (audioInputDeviceId && audioInputEnabled) {
+                const ms = await getUserMedia({ audio: { deviceId: audioInputDeviceId } })
+                srcNodeAudioInputRef.current = audioContext.createMediaStreamSource(ms)
+                srcNodeAudioInputRef.current.connect(dstNodeForZoomRef.current)
+                srcNodeAudioInputRef.current.connect(dstNodeForInternal)
+                srcNodeAudioInputRef.current.connect(analyzerNode)
 
 
+
+                if (intervalTimerAudioInput.current) {
+                    clearInterval(intervalTimerAudioInput.current)
+                    intervalTimerAudioInput.current = null
+                }
+                const times = new Uint8Array(analyzerNode.fftSize);
+                intervalTimerAudioInput.current = setInterval(() => {
+                    analyzerNode.getByteTimeDomainData(times);
+                    const max = Math.max(...times);
+                    const min = Math.min(...times);
+                    voiceDiffRef.current = max - min
+                    console.log("ANALYZER:", max, min, max - min);
+                }, 50);
+            }
+        }
+        reconstructAudioInputNode()
+    }, [audioInputDeviceId, audioInputEnabled])
+
+    // Referable Audio が更新されたとき
+    useEffect(() => {
+        if (!audioContext || !dstNodeForInternal) {
+            return
+        }
+        // 切断処理
+        srcNodeZoomIncommintRef.current?.disconnect(dstNodeForInternal)
+        // 再生成
+        const zoomIncomingMS = new MediaStream()
+        referableAudios.forEach(x => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            const ms = x.captureStream() as MediaStream
+            ms.getAudioTracks().forEach(track => {
+                zoomIncomingMS.addTrack(track)
+            })
+        })
+        if (zoomIncomingMS.getAudioTracks().length > 0) {
+            srcNodeZoomIncommintRef.current = audioContext.createMediaStreamSource(zoomIncomingMS)
+            console.log("Generate Zoom Incoming.")
+
+        } else {
+            console.warn("zoom incoming audio is not initialized. ignore this.")
+        }
+
+    }, [referableAudios])
+
+
+    // Avatar の発話    
     const voiceDiffRef = useRef<number>(0)
     const playAudio = async (audioData: ArrayBuffer) => {
         // decode処理
-        if (!audioContext || !analyzerNode || !dstNodeForZoomRef.current) {
+        if (!audioContext || !dstNodeForZoomRef.current || !dstNodeForInternal || !analyzerNode) {
             console.warn("audio context is not initialized (playAudio) ", audioContext, analyzerNode, dstNodeForZoomRef.current)
             return;
         }
 
-        if (intervalTimer.current) {
-            clearInterval(intervalTimer.current)
-            intervalTimer.current = null
+        if (intervalTimerAvatar.current) {
+            clearInterval(intervalTimerAvatar.current)
+            intervalTimerAvatar.current = null
         }
         const times = new Uint8Array(analyzerNode.fftSize);
-        intervalTimer.current = setInterval(() => {
+        intervalTimerAvatar.current = setInterval(() => {
             analyzerNode.getByteTimeDomainData(times);
             const max = Math.max(...times);
             const min = Math.min(...times);
@@ -230,18 +289,21 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
             console.log("ANALYZER:", max, min, max - min);
         }, 50);
 
+        // Source Node生成
         const srcBufferNode = audioContext.createBufferSource();
         const audioBuffer = await audioContext.decodeAudioData(audioData);
         srcBufferNode.buffer = audioBuffer;
         srcBufferNode.onended = () => {
             console.log("Buffer_end");
-            if (intervalTimer.current) {
-                clearInterval(intervalTimer.current)
-                intervalTimer.current = null
+            if (intervalTimerAvatar.current) {
+                clearInterval(intervalTimerAvatar.current)
+                intervalTimerAvatar.current = null
             }
         };
-        srcBufferNode.connect(analyzerNode);
+        // 接続処理
         srcBufferNode.connect(dstNodeForZoomRef.current);
+        srcBufferNode.connect(dstNodeForInternal);
+        srcBufferNode.connect(analyzerNode);
         srcBufferNode.start();
     };
 
@@ -249,9 +311,15 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
     const retVal: BrowserProxyStateAndMethod = {
         referableAudios,
         audioContext,
-        dstNodeForInternal: dstNodeForInternalRef.current,
+        dstNodeForInternal,
+        audioInputDeviceId,
+        audioInputEnabled,
+
         playAudio,
         getUserMedia,
+        enumerateDevices,
+        setAudioInputDeviceId,
+        setAudioInputEnabled,
 
         voiceDiffRef,
     }

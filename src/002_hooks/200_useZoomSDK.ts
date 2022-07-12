@@ -57,7 +57,7 @@ export const useZoomSDK = (props: UseZoomSDKProps): ZoomSDKStateAndMethod => {
             console.log("zoom joined:", result)
             setIsJoined(true)
         };
-    }, [props.backendManagerState])
+    }, [props.backendManagerState.generateSignature])
 
     const retVal: ZoomSDKStateAndMethod = {
         isJoined,

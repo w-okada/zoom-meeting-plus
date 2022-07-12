@@ -84,7 +84,7 @@ const DialogTiles = (props: DialogTilesProps) => {
 };
 
 export const SettingDialog = () => {
-    const { deviceManagerState, frontendManagerState } = useAppState();
+    const { deviceManagerState, frontendManagerState, browserProxyState } = useAppState();
     // (1) States
 
     const [tab, setTab] = useState<TabItems>("audioInput");
@@ -142,9 +142,9 @@ export const SettingDialog = () => {
                     id="setting-dialog-audio-input-select"
                     className="select"
                     required
-                    defaultValue={deviceManagerState.audioInput}
+                    defaultValue={browserProxyState.audioInputDeviceId || ""}
                     onChange={(e) => {
-                        deviceManagerState.setAudioInput(e.target.value);
+                        browserProxyState.setAudioInputDeviceId(e.target.value);
                     }}
                 >
                     {audioInputOptions}
@@ -153,7 +153,30 @@ export const SettingDialog = () => {
             </div>
         );
     }, [deviceManagerState.audioInputDevices, tab]);
-
+    const audioConnect = useMemo(() => {
+        console.log("dialog-enable", browserProxyState.audioInputEnabled);
+        if (tab != "audioInput") {
+            return <></>;
+        }
+        return (
+            <div className="dialog-input-controls">
+                <div style={{ display: "flex", alignItems: "center" }}>
+                    <input
+                        className="checkbox"
+                        type="checkbox"
+                        id="setting-dialog-audio-input-connect"
+                        defaultChecked={browserProxyState.audioInputEnabled}
+                        onClick={(e) => {
+                            browserProxyState.setAudioInputEnabled(e.currentTarget.checked);
+                        }}
+                    />
+                    <label htmlFor="setting-dialog-audio-input-connect" className="time-keeper-trigger-label">
+                        connect
+                    </label>
+                </div>
+            </div>
+        );
+    }, [browserProxyState.audioInputEnabled, tab]);
     // () Video Input
     const videoInputOptions = useMemo(() => {
         const options = deviceManagerState.videoInputDevices.map((x) => {
@@ -182,9 +205,9 @@ export const SettingDialog = () => {
                         id="setting-dialog-video-input-select"
                         className="select"
                         required
-                        defaultValue={deviceManagerState.videoInput}
+                        defaultValue={deviceManagerState.videoInputDeviceId || ""}
                         onChange={(e) => {
-                            deviceManagerState.setVideoInput(e.target.value);
+                            deviceManagerState.setVideoInputDeviceId(e.target.value);
                         }}
                     >
                         {videoInputOptions}
@@ -217,6 +240,7 @@ export const SettingDialog = () => {
                     <form>
                         <div className="dialog-input-container">
                             {audioInputSelectField}
+                            {audioConnect}
                             {videoInputSelectField}
                             {buttons}
                         </div>

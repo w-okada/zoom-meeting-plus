@@ -5,7 +5,7 @@ import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./parts/002_Hea
 
 type HeaderButtons = {
     rightSidebarButton: JSX.Element;
-    // settingButton: JSX.Element;
+    settingButton: JSX.Element;
     // commentButton: JSX.Element;
     appInfoButton: JSX.Element;
 };
@@ -27,15 +27,15 @@ export const Header = () => {
         const rightSidebarButton = <HeaderButton {...rightSidebarButtonProps}></HeaderButton>;
 
         //// (5) Dialog
-        // ///// (5-1) setting
-        // const settingButtonProps: HeaderButtonProps = {
-        //     stateControlCheckbox: frontendManagerState.stateControls.settingDialogCheckbox,
-        //     tooltip: "setting",
-        //     onIcon: ["fas", "gear"],
-        //     offIcon: ["fas", "gear"],
-        //     animation: AnimationTypes.colored,
-        // };
-        // const settingButton = <HeaderButton {...settingButtonProps}></HeaderButton>;
+        ///// (5-1) setting
+        const settingButtonProps: HeaderButtonProps = {
+            stateControlCheckbox: frontendManagerState.stateControls.settingDialogCheckbox,
+            tooltip: "setting",
+            onIcon: ["fas", "gear"],
+            offIcon: ["fas", "gear"],
+            animation: AnimationTypes.colored,
+        };
+        const settingButton = <HeaderButton {...settingButtonProps}></HeaderButton>;
 
         // ///// (5-2) transcribe
         // const commentButtonProps: HeaderButtonProps = {
@@ -59,7 +59,7 @@ export const Header = () => {
 
         return {
             rightSidebarButton,
-            // settingButton,
+            settingButton,
             // commentButton,
             appInfoButton,
         };
@@ -75,7 +75,7 @@ export const Header = () => {
                     <div className="group">
                         {/* {buttons.commentButton} */}
                         {buttons.appInfoButton}
-                        {/* {buttons.settingButton} */}
+                        {buttons.settingButton}
                     </div>
                     <div className="group">{buttons.rightSidebarButton}</div>
                 </div>
