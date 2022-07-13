@@ -65,17 +65,17 @@ export const RightSidebar = () => {
         return <HeaderButton {...accodionButtonForAvatarVideoProps}></HeaderButton>;
     }, []);
     //// (1-4) accordion button
-    const accodionButtonForSlack = useMemo(() => {
-        const accodionButtonForSlackProps: HeaderButtonProps = {
-            stateControlCheckbox: sidebarAccordionSlackCheckbox,
-            tooltip: "Open/Close",
-            onIcon: ["fas", "caret-down"],
-            offIcon: ["fas", "caret-down"],
-            animation: AnimationTypes.spinner,
-            tooltipClass: "tooltip-right",
-        };
-        return <HeaderButton {...accodionButtonForSlackProps}></HeaderButton>;
-    }, []);
+    // const accodionButtonForSlack = useMemo(() => {
+    //     const accodionButtonForSlackProps: HeaderButtonProps = {
+    //         stateControlCheckbox: sidebarAccordionSlackCheckbox,
+    //         tooltip: "Open/Close",
+    //         onIcon: ["fas", "caret-down"],
+    //         offIcon: ["fas", "caret-down"],
+    //         animation: AnimationTypes.spinner,
+    //         tooltipClass: "tooltip-right",
+    //     };
+    //     return <HeaderButton {...accodionButtonForSlackProps}></HeaderButton>;
+    // }, []);
 
     /**
      * (2)According Initial State
@@ -521,8 +521,8 @@ export const RightSidebar = () => {
                                     </div>
                                 </div>
                             </div>
-                            {/* <div className="sidebar-avatar-area-buttons">{motionButtons}</div>
-                             */}
+                            <div className="sidebar-avatar-area-buttons">{motionButtons}</div>
+
                             <div className="sidebar-zoom-area-input">
                                 {langSelector}
                                 {speakerSelector}
@@ -600,7 +600,7 @@ export const RightSidebar = () => {
                             </div>
                             <div className="sidebar-zoom-area-label">upper body(exp.)</div>
                         </div>
-                        {/* <div className="sidebar-zoom-area-input">
+                        <div className="sidebar-zoom-area-input">
                             <div className="sidebar-zoom-area-toggle-switch">
                                 <input
                                     id="use-upper-body-checkbox"
@@ -612,7 +612,7 @@ export const RightSidebar = () => {
                                 />
                             </div>
                             <div className="sidebar-zoom-area-label">record motion</div>
-                        </div> */}
+                        </div>
                     </div>
                 </div>
             </div>
