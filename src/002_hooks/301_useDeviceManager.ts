@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { DeviceInfo, DeviceManager } from "../001_clients_and_managers/001_DeviceManager"
 import { BrowserProxyStateAndMethod } from "./300_useBrowserProxy";
 

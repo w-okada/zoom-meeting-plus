@@ -51,8 +51,6 @@
     height: calc(100vh - var(--header-height));
     display: flex;
     flex-direction: column;
-}
-.right-sidebar {
     width: var(--right-sidebar-width);
     background: var(--company-color3);
     z-index: 50;
@@ -96,12 +94,12 @@
 }
 
 /*** (4-3) sidebar partitionの開閉 ***/
-.state-control-checkbox:checked + .sidebar-partition {
-    flex-grow: 1;
+.state-control-checkbox:checked + .sidebar-partition .sidebar-content {
+    max-height: 400px;
     transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
 }
-.state-control-checkbox + .sidebar-partition {
-    height: var(--header-height);
+.state-control-checkbox + .sidebar-partition .sidebar-content {
+    max-height: 0px;
     transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
 }
 
@@ -151,7 +149,8 @@
     .sidebar-content {
         position: static;
         width: 100%;
-        height: calc(100% - var(--header-height));
+        height: auto;
+        /* height: calc(100% - var(--header-height)); */
         background: rgba(200, 0, 0, 1);
     }
 }
@@ -166,7 +165,8 @@
     flex-direction: row;
     position: relative;
     margin-left: 4px;
-    margin-top: 3px;
+    margin-top: 2px;
+    margin-bottom: 2px;
     color: #000;
 
     .sidebar-zoom-area-label {
@@ -201,14 +201,39 @@
         background: #666;
         user-select: none;
         width: 40%;
-        position: absolute;
-        right: 10px;
-        margin: 4px;
+        /* margin: 4px; */
+        margin-left: 55%;
         text-align: center;
         cursor: pointer;
         &:hover {
             background: #999;
         }
+    }
+    .sidebar-recognition-button-checkbox {
+        position: absolute;
+        visibility: hidden;
+    }
+    .sidebar-recognition-button-label {
+        position: absolute;
+        user-select: none;
+        cursor: pointer;
+        position: absolute;
+        left: 55%;
+        padding-left: 7px;
+        padding-right: 7px;
+        border-radius: 3px;
+    }
+    .sidebar-recognition-button-checkbox:checked + .sidebar-recognition-button-label {
+        background: #ada;
+        color: #f00;
+        font-weight: 800;
+        transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
+    }
+    .sidebar-recognition-button-checkbox + .sidebar-recognition-button-label {
+        color: #f00;
+        font-weight: 800;
+        background: #aaa;
+        transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
     }
 }
 
@@ -231,7 +256,6 @@
     display: flex;
     flex-direction: column;
     object-fit: contain;
-
     transform: scale(-1, 1);
 }
 .sidebar-zoom-area-toggle-switch {

@@ -1,4 +1,3 @@
-import { useAppSetting } from "../003_provider/AppSettingProvider";
 
 export const fetchMotion = async (filename: string) => {
     const url = `/assets/motions/${filename}`

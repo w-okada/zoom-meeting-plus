@@ -74,8 +74,8 @@ export const Header = () => {
                 <div className="menu-item-area">
                     <div className="group">
                         {/* {buttons.commentButton} */}
-                        {buttons.appInfoButton}
                         {buttons.settingButton}
+                        {buttons.appInfoButton}
                     </div>
                     <div className="group">{buttons.rightSidebarButton}</div>
                 </div>

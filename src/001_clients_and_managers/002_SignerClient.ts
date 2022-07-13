@@ -1,4 +1,3 @@
-import { useAppSetting } from "../003_provider/AppSettingProvider";
 
 export const GENERATE_SIGNATURE_LOCAL_URL = "/api/generateSignature";
 

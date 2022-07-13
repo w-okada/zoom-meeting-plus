@@ -3,8 +3,7 @@ import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppState } from "../003_provider/AppStateProvider";
 import { useFileInput } from "./hooks/useFileInput";
-import { VRM } from "@pixiv/three-vrm";
-import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+
 const TabItems = {
     audioInput: "audioInput",
     videoInput: "videoInput",
@@ -98,7 +97,7 @@ const DialogTiles = (props: DialogTilesProps) => {
 };
 
 export const SettingDialog = () => {
-    const { deviceManagerState, frontendManagerState, browserProxyState, threeState, avatarControlState } = useAppState();
+    const { deviceManagerState, frontendManagerState, browserProxyState, threeState } = useAppState();
     // (1) States
 
     const [tab, setTab] = useState<TabItems>("audioInput");
@@ -348,8 +347,8 @@ export const SettingDialog = () => {
                     <div className="dialog-description">{description}</div>
                     <form>
                         <div className="dialog-input-container">
-                            {/* {audioInputSelectField}
-                            {audioConnect} */}
+                            {audioInputSelectField}
+                            {audioConnect}
                             {videoInputSelectField}
                             {fileInputButtonForVideo}
                             {fileButtonForAvatar}

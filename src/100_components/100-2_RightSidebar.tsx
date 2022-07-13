@@ -6,6 +6,8 @@ import { PosePredictionEx } from "@dannadori/mediapipe-avatar-js/dist/MotionDete
 import { Side, TFace, THand, TPose } from "@dannadori/mediapipe-avatar-js/dist/kalido";
 import { useMotionPlayer } from "./hooks/useMotionPlayer";
 import { useAppSetting } from "../003_provider/AppSettingProvider";
+import { SpeachRecognitionLanguagesKeys, useSpeachRecognition } from "./hooks/useSpeachRecognition";
+import { SpeachRecognitionLanguages } from "./hooks/SpeachRecognitherLanguages";
 
 let GlobalLoopID = 0;
 
@@ -14,6 +16,8 @@ export const RightSidebar = () => {
     const { applicationSetting } = useAppSetting();
     const voiceSetting = applicationSetting!.voice_setting;
     const [voice, setVoice] = useState<Blob | null>(null);
+    const { languageKey, recognitionStartSync, setLanguageKey } = useSpeachRecognition();
+    const isRecognitionEnabledRef = useRef<boolean>(false);
     const sidebarAccordionZoomCheckbox = useStateControlCheckbox("sidebar-accordion-zoom-checkbox");
     const sidebarAccordionAvatarCheckbox = useStateControlCheckbox("sidebar-accordion-avatar-checkbox");
     const sidebarAccordionAvatarVideoCheckbox = useStateControlCheckbox("sidebar-accordion-avatar-video-checkbox");
@@ -220,6 +224,59 @@ export const RightSidebar = () => {
             clearTimeout(timeout!);
         };
     }, [timeKeeperState]);
+
+    //// (3-4A-1)
+    const speachRecognitonLanguagesSelector = useMemo(() => {
+        const selector = (
+            <select
+                id="sidebar-lang-selector"
+                className="sidebar-lang-selector"
+                onChange={(ev) => {
+                    setLanguageKey(ev.target.value as SpeachRecognitionLanguagesKeys);
+                }}
+                value={languageKey}
+            >
+                {Object.keys(SpeachRecognitionLanguages).map((x) => {
+                    return (
+                        <option key={x} value={x}>
+                            {x}
+                        </option>
+                    );
+                })}
+            </select>
+        );
+        return selector;
+    }, []);
+
+    const recognitionClicked = async () => {
+        isRecognitionEnabledRef.current = !isRecognitionEnabledRef.current;
+
+        if (isRecognitionEnabledRef.current) {
+            const recognition = async () => {
+                const message = await recognitionStartSync();
+                console.log("MESSAGE:", message);
+                const generateVoice = async () => {
+                    const lang = document.getElementById("sidebar-lang-selector") as HTMLInputElement;
+                    const speaker = document.getElementById("sidebar-speaker-selector") as HTMLInputElement;
+                    if (resourceManagerState.speakersInVoiceVox[speaker.value]) {
+                        const speakerId = resourceManagerState.speakersInVoiceVox[speaker.value];
+                        const voice = await resourceManagerState.generateVoiceWithVoiceVox(speakerId, message);
+                        setVoice(voice);
+                    } else if (resourceManagerState.speakersInOpenTTS[lang.value]) {
+                        const voice = await resourceManagerState.generateVoiceWithOpenTTS(lang.value, speaker.value, message);
+                        setVoice(voice);
+                    }
+                };
+                if (message.length > 0) {
+                    generateVoice();
+                }
+                if (isRecognitionEnabledRef.current) {
+                    recognition();
+                }
+            };
+            recognition();
+        }
+    };
 
     //// (3-4) Motion Capture
     const motionCaptureEnableRef = useRef(false);
@@ -485,6 +542,22 @@ export const RightSidebar = () => {
                                 >
                                     speak
                                 </div>
+                            </div>
+
+                            <div className="sidebar-zoom-area-input">
+                                {speachRecognitonLanguagesSelector}
+                                <input
+                                    type="checkbox"
+                                    id="sidebar-recognition-button-checkbox"
+                                    className="sidebar-recognition-button-checkbox"
+                                    onClick={() => {
+                                        recognitionClicked();
+                                    }}
+                                />
+                                <label htmlFor="sidebar-recognition-button-checkbox" className="sidebar-recognition-button-label">
+                                    {isRecognitionEnabledRef.current ? "on" : "off"}
+                                </label>
+                                <div className="sidebar-zoom-area-label">recognition</div>
                             </div>
                         </div>
                     </div>

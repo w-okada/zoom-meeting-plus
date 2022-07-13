@@ -147,6 +147,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
     // 関連して周囲のNode Chainも再構成
     useEffect(() => {
         navigator.mediaDevices.getUserMedia = async (params) => {
+            console.log("GETUSERMEDIA")
             const msForZoom = new MediaStream();
             if (params?.audio) {
                 if (!audioContext) {
