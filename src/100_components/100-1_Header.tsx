@@ -69,7 +69,7 @@ export const Header = () => {
         // (X) Header
         const header = (
             <div className="header">
-                <div className="sidebar-button-area"></div>
+                <div className="sidebar-button-area">v0023</div>
                 <div className="status-area">{applicationTitle}</div>
                 <div className="menu-item-area">
                     <div className="group">
