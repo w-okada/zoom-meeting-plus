@@ -11,8 +11,8 @@ const port = process.env.PORT || 8888;
 app.use(bodyParser.json(), cors());
 
 // 意味不明だ。。。requireの時のみ記載されたファイルからの相対パスになるらしい。https://yinm.info/20201104/
-// const setting = require("../dist/assets/setting.json");
-const setting = fs.readFileSync(`./dist/assets/setting.json`, "utf8");
+const setting = require("../dist/assets/setting.json");
+// const setting = fs.readFileSync(`./dist/assets/setting.json`, "utf8");
 console.log(setting);
 
 if (process.env.VOICE_VOX_URL) {
