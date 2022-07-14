@@ -5,13 +5,14 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const KJUR = require("jsrsasign");
 const path = require("path");
-
+const fs = require("fs");
 const app = express();
 const port = process.env.PORT || 8888;
 app.use(bodyParser.json(), cors());
 
 // 意味不明だ。。。requireの時のみ記載されたファイルからの相対パスになるらしい。https://yinm.info/20201104/
-const setting = require("../dist/assets/setting.json");
+// const setting = require("../dist/assets/setting.json");
+const setting = fs.readFileSync(`./dist/assets/setting.json`, "utf8");
 console.log(setting);
 
 if (process.env.VOICE_VOX_URL) {
