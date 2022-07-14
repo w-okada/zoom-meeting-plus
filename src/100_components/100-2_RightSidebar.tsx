@@ -18,6 +18,7 @@ export const RightSidebar = () => {
     const [voice, setVoice] = useState<Blob | null>(null);
     const { languageKey, recognitionStartSync, setLanguageKey } = useSpeachRecognition();
     const isRecognitionEnabledRef = useRef<boolean>(false);
+    const [isRecognitionEnableSync, setIsRecognitionEnableSync] = useState<boolean>(false);
     const sidebarAccordionZoomCheckbox = useStateControlCheckbox("sidebar-accordion-zoom-checkbox");
     const sidebarAccordionAvatarCheckbox = useStateControlCheckbox("sidebar-accordion-avatar-checkbox");
     const sidebarAccordionAvatarVideoCheckbox = useStateControlCheckbox("sidebar-accordion-avatar-video-checkbox");
@@ -140,6 +141,9 @@ export const RightSidebar = () => {
         setLocalLangSpeakerMap({ ...langSpeakerMap });
     }, [resourceManagerState.speakersInOpenTTS, resourceManagerState.speakersInVoiceVox]);
     const langSelector = useMemo(() => {
+        const keys = Object.keys(localLangSpeakerMap).sort((a, b) => {
+            return a < b ? -1 : 1;
+        });
         const selector = (
             <select
                 id="sidebar-lang-selector"
@@ -149,7 +153,7 @@ export const RightSidebar = () => {
                 }}
                 value={selectedLang}
             >
-                {Object.keys(localLangSpeakerMap).map((x) => {
+                {keys.map((x) => {
                     return (
                         <option key={x} value={x}>
                             {x}
@@ -246,12 +250,14 @@ export const RightSidebar = () => {
             </select>
         );
         return selector;
-    }, []);
+    }, [languageKey]);
 
     const recognitionClicked = async () => {
         isRecognitionEnabledRef.current = !isRecognitionEnabledRef.current;
+        console.log("recognitionClicked", isRecognitionEnabledRef.current);
 
         if (isRecognitionEnabledRef.current) {
+            setIsRecognitionEnableSync(true);
             const recognition = async () => {
                 const message = await recognitionStartSync();
                 console.log("MESSAGE:", message);
@@ -272,6 +278,8 @@ export const RightSidebar = () => {
                 }
                 if (isRecognitionEnabledRef.current) {
                     recognition();
+                } else {
+                    setIsRecognitionEnableSync(false);
                 }
             };
             recognition();
@@ -551,11 +559,13 @@ export const RightSidebar = () => {
                                     id="sidebar-recognition-button-checkbox"
                                     className="sidebar-recognition-button-checkbox"
                                     onClick={() => {
-                                        recognitionClicked();
+                                        if (isRecognitionEnableSync == isRecognitionEnabledRef.current) {
+                                            recognitionClicked();
+                                        }
                                     }}
                                 />
-                                <label htmlFor="sidebar-recognition-button-checkbox" className="sidebar-recognition-button-label">
-                                    {isRecognitionEnabledRef.current ? "on" : "off"}
+                                <label htmlFor="sidebar-recognition-button-checkbox" className={isRecognitionEnableSync ? "sidebar-recognition-button-label-on" : "sidebar-recognition-button-label-off"}>
+                                    {isRecognitionEnableSync ? "on" : "off"}
                                 </label>
                                 <div className="sidebar-zoom-area-label">recognition</div>
                             </div>

@@ -233,7 +233,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
                     const max = Math.max(...times);
                     const min = Math.min(...times);
                     voiceDiffRef.current = max - min
-                    console.log("ANALYZER:", max, min, max - min);
+                    // console.log("ANALYZER:", max, min, max - min);
                 }, 50);
             }
         }
@@ -287,7 +287,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
             const max = Math.max(...times);
             const min = Math.min(...times);
             voiceDiffRef.current = max - min
-            console.log("ANALYZER:", max, min, max - min);
+            // console.log("ANALYZER:", max, min, max - min);
         }, 50);
 
         // Source Node生成

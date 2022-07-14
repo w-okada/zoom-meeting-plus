@@ -52,7 +52,11 @@ export const useResourceManager = (): ResourceManagerStateAndMethod => {
         const tmpSpeakers: { [lang: string]: string[] } = {}
         for (const lang of languages) {
             const speakers = await ResourceLoader.getSpeakerListFromOpenTTS(voiceSetting.open_tts_url, lang)
-            const names = Object.keys(speakers)
+            let names = Object.keys(speakers)
+            const notEspeaks = names.filter(x => { return x.indexOf("espeak") < 0 })
+            if (notEspeaks.length > 0) {
+                names = notEspeaks
+            }
             tmpSpeakers[lang] = names
         }
         setSpeakers({ ...tmpSpeakers })
