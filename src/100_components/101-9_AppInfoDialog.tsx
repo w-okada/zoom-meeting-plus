@@ -23,7 +23,7 @@ export const AppInfoDialog = () => {
         return [
             [`燐酸様`, `VRM`, `https://hub.vroid.com/characters/3590580643081577083/models/4344551722337138718`],
             [`音読さん様`, `Voice is generated in 音読さん`, `https://ondoku3.com/ja/`],
-            [`VOICEVOX様`, `Voice is generated with VOICEVOX`, `https://voicevox.hiroshiba.jp/`],
+            [`VOICEVOX様`, `Voice is generated with VOICEVOX(VOICEVOX:四国めたん, VOICEVOX:ずんだもん, VOICEVOX:春日部つむぎ, VOICEVOX:波音リツ, VOICEVOX:玄野武宏, VOICEVOX:白上虎太郎, VOICEVOX:青山龍星, VOICEVOX:冥鳴ひまり, VOICEVOX:九州そら)`, `https://voicevox.hiroshiba.jp/`],
         ].map((x) => {
             return (
                 <div key={`${x[2]}`} className="app-info-dialog-record-container">

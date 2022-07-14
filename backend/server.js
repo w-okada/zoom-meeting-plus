@@ -9,9 +9,24 @@ const path = require("path");
 const app = express();
 const port = process.env.PORT || 8888;
 app.use(bodyParser.json(), cors());
+
+// 意味不明だ。。。requireの時のみ記載されたファイルからの相対パスになるらしい。https://yinm.info/20201104/
+const setting = require("../dist/assets/setting.json");
+console.log(setting);
+
+if (process.env.VOICE_VOX_URL) {
+    setting.voice_setting.voice_vox_url = process.env.VOICE_VOX_URL;
+}
+if (process.env.OPEN_TTS_URL) {
+    setting.voice_setting.open_tts_url = process.env.OPEN_TTS_URL;
+}
+
 app.use("/", express.static("dist/"));
 
 app.options("*", cors());
+app.get("/api/setting", (req, res) => {
+    res.json(setting);
+});
 
 app.get("/api/generateSignature", (req, res) => {
     res.json({
