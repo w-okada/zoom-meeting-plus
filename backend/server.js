@@ -22,7 +22,7 @@ if (process.env.OPEN_TTS_URL) {
     setting.voice_setting.open_tts_url = process.env.OPEN_TTS_URL;
 }
 
-app.use("/", express.static("dist/"));
+app.use("/", express.static("dist1/"));
 
 app.options("*", cors());
 app.get("/api/setting", (req, res) => {
