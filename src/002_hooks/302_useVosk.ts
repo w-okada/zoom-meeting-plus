@@ -1,6 +1,6 @@
-import MicrophoneStream from "microphone-stream";
-import { useEffect, useRef, useState, useMemo } from "react";
-import { Duplex, DuplexOptions } from "readable-stream";
+// import MicrophoneStream from "microphone-stream";
+import { useEffect, useRef, useState } from "react";
+// import { Duplex, DuplexOptions } from "readable-stream";
 import { createModel, KaldiRecognizer } from "vosk-browser";
 import { RecognizerMessage, ServerMessageResult } from "vosk-browser/dist/interfaces";
 export type UseVoskProps = {
@@ -8,19 +8,19 @@ export type UseVoskProps = {
     referableAudios: HTMLAudioElement[]
     audioContext: AudioContext | null
 }
-class AudioStreamer extends Duplex {
-    constructor(public recognizer: KaldiRecognizer, options?: DuplexOptions) {
-        super(options);
-    }
+// class AudioStreamer extends Duplex {
+//     constructor(public recognizer: KaldiRecognizer, options?: DuplexOptions) {
+//         super(options);
+//     }
 
-    public _write(chunk: AudioBuffer, _encoding: any, callback: any) {
-        const buffer = chunk.getChannelData(0);
-        if (this.recognizer && buffer.byteLength > 0) {
-            this.recognizer.acceptWaveform(chunk);
-        }
-        callback();
-    }
-}
+//     public _write(chunk: AudioBuffer, _encoding: any, callback: any) {
+//         const buffer = chunk.getChannelData(0);
+//         if (this.recognizer && buffer.byteLength > 0) {
+//             this.recognizer.acceptWaveform(chunk);
+//         }
+//         callback();
+//     }
+// }
 
 export type VoskState = {
     startTranscribe: boolean
@@ -30,7 +30,7 @@ export type VoskStateAndMethod = VoskState & {
 }
 
 export const useVosk = (props: UseVoskProps): VoskStateAndMethod => {
-    const [recognizer, setRecognizer] = useState<KaldiRecognizer>();
+    const [_recognizer, setRecognizer] = useState<KaldiRecognizer>();
     const resultRef = useRef<string[]>([]);
     const [_result, setResult] = useState<string[]>(resultRef.current);
     const [_partialResult, setPartialResult] = useState<string>("");
@@ -38,12 +38,8 @@ export const useVosk = (props: UseVoskProps): VoskStateAndMethod => {
 
     useEffect(() => {
         const loadVosk = async () => {
-            let model;
-            if (document.domain.includes("localhost")) {
-                model = await createModel("./vosk/model.tar.gz");
-            } else {
-                model = await createModel("./frontend/vosk/model.tar.gz");
-            }
+            console.log("LOAD_VOSK1")
+            const model = await createModel("./vosk/model.tar.gz");
             const recognizer = new model.KaldiRecognizer(48000);
             recognizer.on("result", (message: RecognizerMessage) => {
                 console.log(`Result: ${message}`, message);
@@ -62,32 +58,34 @@ export const useVosk = (props: UseVoskProps): VoskStateAndMethod => {
         loadVosk();
     }, []);
 
-    const micStream = useMemo(() => {
-        if (!recognizer || !props.dstNodeForInternal) {
-            return null;
-        }
+    // const micStream = useMemo(() => {
+    //     if (!recognizer || !props.dstNodeForInternal) {
+    //         return null;
+    //     }
 
-        const audioStreamer = new AudioStreamer(recognizer, {
-            objectMode: true,
-        });
-        const micStream = new MicrophoneStream({
-            objectMode: true,
-            bufferSize: 1024,
-        });
-        micStream.setStream(props.dstNodeForInternal.stream);
+    //     const audioStreamer = new AudioStreamer(recognizer, {
+    //         objectMode: true,
+    //     });
+    //     const micStream = new MicrophoneStream({
+    //         objectMode: true,
+    //         bufferSize: 1024,
+    //     });
+    //     micStream.setStream(props.dstNodeForInternal.stream);
 
-        micStream.pipe(audioStreamer);
-        micStream.pause();
-        return micStream
-    }, [recognizer, props.dstNodeForInternal])
+    //     micStream.pipe(audioStreamer);
+    //     micStream.pause();
+    //     return micStream
+    // }, [recognizer, props.dstNodeForInternal])
 
 
     ///// (X) Start Transcribe
+    const recorderRef = useRef<MediaRecorder | null>(null)
+    const chunksRef = useRef<Blob[]>([])
     useEffect(() => {
         console.log("TRANSCIBE START?", startTranscribe);
-        if (!micStream) {
-            return
-        }
+        // if (!micStream) {
+        //     return
+        // }
         if (!props.dstNodeForInternal) {
             return
         }
@@ -102,40 +100,49 @@ export const useVosk = (props: UseVoskProps): VoskStateAndMethod => {
                     src.connect(props.dstNodeForInternal!);
                 }
             }
-            console.log("TRANSCIBE START?", micStream);
-            micStream.resume();
-            // recorderRef.current = new MediaRecorder(dstForRecRef.current!.stream);
+            // console.log("TRANSCIBE START?", micStream);
+            // micStream.resume();
 
-            // recorderRef.current.ondataavailable = (e) => {
-            //     console.log("Data Added", e);
-            //     chunksRef.current.push(e.data);
-            // };
-            // recorderRef.current.onstop = () => {
-            //     console.log("data available after MediaRecorder.stop() called.");
-            //     const blob = new Blob(chunksRef.current, {
-            //         type: "audio/opus",
-            //     });
-            //     const url = URL.createObjectURL(blob);
-            //     const a = document.createElement("a");
-            //     document.body.appendChild(a);
-            //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            //     // @ts-ignore
-            //     a.style = "display: none";
-            //     a.href = url;
-            //     a.download = "test.mp3";
-            //     a.click();
-            //     window.URL.revokeObjectURL(url);
-            //     chunksRef.current = [];
-            // };
-            // recorderRef.current.start(1000 * 3);
+
+            console.log("RECORD1", props.dstNodeForInternal)
+            console.log("RECORD2", props.dstNodeForInternal!.stream)
+            console.log("RECORD3", props.dstNodeForInternal!.stream.getAudioTracks())
+            recorderRef.current = new MediaRecorder(props.dstNodeForInternal!.stream);
+
+            recorderRef.current.ondataavailable = (e) => {
+                console.log("Data Added", e);
+                chunksRef.current.push(e.data);
+            };
+            recorderRef.current.onstop = () => {
+                console.log("data available after MediaRecorder.stop() called.");
+                const blob = new Blob(chunksRef.current, {
+                    type: "audio/opus",
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                document.body.appendChild(a);
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                a.style = "display: none";
+                a.href = url;
+                a.download = "test.mp3";
+                a.click();
+                window.URL.revokeObjectURL(url);
+                chunksRef.current = [];
+            };
+            recorderRef.current.start(1000 * 3);
         };
 
         if (startTranscribe) {
+            console.log("TRANSCRIBE START")
             startT();
         } else {
-            micStream?.stop();
+            console.log("TRANSCRIBE STOP")
+            recorderRef.current?.stop()
+            // micStream?.stop();
         }
-    }, [startTranscribe, micStream, props.audioContext, props.dstNodeForInternal, props.referableAudios]);
+        // }, [startTranscribe, micStream, props.audioContext, props.dstNodeForInternal, props.referableAudios]);
+    }, [startTranscribe, props.audioContext, props.dstNodeForInternal, props.referableAudios]);
 
     const retVal: VoskStateAndMethod = {
         startTranscribe,

@@ -35,6 +35,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
     class ReferableAudio extends Audio {
         constructor(src?: string | undefined) {
             super(src);
+            console.log("REFEREABLE AUDIO")
             referableAudioAdded(this);
         }
     }
@@ -56,6 +57,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
     navigator.mediaDevices.enumerateDevices = useMemo(() => {
         return async () => {
             const devices = await enumerateDevices()
+            // return devices
             const newDevices = devices.filter(x => { return x.kind === "audiooutput" })
             newDevices.push({
                 deviceId: "default_audioinput",
@@ -78,12 +80,23 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
 
 
     // Audio Context
+    const [wait, setWait] = useState<boolean>(false)
     const audioContext = useMemo(() => {
-        if (!props.isJoined) {
+        if (!props.isJoined && wait) {
             return null
         }
         return new AudioContext()
-    }, [props.isJoined])
+    }, [props.isJoined,])
+    useEffect(() => {
+        const wait = async () => {
+            await new Promise<void>((resolve) => {
+                setTimeout(resolve, 1000 * 2)
+            })
+            console.log("WAIT_DONE!")
+            setWait(true)
+        }
+        wait()
+    }, [])
 
     // Dummy Audio Input
     const dummyMediaStream = useMemo(() => {
@@ -141,6 +154,52 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
     const intervalTimerAvatar = useRef<NodeJS.Timer | null>(null)
     const intervalTimerAudioInput = useRef<NodeJS.Timer | null>(null)
 
+
+    // function convertI420AFrameToI420Frame(frame: any) {
+    //     const { width, height } = frame.codedRect;
+    //     // Y, U, V, Alpha values are stored sequentially. Take only YUV values
+    //     const buffer = new Uint8Array(width * height * 3);
+    //     frame.copyTo(buffer, { rect: frame.codedRect });
+    //     const init = {
+    //         timestamp: 0,
+    //         codedWidth: width,
+    //         codedHeight: height,
+    //         format: "I420"
+    //     };
+    //     console.log("convert")
+    //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //     // @ts-ignore
+    //     return new VideoFrame(buffer, init);
+    // }
+
+    // function transform(stream: MediaStream) {
+    //     const videoTrack = stream.getVideoTracks()[0];
+    //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //     // @ts-ignore
+    //     const trackProcessor = new MediaStreamTrackProcessor({
+    //         track: videoTrack
+    //     });
+    //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //     // @ts-ignore
+    //     const trackGenerator = new MediaStreamTrackGenerator({ kind: "video" });
+
+    //     const transformer = new TransformStream({
+    //         async transform(videoFrame, controller) {
+    //             const newFrame = convertI420AFrameToI420Frame(videoFrame);
+    //             videoFrame.close();
+    //             controller.enqueue(newFrame);
+    //         }
+    //     });
+
+    //     trackProcessor.readable
+    //         .pipeThrough(transformer)
+    //         .pipeTo(trackGenerator.writable);
+
+    //     const processedStream = new MediaStream();
+    //     processedStream.addTrack(trackGenerator);
+    //     return processedStream;
+    // }
+
     // getUserMedia の上書き
     // getUserMedia を呼ばれるときには、Zoomに渡していたMediaStreamと、
     // 取得元のDestNodeは壊されるようなので、DestNodeを再生成する必要がある。
@@ -178,15 +237,19 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
             }
 
             if (params?.video) {
+                // const testCanvas = document.getElementById("test") as HTMLCanvasElement;
                 //// Zoom用のストリーム作成
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 const avatarMediaStream = props.threeState.renderer.domElement.captureStream() as MediaStream;
+                // const avatarMediaStream = testCanvas.captureStream() as MediaStream;
                 avatarMediaStream.getVideoTracks().forEach((x) => {
                     msForZoom.addTrack(x);
                 });
+
                 console.log("VIDEOTRACKS", params, msForZoom.getTracks())
             }
+            // return transform(msForZoom);
             return msForZoom;
         };
     }, [props.threeState.renderer, audioContext, srcNodeDummyInput]);

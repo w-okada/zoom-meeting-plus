@@ -11,7 +11,7 @@ import { SpeachRecognitionLanguages } from "./hooks/SpeachRecognitherLanguages";
 let GlobalLoopID = 0;
 
 export const RightSidebar = () => {
-    const { frontendManagerState, threeState, timeKeeperState, zoomSDKState, avatarControlState, browserProxyState, resourceManagerState, deviceManagerState, motionPlayerState } = useAppState();
+    const { frontendManagerState, threeState, timeKeeperState, zoomSDKState, avatarControlState, browserProxyState, resourceManagerState, deviceManagerState, motionPlayerState, voskState } = useAppState();
     const { applicationSetting } = useAppSetting();
     const voiceSetting = applicationSetting!.voice_setting;
     const [voice, setVoice] = useState<Blob | null>(null);
@@ -440,9 +440,11 @@ export const RightSidebar = () => {
         }
         motionFramesForRec.current = [];
     };
-    // const replayNewMotion = () => {
-    //     console.log("not implemented");
-    // };
+    const replayNewMotion = () => {
+        console.log("not implemented");
+        console.log("dummy_transcribe");
+        voskState.setStartTranscribe(!voskState.startTranscribe);
+    };
     // const openMotionDialog = () => {
     //     console.log("not implemented");
     // };
@@ -600,6 +602,11 @@ export const RightSidebar = () => {
                         </div>
                     </div>
                 </div>
+                {/* 
+                {sidebarAccordionAvatarVideoCheckbox.trigger}
+                <div className="sidebar-partition">
+                    <div id="meetingSDKChatElement"></div>
+                </div> */}
 
                 {sidebarAccordionAvatarVideoCheckbox.trigger}
                 <div className="sidebar-partition">
@@ -666,7 +673,7 @@ export const RightSidebar = () => {
                                 >
                                     set
                                 </div>
-                                {/* <div
+                                <div
                                     className="sidebar-motion-recorder-replay-button"
                                     onClick={() => {
                                         replayNewMotion();
@@ -674,7 +681,7 @@ export const RightSidebar = () => {
                                 >
                                     replay
                                 </div>
-                                <div
+                                {/* <div
                                     className="sidebar-motion-recorder-open-dialog-button"
                                     onClick={() => {
                                         openMotionDialog();

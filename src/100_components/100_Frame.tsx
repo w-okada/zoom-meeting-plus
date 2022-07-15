@@ -13,9 +13,25 @@ export const Frame = () => {
     //// initial
     useEffect(() => {
         frontendManagerState.stateControls.openRightSidebarCheckbox.updateState(true);
+        // const testCanvas = document.getElementById("test") as HTMLCanvasElement;
+        // testCanvas.width = 500;
+        // testCanvas.height = 500;
+
+        // const ctx = testCanvas.getContext("2d")!;
+        // ctx.font = "32px 'ＭＳ ゴシック'";
+        // ctx.fillStyle = "Red";
+        // const draw = () => {
+        //     const d = new Date();
+
+        //     ctx.clearRect(0, 0, 500, 500);
+        //     ctx.fillText("AABBCCDD" + d.getTime(), 100, 100);
+        //     requestAnimationFrame(draw);
+        // };
+        // draw();
     }, []);
     return (
         <>
+            {/* <canvas id="test"></canvas> */}
             <Header />
             <RightSidebar />
             <MainArea />
