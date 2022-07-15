@@ -4,7 +4,6 @@ import { useStateControlCheckbox } from "./hooks/useStateControlCheckbox";
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./parts/002_HeaderButton";
 import { PosePredictionEx } from "@dannadori/mediapipe-avatar-js/dist/MotionDetector";
 import { Side, TFace, THand, TPose } from "@dannadori/mediapipe-avatar-js/dist/kalido";
-import { useMotionPlayer } from "./hooks/useMotionPlayer";
 import { useAppSetting } from "../003_provider/AppSettingProvider";
 import { SpeachRecognitionLanguagesKeys, useSpeachRecognition } from "./hooks/useSpeachRecognition";
 import { SpeachRecognitionLanguages } from "./hooks/SpeachRecognitherLanguages";
@@ -12,7 +11,7 @@ import { SpeachRecognitionLanguages } from "./hooks/SpeachRecognitherLanguages";
 let GlobalLoopID = 0;
 
 export const RightSidebar = () => {
-    const { frontendManagerState, threeState, timeKeeperState, zoomSDKState, avatarControlState, browserProxyState, resourceManagerState, deviceManagerState } = useAppState();
+    const { frontendManagerState, threeState, timeKeeperState, zoomSDKState, avatarControlState, browserProxyState, resourceManagerState, deviceManagerState, motionPlayerState } = useAppState();
     const { applicationSetting } = useAppSetting();
     const voiceSetting = applicationSetting!.voice_setting;
     const [voice, setVoice] = useState<Blob | null>(null);
@@ -23,7 +22,6 @@ export const RightSidebar = () => {
     const sidebarAccordionAvatarCheckbox = useStateControlCheckbox("sidebar-accordion-avatar-checkbox");
     const sidebarAccordionAvatarVideoCheckbox = useStateControlCheckbox("sidebar-accordion-avatar-video-checkbox");
     const sidebarAccordionSlackCheckbox = useStateControlCheckbox("sidebar-accordion-slack-checkbox");
-    const { motions } = useMotionPlayer();
 
     /**
      * (1)According Actions
@@ -301,7 +299,8 @@ export const RightSidebar = () => {
     /**
      * (4) Avatar Motion Loop
      */
-    const recordMotionEnableRef = useRef(false);
+    const recordMotionEnabledRef = useRef(false);
+    const [recordMotionEnabled, setRecordMotionEnabled] = useState<boolean>(false);
     const motionFramesForRec = useRef<any[]>([]);
     const motionFramesForPlay = useRef<any[]>([]);
     const currentTimeRef = useRef<number>(0);
@@ -347,7 +346,8 @@ export const RightSidebar = () => {
             // avatarControlState.avatar.updatePose(faceRig, poseRig, leftHandRig, rightHandRig);
             if (avatarControlState.isInitialized) {
                 avatarControlState.avatar.isTargetVisible = false;
-                avatarControlState.avatar.updatePoseWithRaw(faceRig, poseRig, leftHandRig, rightHandRig, _poses);
+                // avatarControlState.avatar.updatePoseWithRaw(faceRig, poseRig, leftHandRig, rightHandRig, _poses);
+                avatarControlState.avatar.updatePose(faceRig, poseRig, leftHandRig, rightHandRig);
             }
         };
 
@@ -360,7 +360,7 @@ export const RightSidebar = () => {
                     if (snap.width > 0 && snap.height > 0) {
                         const { poses, faceRig, leftHandRig, rightHandRig, poseRig } = await avatarControlState.detector.predict(snap);
                         updatePose(poses, faceRig, leftHandRig, rightHandRig, poseRig);
-                        if (recordMotionEnableRef.current) {
+                        if (recordMotionEnabledRef.current) {
                             const currentTime = new Date().getTime();
                             const interval = currentTime - currentTimeRef.current;
                             motionFramesForRec.current.push({ poses, faceRig, leftHandRig, rightHandRig, poseRig, interval: interval });
@@ -383,8 +383,8 @@ export const RightSidebar = () => {
                     }
                 } else {
                     //// フレームがなくなった場合、次のデフォルト動作を積み込む。
-                    if (motions.length > 0) {
-                        motionFramesForPlay.current = [...motions[0].motion];
+                    if (motionPlayerState.motions.length > 0) {
+                        motionFramesForPlay.current = [...motionPlayerState.motions[0].motion];
                     }
                 }
             }
@@ -392,10 +392,10 @@ export const RightSidebar = () => {
             threeState.controls.update();
             threeState.character?.springBoneManager?.springBoneGroupList.forEach((element) => {
                 element.forEach((node) => {
-                    node.update(0.01);
+                    node.update(2);
                 });
             });
-            threeState.character?.springBoneManager?.lateUpdate(0.1);
+            threeState.character?.springBoneManager?.lateUpdate(10);
 
             threeState.renderer?.render(threeState.scene!, threeState.camera!);
             if (GlobalLoopID === LOOP_ID) {
@@ -408,28 +408,44 @@ export const RightSidebar = () => {
             console.log("CANCEL", renderRequestId);
             cancelAnimationFrame(renderRequestId);
         };
-    }, [threeState, motions, avatarControlState.isInitialized]);
+    }, [threeState, motionPlayerState.motions, avatarControlState.isInitialized]);
 
     //// (4-2) メインループ
     const setRecordingStart = (ev: React.ChangeEvent<HTMLInputElement>) => {
-        recordMotionEnableRef.current = ev.target.checked;
+        recordMotionEnabledRef.current = ev.target.checked;
+        setRecordMotionEnabled(recordMotionEnabledRef.current);
         if (ev.target.checked === true) {
+            motionFramesForRec.current = [];
             currentTimeRef.current = new Date().getTime();
         } else {
-            const blob = new Blob([JSON.stringify(motionFramesForRec.current)], { type: "text/plain" });
-            motionFramesForRec.current = [];
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            document.body.appendChild(a);
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            a.style = "display: none";
-            a.href = url;
-            a.download = "motion.json";
-            a.click();
-            window.URL.revokeObjectURL(url);
+            // const blob = new Blob([JSON.stringify(motionFramesForRec.current)], { type: "text/plain" });
+            // const url = URL.createObjectURL(blob);
+            // const a = document.createElement("a");
+            // document.body.appendChild(a);
+            // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // // @ts-ignore
+            // a.style = "display: none";
+            // a.href = url;
+            // a.download = "motion.json";
+            // a.click();
+            // window.URL.revokeObjectURL(url);
         }
     };
+    const setNewMotion = () => {
+        const motionNameInput = document.getElementById("motion-name") as HTMLInputElement;
+        console.log(motionFramesForRec.current);
+        const motionName = motionNameInput.value.length > 0 ? motionNameInput.value : "new";
+        if (motionFramesForRec.current.length > 0) {
+            motionPlayerState.setMotion(motionName, motionFramesForRec.current);
+        }
+        motionFramesForRec.current = [];
+    };
+    // const replayNewMotion = () => {
+    //     console.log("not implemented");
+    // };
+    // const openMotionDialog = () => {
+    //     console.log("not implemented");
+    // };
 
     // (5) video initialize
     useEffect(() => {
@@ -437,7 +453,7 @@ export const RightSidebar = () => {
         deviceManagerState.setVideoElement(videoElem);
     }, []);
     const motionButtons = useMemo(() => {
-        const b = motions.map((m) => {
+        const b = motionPlayerState.motions.map((m) => {
             const button = (
                 <div
                     key={m.name}
@@ -451,8 +467,20 @@ export const RightSidebar = () => {
             );
             return button;
         });
+        b.unshift(
+            <div
+                key={"rest"}
+                className="sidebar-zoom-area-motion-button"
+                onClick={async () => {
+                    console.log("rest");
+                    threeState.resetAvatar();
+                }}
+            >
+                reset
+            </div>
+        );
         return b;
-    }, [motions]);
+    }, [motionPlayerState.motions, threeState.character]);
 
     //////////////////
     // Rendering   ///
@@ -610,18 +638,51 @@ export const RightSidebar = () => {
                             </div>
                             <div className="sidebar-zoom-area-label">upper body(exp.)</div>
                         </div>
+
                         <div className="sidebar-zoom-area-input">
-                            <div className="sidebar-zoom-area-toggle-switch">
-                                <input
-                                    id="use-upper-body-checkbox"
-                                    className="sidebar-zoom-area-toggle-input"
-                                    type="checkbox"
-                                    onChange={(ev) => {
-                                        setRecordingStart(ev);
-                                    }}
-                                />
-                            </div>
+                            <input
+                                type="checkbox"
+                                id="sidebar-motion-recorder-button-checkbox"
+                                className="sidebar-motion-recorder-button-checkbox"
+                                onChange={(ev) => {
+                                    setRecordingStart(ev);
+                                }}
+                            />
+                            <label htmlFor="sidebar-motion-recorder-button-checkbox" className={recordMotionEnabled ? "sidebar-motion-recorder-button-label-on" : "sidebar-motion-recorder-button-label-off"}>
+                                {recordMotionEnabled ? "on" : "off"}
+                            </label>
+
                             <div className="sidebar-zoom-area-label">record motion</div>
+                        </div>
+                        <div className="sidebar-zoom-area-input">
+                            <div className="sidebar-motion-recorder-buttons">
+                                <div>name:</div>
+                                <input type="text" className="sidebar-motion-recorder-motion-name-text" id="motion-name" />
+                                <div
+                                    className="sidebar-motion-recorder-register-button"
+                                    onClick={() => {
+                                        setNewMotion();
+                                    }}
+                                >
+                                    set
+                                </div>
+                                {/* <div
+                                    className="sidebar-motion-recorder-replay-button"
+                                    onClick={() => {
+                                        replayNewMotion();
+                                    }}
+                                >
+                                    replay
+                                </div>
+                                <div
+                                    className="sidebar-motion-recorder-open-dialog-button"
+                                    onClick={() => {
+                                        openMotionDialog();
+                                    }}
+                                >
+                                    config
+                                </div> */}
+                            </div>
                         </div>
                     </div>
                 </div>

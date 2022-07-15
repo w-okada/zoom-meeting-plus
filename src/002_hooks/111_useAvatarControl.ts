@@ -21,6 +21,7 @@ export const useAvatarControl = (props: UseAvatarControlProps): AvatarControlSta
     const detector = useMemo(() => {
         const d = new MotionDetector();
         d.setEnableFullbodyCapture(false);
+        d.setMovingAverageWindow(10)
         d.initializeManagers();
         return d
     }, [])
@@ -44,6 +45,7 @@ export const useAvatarControl = (props: UseAvatarControlProps): AvatarControlSta
 
     const useBodyRig = (val: boolean) => {
         detector.setEnableFullbodyCapture(val);
+
         avatar.enableUpperBody = val;
     }
     const retVal: AvatarControlStateAndMethod = {

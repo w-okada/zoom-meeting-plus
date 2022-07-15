@@ -272,7 +272,7 @@ export const SettingDialog = () => {
                 </div>
             </div>
         );
-    }, [showFileInputForVideo]);
+    }, [showFileInputForVideo, tab]);
 
     // () Avatar Input
     const fileButtonForAvatar = useMemo(() => {
@@ -299,7 +299,7 @@ export const SettingDialog = () => {
                 </div>
             </div>
         );
-    }, [tab]);
+    }, [tab, threeState.character]);
     const fileButtonForAvatarMotion = useMemo(() => {
         if (tab != "avatar") {
             return <></>;

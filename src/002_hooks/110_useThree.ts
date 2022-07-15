@@ -21,6 +21,7 @@ export type ThreeState = {
 export type ThreeStateAndMethods = ThreeState & {
     setParentDiv: (parent: HTMLDivElement) => void
     loadAvatar: (url: string) => Promise<VRM>
+    resetAvatar: () => void
 }
 export type ThreeStateInitProps = {
     scene: THREE.Scene,
@@ -33,6 +34,7 @@ export type ThreeStateInitProps = {
 }
 export const useThree = (): ThreeStateAndMethods => {
     const { applicationSetting } = useAppSetting()
+    const [vrmPath, setVrmPath] = useState<string | null>(null)
 
     //// (1) シーン設定
     const scene = useMemo(() => {
@@ -100,8 +102,15 @@ export const useThree = (): ThreeStateAndMethods => {
         });
         const vrm = await p;
         scene.add(vrm.scene);
+        setVrmPath(url)
+
         setCharacter(vrm)
         return vrm
+    }
+    const resetAvatar = () => {
+        if (vrmPath) {
+            loadAvatar(vrmPath)
+        }
     }
 
     useEffect(() => {
@@ -121,5 +130,6 @@ export const useThree = (): ThreeStateAndMethods => {
         character,
         setParentDiv,
         loadAvatar,
+        resetAvatar,
     }
 };

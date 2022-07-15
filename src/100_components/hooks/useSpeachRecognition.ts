@@ -29,7 +29,7 @@ export type SpeachRecognitionStateAndMethod = SpeachRecognitionState & {
 export type SpeachRecognitionLanguagesKeys = keyof typeof SpeachRecognitionLanguages | "default"
 
 export const useSpeachRecognition = () => {
-    const [languageKey, setLanguageKey] = useState<SpeachRecognitionLanguagesKeys>("default");
+    const [languageKey, setLanguageKey] = useState<SpeachRecognitionLanguagesKeys>("日本語(ja-JP)");
     const [recordingState, setRecordingState] = useState<RecordingState>("STOP")
     const [words, setWords] = useState<string>("");
     const [isProcessing, setIsProcessing] = useState<boolean>(false)

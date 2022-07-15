@@ -10,6 +10,7 @@ import { AvatarControlStateAndMethod, useAvatarControl } from "../002_hooks/111_
 import { useZoomSDK, ZoomSDKStateAndMethod } from "../002_hooks/200_useZoomSDK";
 import { BrowserProxyStateAndMethod, useBrowserProxy } from "../002_hooks/300_useBrowserProxy";
 import { useVosk, VoskStateAndMethod } from "../002_hooks/302_useVosk";
+import { MotionPlayerStateAndMethod, useMotionPlayer } from "../002_hooks/303_useMotionPlayer";
 type Props = {
     children: ReactNode;
 };
@@ -25,6 +26,7 @@ interface AppStateValue {
     browserProxyState: BrowserProxyStateAndMethod;
     deviceManagerState: DeviceManagerStateAndMethod;
     voskState: VoskStateAndMethod;
+    motionPlayerState: MotionPlayerStateAndMethod;
 
     frontendManagerState: FrontendManagerStateAndMethod;
 }
@@ -61,6 +63,7 @@ export const AppStateProvider = ({ children }: Props) => {
     const frontendManagerState = useFrontendManager({
         setStartTranscribe: voskState.setStartTranscribe,
     });
+    const motionPlayerState = useMotionPlayer({ resourceManagerState });
 
     const providerValue = {
         deviceManagerState,
@@ -72,6 +75,7 @@ export const AppStateProvider = ({ children }: Props) => {
         zoomSDKState,
         browserProxyState,
         voskState,
+        motionPlayerState,
         frontendManagerState,
     };
 

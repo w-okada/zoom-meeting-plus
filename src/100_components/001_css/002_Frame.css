@@ -209,12 +209,15 @@
             background: #999;
         }
     }
-    .sidebar-recognition-button-checkbox {
+    .sidebar-recognition-button-checkbox,
+    .sidebar-motion-recorder-button-checkbox {
         position: absolute;
         visibility: hidden;
     }
     .sidebar-recognition-button-label-on,
-    .sidebar-recognition-button-label-off {
+    .sidebar-recognition-button-label-off,
+    .sidebar-motion-recorder-button-label-on,
+    .sidebar-motion-recorder-button-label-off {
         position: absolute;
         user-select: none;
         cursor: pointer;
@@ -224,17 +227,45 @@
         padding-right: 7px;
         border-radius: 3px;
     }
-    .sidebar-recognition-button-label-on {
+    .sidebar-recognition-button-label-on,
+    .sidebar-motion-recorder-button-label-on {
         background: #ada;
         color: #f00;
         font-weight: 800;
         transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
     }
-    .sidebar-recognition-button-label-off {
+    .sidebar-recognition-button-label-off,
+    .sidebar-motion-recorder-button-label-off {
         color: #f00;
         font-weight: 800;
         background: #aaa;
         transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
+    }
+    .sidebar-motion-recorder-buttons {
+        display: flex;
+        margin-left: 10px;
+    }
+    .sidebar-motion-recorder-replay-button,
+    .sidebar-motion-recorder-register-button,
+    .sidebar-motion-recorder-open-dialog-button {
+        user-select: none;
+        cursor: pointer;
+        padding-left: 7px;
+        padding-right: 7px;
+        margin-left: 4px;
+        font-weight: 800;
+        color: #f00;
+        background: #aaa;
+        user-select: none;
+        text-align: center;
+        cursor: pointer;
+        &:hover {
+            background: #999;
+        }
+    }
+    .sidebar-motion-recorder-motion-name-text {
+        width: 30%;
+        padding-left: 3px;
     }
 }
 
