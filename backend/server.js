@@ -23,15 +23,15 @@ if (process.env.OPEN_TTS_URL) {
 }
 
 app.use("/", express.static("dist"));
-// app.use(
-//     "/",
-//     express.static("dist", {
-//         setHeaders: function (res, path) {
-//             res.set("Cross-Origin-Opener-Policy", "same-origin");
-//             res.set("Cross-Origin-Embedder-Policy", "require-corp");
-//         },
-//     })
-// );
+app.use(
+    "/",
+    express.static("dist", {
+        setHeaders: function (res, path) {
+            res.set("Cross-Origin-Opener-Policy", "same-origin");
+            res.set("Cross-Origin-Embedder-Policy", "require-corp");
+        },
+    })
+);
 
 app.options("*", cors());
 app.get("/api/setting", (req, res) => {
