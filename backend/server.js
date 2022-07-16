@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 require("dotenv").config({ path: "./.env/.env" });
 const express = require("express");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const KJUR = require("jsrsasign");
@@ -79,5 +81,8 @@ app.post("/api/generateSignature", (req, res) => {
         sdkKey: process.env.ZOOM_SDK_KEY,
     });
 });
-
+app.post("/api/transcribe", upload.single("audio"), function (req, res, next) {
+    console.log(req.body);
+    console.log(req.file);
+});
 app.listen(port, () => console.log(`Zoom Meeting SDK for Web. running on port: ${port}!`));

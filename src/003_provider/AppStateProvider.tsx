@@ -61,7 +61,7 @@ export const AppStateProvider = ({ children }: Props) => {
         referableAudios: browserProxyState.referableAudios,
     });
     const frontendManagerState = useFrontendManager({
-        setStartTranscribe: voskState.setStartTranscribe,
+        setStartTranscribe: voskState.setIsTranscribeStated,
     });
     const motionPlayerState = useMotionPlayer({ resourceManagerState });
 
