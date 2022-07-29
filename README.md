@@ -25,6 +25,7 @@ $ docker run -p 8888:8888 dannadori/zoom-meeting-plus:v06
 $ docker run --rm -it -p '127.0.0.1:50021:50021' voicevox/voicevox_engine:cpu-ubuntu20.04-latest
 $ docker run -it -p 5500:5500 synesthesiam/opentts:en
 ```
+access to http://localhost:8888/
 ## Heroku
 https://zoom-meeting-plus.herokuapp.com/
 
