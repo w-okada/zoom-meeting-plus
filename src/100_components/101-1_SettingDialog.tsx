@@ -109,7 +109,8 @@ export const SettingDialog = () => {
     ////////////////////////////
     //  Conponents
     ////////////////////////////
-    // Icons
+    // (2) input field
+    //// (2-1) Tiles
     const dialogTilesProps: DialogTilesProps = {
         currentTab: tab,
         onChange: (tabId: TabItems) => {
@@ -118,22 +119,22 @@ export const SettingDialog = () => {
     };
     const dialogTiles = <DialogTiles {...dialogTilesProps}></DialogTiles>;
 
-    // Input field
+    //// (2-2) Description
     const description = useMemo(() => {
         switch (tab) {
             case "audioInput":
-                return "Audio input setting.";
+                return "Audio input setting";
             case "videoInput":
-                return "Video input setting.";
+                return "Video input setting";
             case "avatar":
-                return "Avatar setting.";
+                return "Avatar setting";
             default:
                 console.error("unknwon state", tab);
-                return "Unknown state.";
+                return "Unknown state";
         }
     }, [tab]);
 
-    // () Audio Input
+    //// (2-2) Audio Input
     const audioInputOptions = useMemo(() => {
         const options = deviceManagerState.audioInputDevices.map((x) => {
             return (
@@ -153,10 +154,11 @@ export const SettingDialog = () => {
             return <></>;
         }
         return (
-            <div className={`dialog-input-controls`}>
+            <div className="dialog-input-controls">
+                <div className="dialog-input-description-label">audio device</div>
                 <select
                     id="setting-dialog-audio-input-select"
-                    className="select"
+                    className="dialog-input-select"
                     required
                     defaultValue={browserProxyState.audioInputDeviceId || "none"}
                     onChange={(e) => {
@@ -169,7 +171,6 @@ export const SettingDialog = () => {
                 >
                     {audioInputOptions}
                 </select>
-                <label htmlFor="">auido device</label>
             </div>
         );
     }, [deviceManagerState.audioInputDevices, tab]);
@@ -180,24 +181,21 @@ export const SettingDialog = () => {
         }
         return (
             <div className="dialog-input-controls">
-                <div style={{ display: "flex", alignItems: "center" }}>
-                    <input
-                        className="checkbox"
-                        type="checkbox"
-                        id="setting-dialog-audio-input-connect"
-                        defaultChecked={browserProxyState.audioInputEnabled}
-                        onClick={(e) => {
-                            browserProxyState.setAudioInputEnabled(e.currentTarget.checked);
-                        }}
-                    />
-                    <label htmlFor="setting-dialog-audio-input-connect" className="time-keeper-trigger-label">
-                        connect
-                    </label>
-                </div>
+                <div className="dialog-input-description-label">connect</div>
+                <input
+                    id="dialog-input-connect-audio-toggle"
+                    className="dialog-input-toggle"
+                    type="checkbox"
+                    onClick={(e) => {
+                        browserProxyState.setAudioInputEnabled(e.currentTarget.checked);
+                    }}
+                />
+                <label htmlFor="dialog-input-connect-audio-toggle" className="dialog-input-toggle-label" />
             </div>
         );
     }, [browserProxyState.audioInputEnabled, tab]);
-    // () Video Input
+
+    //// (2-2) Video Input
     const videoInputOptions = useMemo(() => {
         const options = deviceManagerState.videoInputDevices.map((x) => {
             return (
@@ -225,10 +223,12 @@ export const SettingDialog = () => {
 
         return (
             <>
-                <div className={`dialog-input-controls`}>
+                <div className="dialog-input-controls">
+                    <div className="dialog-input-description-label">video device</div>
+
                     <select
                         id="setting-dialog-video-input-select"
-                        className="select"
+                        className="dialog-input-select"
                         required
                         defaultValue={deviceManagerState.videoInputDeviceId || "none"}
                         onChange={(e) => {
@@ -246,7 +246,6 @@ export const SettingDialog = () => {
                     >
                         {videoInputOptions}
                     </select>
-                    <label htmlFor="">video device</label>
                 </div>
             </>
         );
@@ -257,9 +256,10 @@ export const SettingDialog = () => {
         }
         // const url = await fileInputState.click("audio.*|video.*");
         return (
-            <div className={`dialog-input-controls`}>
+            <div className="dialog-input-controls">
+                <div className="dialog-input-description-label">Load Movie File</div>
                 <div
-                    className="setting-dialog-normal-button"
+                    className="dialog-input-normal-button"
                     onClick={() => {
                         const loadFile = async () => {
                             const url = await fileInputState.click("audio.*|video.*");
@@ -274,29 +274,29 @@ export const SettingDialog = () => {
         );
     }, [showFileInputForVideo, tab]);
 
-    // () Avatar Input
+    //// (2-3) Avatar Input
     const fileButtonForAvatar = useMemo(() => {
         if (tab != "avatar") {
             return <></>;
         }
         return (
-            <div className={`dialog-input-controls`}>
-                <div className="setting-dialog-normal-button-container">
-                    <div className="setting-dialog-normal-button-label">Load Avatar VRM File</div>
+            <div className="dialog-input-controls">
+                {/* <div className="setting-dialog-normal-button-container"> */}
+                <div className="dialog-input-description-label">Load VRM</div>
 
-                    <div
-                        className="setting-dialog-normal-button"
-                        onClick={() => {
-                            const loadFile = async () => {
-                                const url = await fileInputState.click("");
-                                await threeState.loadAvatar(url);
-                            };
-                            loadFile();
-                        }}
-                    >
-                        load file
-                    </div>
+                <div
+                    className="dialog-input-normal-button"
+                    onClick={() => {
+                        const loadFile = async () => {
+                            const url = await fileInputState.click("");
+                            await threeState.loadAvatar(url);
+                        };
+                        loadFile();
+                    }}
+                >
+                    load file
                 </div>
+                {/* </div> */}
             </div>
         );
     }, [tab, threeState.character]);
@@ -305,7 +305,7 @@ export const SettingDialog = () => {
             return <></>;
         }
         return (
-            <div className={`dialog-input-controls`}>
+            <div className="dialog-input-controls">
                 <div className="setting-dialog-normal-button-container">
                     <div className="setting-dialog-normal-button-label">Load Avatar Motion File</div>
 
@@ -328,8 +328,8 @@ export const SettingDialog = () => {
 
     const buttons = useMemo(() => {
         return (
-            <div className="dialog-input-controls">
-                <div id="submit" className="submit-button" onClick={close}>
+            <div className="dialog-input-submit-buttons-container">
+                <div id="submit" className="dialog-input-submit-button" onClick={close}>
                     close
                 </div>
             </div>

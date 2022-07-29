@@ -10,24 +10,31 @@ export type AvatarControlState = {
     detector: MotionDetector
     avatar: MediapipeAvator
     isInitialized: boolean
+    smaWinSize: number
 }
 export type AvatarControlStateAndMethod = AvatarControlState & {
     useBodyRig: (val: boolean) => void
+    setSmaWinSize: (val: number) => void
 }
 
 
 export const useAvatarControl = (props: UseAvatarControlProps): AvatarControlStateAndMethod => {
     const [isInitialized, setIsInitialzed] = useState<boolean>(false)
+    const [smaWinSize, setSmaWinSize] = useState<number>(1)
     const detector = useMemo(() => {
         const d = new MotionDetector();
         d.setEnableFullbodyCapture(false);
-        d.setMovingAverageWindow(10)
+        d.setMovingAverageWindow(smaWinSize)
         d.initializeManagers();
         return d
     }, [])
+    useEffect(() => {
+        detector.setMovingAverageWindow(smaWinSize)
+    }, [smaWinSize])
 
     const avatar = useMemo(() => {
         const avatar = new MediapipeAvator()
+        avatar.enableUpperBody = true
         return avatar
     }, [])
 
@@ -45,15 +52,15 @@ export const useAvatarControl = (props: UseAvatarControlProps): AvatarControlSta
 
     const useBodyRig = (val: boolean) => {
         detector.setEnableFullbodyCapture(val);
-
-        avatar.enableUpperBody = val;
+        // avatar.enableUpperBody = val;
     }
     const retVal: AvatarControlStateAndMethod = {
         detector,
         avatar,
         isInitialized,
-        useBodyRig
-
+        smaWinSize,
+        useBodyRig,
+        setSmaWinSize
     }
     return retVal
 }
