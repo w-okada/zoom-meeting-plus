@@ -8,6 +8,7 @@
 .tooltip {
     position: relative;
     cursor: pointer;
+    opacity: 1;
 }
 
 /* Base styles for the entire tooltip */

@@ -1,18 +1,34 @@
 {
-    "app_title": "Zoom Meeting SDK Demo",
+    "app_title": "Zoom Meeting Plus",
     "default_meeting": {
         "default_username": "",
         "default_meeting_number": "",
         "default_meeting_password": "",
         "default_secret": ""
     },
-    "vrm_path": "./assets/vrm/megane.vrm",
-    "vrm_motions": {
-        "nod": "nod.json",
-        "refuse": "refuse.json",
-        "sing": "sing.json",
-        "smile": "smile.json"
-    },
+    "vrm_path": "./assets/vrm/AliciaSolid.vrm",
+    "vrm_motions": [
+        {
+            "name": "default",
+            "file": "default.json"
+        },
+        {
+            "name": "nod",
+            "file": "nod.json"
+        },
+        {
+            "name": "refuse",
+            "file": "refuse.json"
+        },
+        {
+            "name": "raise",
+            "file": "raise.json"
+        },
+        {
+            "name": "first",
+            "file": "first.json"
+        }
+    ],
     "sign_server": {
         "use_local_sign_server": false,
         "sign_server_url": "https://zoom-meeting-sdk-demo.herokuapp.com/api/generateSignature"

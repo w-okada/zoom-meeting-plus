@@ -10,11 +10,11 @@ import { fab } from "@fortawesome/free-brands-svg-icons";
 import { Frame } from "./100_components/100_Frame";
 library.add(fas, far, fab);
 
-// getUserMedia;
 const App = () => {
     const frame = useMemo(() => {
         return <Frame />;
     }, []);
+
     return <div className="application-container">{frame}</div>;
 };
 

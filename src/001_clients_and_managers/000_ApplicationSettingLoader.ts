@@ -8,9 +8,12 @@ export type ApplicationSetting =
             "default_secret": string
         },
         "vrm_path": string,
-        "vrm_motions": {
-            [key: string]: string
-        }
+        "vrm_motions": [
+            {
+                "name": string,
+                "file": string
+            }
+        ],
         "sign_server": {
             "use_local_sign_server": boolean,
             "sign_server_url": string

@@ -37,17 +37,7 @@ export const Header = () => {
         };
         const settingButton = <HeaderButton {...settingButtonProps}></HeaderButton>;
 
-        // ///// (5-2) transcribe
-        // const commentButtonProps: HeaderButtonProps = {
-        //     stateControlCheckbox: frontendManagerState.stateControls.startTranscribeCheckbox,
-        //     tooltip: "post to slack",
-        //     onIcon: ["fas", "comments"],
-        //     offIcon: ["fas", "comments"],
-        //     animation: AnimationTypes.colored,
-        // };
-        // const commentButton = <HeaderButton {...commentButtonProps}></HeaderButton>;
-
-        ///// (5-3) appinfo
+        ///// (5-2) appinfo
         const appInfoButtonProps: HeaderButtonProps = {
             stateControlCheckbox: frontendManagerState.stateControls.appInfoDialogCheckbox,
             tooltip: "info",
@@ -60,7 +50,6 @@ export const Header = () => {
         return {
             rightSidebarButton,
             settingButton,
-            // commentButton,
             appInfoButton,
         };
     }, []);
@@ -69,16 +58,13 @@ export const Header = () => {
         // (X) Header
         const header = (
             <div className="header">
-                <div className="sidebar-button-area">v0023</div>
-                <div className="status-area">{applicationTitle}</div>
-                <div className="menu-item-area">
-                    <div className="group">
-                        {/* {buttons.commentButton} */}
-                        {buttons.settingButton}
-                        {buttons.appInfoButton}
-                    </div>
-                    <div className="group">{buttons.rightSidebarButton}</div>
+                {applicationTitle}
+                <div className="header-partition">
+                    {buttons.settingButton}
+                    {buttons.appInfoButton}
                 </div>
+                <div className="header-spacer-for-toggle"></div>
+                <div className="header-fixed-sidebar-toggle">{buttons.rightSidebarButton}</div>
             </div>
         );
         return header;

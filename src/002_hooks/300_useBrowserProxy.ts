@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ThreeStateAndMethods } from "./110_useThree";
 
 export type UseBrowserProxyProps = {
-    isJoined: boolean,
     threeState: ThreeStateAndMethods;
 }
 
@@ -16,6 +15,8 @@ export type BrowserProxyState = {
     audioInputEnabled: boolean
 }
 export type BrowserProxyStateAndMethod = BrowserProxyState & {
+    initBrowserProxy: () => void
+
     playAudio: (audioData: ArrayBuffer, callback?: ((diff: number) => void) | undefined) => Promise<void>
     getUserMedia: (constraints?: MediaStreamConstraints | undefined) => Promise<MediaStream>
     enumerateDevices: () => Promise<MediaDeviceInfo[]>
@@ -37,6 +38,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
             super(src);
             console.log("REFEREABLE AUDIO")
             referableAudioAdded(this);
+            this.crossOrigin = "anonymous"
         }
     }
 
@@ -73,30 +75,22 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
                 label: "avatar movie",
                 toJSON: () => { console.warn("not implemented.") }
             })
-            console.log("devices:", devices)
+            console.log("devices original:", devices)
+            console.log("devices new:", newDevices)
             return newDevices
         }
     }, [])
 
 
     // Audio Context
-    const [wait, setWait] = useState<boolean>(false)
-    const audioContext = useMemo(() => {
-        if (!props.isJoined && wait) {
-            return null
+    const [audioContext, setAudioContext] = useState<AudioContext | null>(null)
+    const initBrowserProxy = useMemo(() => {
+        return () => {
+            if (!audioContext) {
+                setAudioContext(new AudioContext())
+            }
         }
-        return new AudioContext()
-    }, [props.isJoined,])
-    useEffect(() => {
-        const wait = async () => {
-            await new Promise<void>((resolve) => {
-                setTimeout(resolve, 1000 * 2)
-            })
-            console.log("WAIT_DONE!")
-            setWait(true)
-        }
-        wait()
-    }, [])
+    }, [audioContext])
 
     // Dummy Audio Input
     const dummyMediaStream = useMemo(() => {
@@ -206,7 +200,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
     // 関連して周囲のNode Chainも再構成
     useEffect(() => {
         navigator.mediaDevices.getUserMedia = async (params) => {
-            console.log("GETUSERMEDIA")
+            // console.log("GETUSERMEDIA", params)
             const msForZoom = new MediaStream();
             if (params?.audio) {
                 if (!audioContext) {
@@ -219,8 +213,9 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
                 }
 
                 // zoom-outgoingから切断
+                // TODO: disconnect freeze?
                 if (dstNodeForZoomRef.current) {
-                    srcNodeDummyInput.disconnect(dstNodeForZoomRef.current)
+                    // srcNodeDummyInput.disconnect(dstNodeForZoomRef.current)
                     srcNodeAudioInputRef.current?.disconnect(dstNodeForZoomRef.current)
                 }
 
@@ -247,7 +242,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
                     msForZoom.addTrack(x);
                 });
 
-                console.log("VIDEOTRACKS", params, msForZoom.getTracks())
+
             }
             // return transform(msForZoom);
             return msForZoom;
@@ -379,6 +374,7 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
         audioInputDeviceId,
         audioInputEnabled,
 
+        initBrowserProxy,
         playAudio,
         getUserMedia,
         enumerateDevices,

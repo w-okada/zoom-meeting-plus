@@ -25,11 +25,11 @@ export const useMotionPlayer = (props: UseMotionPlayerProps): MotionPlayerStateA
         console.log(applicationSetting)
         console.log(vrmMotions)
         const loadMotions = async () => {
-            const motionNames = Object.keys(vrmMotions)
-            for (const name of motionNames) {
+            for (const m of vrmMotions) {
+                const file = m.file
+                const name = m.name
                 try {
-                    const fileName = vrmMotions[name]
-                    const motion = await props.resourceManagerState.fetchMotion(fileName)
+                    const motion = await props.resourceManagerState.fetchMotion(file)
                     console.log(name, motion)
                     const m: Motion = {
                         name: name,

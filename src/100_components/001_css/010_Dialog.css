@@ -1,15 +1,18 @@
-/* (1) Dialog コンテナと表示・非表示 */
+/* (1) Dialog コンテナ デフォルト設定 */
 .dialog-container {
+    position: fixed;
     display: flex;
     justify-content: center;
     align-items: center;
-    position: absolute;
     top: 0px;
     left: 0px;
     width: 100vw;
     height: 100vh;
+    user-select: none;
+    color: #333;
 }
-
+/* (2) Dialog コンテナ　表示・非表示 */
+/** (2-1) アニメーション */
 .state-control-checkbox:checked ~ .dialog-container {
     background: rgba(200, 200, 200, 0.4);
     animation-name: dialog-show;
@@ -58,7 +61,15 @@
     }
 }
 
-/* (2) Dialog の枠 */
+/** (2-2)  ダイアログ別の表示・非表示*/
+.state-control-checkbox:checked + .dialog-frame {
+    display: flex;
+}
+.state-control-checkbox + .dialog-frame {
+    display: none;
+}
+
+/* (3) Dialog の枠 */
 .dialog-frame {
     color: #000;
     width: 40rem;
@@ -70,15 +81,9 @@
     background: var(--dialog-background-color);
     overflow: hidden;
 }
-.state-control-checkbox:checked + .dialog-frame {
-    display: flex;
-}
-.state-control-checkbox + .dialog-frame {
-    display: none;
-}
 
-/* (2) Dialog の中身 */
-/****** (a) title */
+/* (4) Dialog の中身 */
+/** (4-1) title */
 .dialog-title {
     margin-top: 20px;
     background: var(--company-color2);
@@ -86,17 +91,17 @@
     width: 100%;
     text-align: center;
 }
-/****** (b) content */
+/** (4-2) content */
 .dialog-content {
     width: 90%;
 }
-/****** (b-1) Application Title */
+/** (4-3) Application Title */
 .dialog-application-title {
     font-family: "Chicle", cursive;
     font-size: 3rem;
     text-align: center;
 }
-/****** (b-2) Radio Button Title */
+/** (4-4) Radio Button Title */
 .dialog-radio-tile-group {
     display: flex;
     flex-wrap: wrap;
@@ -151,324 +156,209 @@
     }
 }
 
-/****** (b-3) Dialog description */
+/** (4-5) Dialog description */
 .dialog-description {
     margin: 10px;
+    font-size: 1.2rem;
     padding-left: 20px;
     padding-right: 20px;
     overflow-wrap: break-word;
-    color: #333333;
 }
 
+/** (4-6) General Input */
 .dialog-input-container {
     display: flex;
     flex-direction: column;
     margin: 10px;
     padding-left: 20px;
     padding-right: 20px;
-    .dialog-input-controls.hidden {
+    /* .dialog-input-controls.hidden {
         display: none;
-    }
+    } */
     .dialog-input-controls {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-content: center;
-        text-align: left;
+        /* display: flex; */
+        /* flex-direction: row; */
+        /* justify-content: center; */
+        /* align-content: center; */
+        /* text-align: left; */
         position: relative;
         margin-left: 0px;
         margin-right: 0px;
-        margin-top: 15px;
-        margin-bottom: 15px;
+        height: 2rem;
         transition: all 1.3s;
 
-        .input-text,
-        .select {
-            padding: 0.5rem;
+        .dialog-input-description-label {
+            position: absolute;
+            width: 40%;
+            left: 0px;
+            padding-left: 1rem;
+        }
+        .right {
+            text-align: right;
+        }
+        .dialog-input-input-text,
+        .dialog-input-select,
+        .dialog-input-time {
+            margin-left: 10px;
+            position: absolute;
+            left: 40%;
+            max-width: 60%;
+            padding-left: 10px;
             font-size: 1rem;
-            border: 2px solid var(--dialog-primary-color);
-            width: 100%;
-            /* margin-bottom: 18px; */
-            font-size: 1rem;
-            font-weight: 600;
+            background: #ddd;
             border-radius: 4px;
             transition: all 0.3s;
             &:hover,
             &:focus {
-                /* border: 2px solid var(--dialog-active-color); */
-                border: 2px solid var(--dialog-primary-color);
-                /* outline: none !important; */
-                outline: 2px solid var(--dialog-primary-color);
-            }
-            &:hover + label,
-            &:focus + label,
-            + label:hover,
-            &:not(:placeholder-shown) + label {
-                top: -0.8rem;
-                color: #555;
-                background-color: rgba(255, 255, 255, 1);
-                width: auto;
-            }
-            + label {
-                position: absolute;
-                left: 0.5rem;
-                top: 0.5rem;
-                color: #000;
-                font-size: 1rem;
-                padding-left: 0.5rem;
-                padding-right: 0.5rem;
-                font-weight: 200;
-                background-color: rgba(255, 255, 255, 1);
-                transition: top 0.15s;
-                user-select: none;
-                border-radius: 10px;
+                border: 2px solid var(--dialog-active-color);
             }
         }
-        .checkbox {
-            border: 2px solid var(--dialog-primary-color);
-            border-radius: 4px;
-            transition: all 0.3s;
-            &:hover,
-            &:focus {
-                border: 2px solid var(--dialog-primary-color);
-                outline: 2px solid var(--dialog-primary-color);
-            }
-            + label {
+
+        .dialog-input-toggle {
+            display: none;
+            margin-left: 10px;
+
+            + .dialog-input-toggle-label {
+                left: 40%;
+                width: 2rem;
+                height: 1rem;
+                top: 0.25rem;
                 cursor: pointer;
-                color: #000;
-                font-size: 1rem;
-                margin-left: 5px;
-                font-weight: 400;
-                color: #000;
-                background-color: rgba(255, 255, 255, 1);
-                transition: top 0.15s;
-                user-select: none;
-                margin-right: 3rem;
+                background: #ccc;
+                position: absolute;
+                margin-left: 10px;
+
+                display: inline-block;
+                border-radius: 16px;
+                transition: 0.4s;
+
+                &:after {
+                    content: "";
+                    position: absolute;
+                    width: 1rem;
+                    height: 1rem;
+                    top: 0.25rem;
+                    border-radius: 100%;
+                    left: 0;
+                    top: 0;
+                    z-index: 2;
+                    background: #fff;
+                    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+                    transition: 0.4s;
+                }
+            }
+            &:checked + .dialog-input-toggle-label {
+                background-color: var(--dialog-primary-color);
+                &:after {
+                    left: 1rem;
+                }
             }
         }
-        .submit-button {
-            width: 30%;
-            color: var(--dialog-primary-color);
+
+        .dialog-input-normal-button {
+            position: absolute;
+            left: 40%;
+            padding-left: 10px;
+            padding-right: 10px;
+            font-size: 1rem;
+            background: linear-gradient(to bottom, #fdfbfb 0%, #ebedee 100%);
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: all 0.1s;
+            &:hover,
+            &:focus {
+                border: 2px solid var(--dialog-active-color);
+                background: -webkit-gradient(linear, left bottom, left top, from(#fdfbfb), to(#ebedee));
+                background: -webkit-linear-gradient(bottom, #fdfbfb 0%, #ebedee 100%);
+                background: linear-gradient(to top, #fdfbfb 0%, #ebedee 100%);
+            }
+        }
+    }
+
+    .dialog-input-submit-buttons-container {
+        display: flex;
+        padding: 10px;
+        justify-content: center;
+        align-content: center;
+        .dialog-input-submit-button,
+        .dialog-input-cancel-button {
             cursor: pointer;
-            user-select: none;
-            background: transparent;
             border-width: 2px;
             position: relative;
-
             border-style: solid;
-            border-color: var(--dialog-primary-color);
-
-            margin: 1em;
             display: inline-block;
-            padding: 0.5em 1em;
+            padding: 5px 20px;
+            margin-left: 10px;
+            margin-right: 10px;
             transition: all 0.3s ease-in-out;
             text-align: center;
-            font-family: comfortaa;
             font-weight: bold;
-            &.hide {
-                display: none;
-            }
-            &:before,
-            &:after {
-                content: "";
-                display: block;
-                position: absolute;
-                border-color: var(--dialog-primary-color);
-                box-sizing: border-box;
-                border-style: solid;
-                width: 1rem;
-                height: 1rem;
-                transition: all 0.3s ease-in-out;
-            }
-            &:before {
-                top: -6px;
-                left: -6px;
-                border-width: 2px 0 0 2px;
-                z-index: 5;
-            }
-            &:after {
-                bottom: -6px;
-                right: -6px;
-                border-width: 0 2px 2px 0;
-            }
-            &:hover:before,
-            &:hover:after {
-                width: calc(100% + 12px);
-                height: calc(100% + 12px);
-                border-color: var(--dialog-primary-color);
-            }
+        }
+        .dialog-input-submit-button {
+            color: var(--dialog-primary-color);
+            border-color: var(--dialog-primary-color);
             &:hover {
-                color: #ffffff;
+                color: #fff;
                 background-color: var(--dialog-primary-color);
                 border-color: var(--dialog-primary-color);
             }
         }
-        .cancel-button {
-            width: 30%;
+        .dialog-input-cancel-button {
             color: var(--dialog-cancel-button-color);
-            cursor: pointer;
-            user-select: none;
-            background: transparent;
-            border-width: 2px;
-            position: relative;
-
-            border-style: solid;
             border-color: var(--dialog-cancel-button-color);
 
-            margin: 1em;
-            display: inline-block;
-            padding: 0.5em 1em;
-            transition: all 0.3s ease-in-out;
-            text-align: center;
-            font-family: comfortaa;
-            font-weight: bold;
-            &.hide {
-                display: none;
-            }
-            &:before,
-            &:after {
-                content: "";
-                display: block;
-                position: absolute;
-                border-color: var(--dialog-cancel-button-color);
-                box-sizing: border-box;
-                border-style: solid;
-                width: 1rem;
-                height: 1rem;
-                transition: all 0.3s ease-in-out;
-            }
-            &:before {
-                top: -6px;
-                left: -6px;
-                border-width: 2px 0 0 2px;
-                z-index: 5;
-            }
-            &:after {
-                bottom: -6px;
-                right: -6px;
-                border-width: 0 2px 2px 0;
-            }
-            &:hover:before,
-            &:hover:after {
-                width: calc(100% + 12px);
-                height: calc(100% + 12px);
-                border-color: var(--dialog-cancel-button-color);
-            }
             &:hover {
                 color: #ffffff;
                 background-color: var(--dialog-cancel-button-color);
                 border-color: var(--dialog-cancel-button-color);
             }
         }
-        .normal-button {
-            display: inline;
-            padding: 5px;
-            margin-left: 1rem;
-            /* margin-right: 2rem; */
-            /* margin-top: 1rem; */
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            background: #f1e767;
-            background: linear-gradient(to bottom, #fdfbfb 0%, #ebedee 100%);
-            box-shadow: inset 1px 1px 1px #fff;
-            white-space: nowrap;
-        }
-        .normal-button:hover {
-            background: -webkit-gradient(linear, left bottom, left top, from(#fdfbfb), to(#ebedee));
-            background: -webkit-linear-gradient(bottom, #fdfbfb 0%, #ebedee 100%);
-            background: linear-gradient(to top, #fdfbfb 0%, #ebedee 100%);
-        }
-        .image-card-selector {
+    }
+}
+
+/** (5-2) Application Information */
+
+.dialog-application-information-container {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    color: #333;
+    .dialog-application-information-title {
+        font-size: 1.5rem;
+        color: #faa;
+    }
+    .dialog-application-information-text {
+        padding-left: 20px;
+    }
+    .dialog-application-information-list-container {
+        display: flex;
+        flex-direction: column;
+        padding-left: 20px;
+        .dialog-application-information-list {
             display: flex;
             flex-direction: row;
-            justify-content: space-evenly;
-            background: #ccc;
-            width: 100%;
-            height: 100px;
-            .image-card-selector-image-card-container {
-                background: #ffa;
-                width: 100px;
-                height: 100px;
-                border: 2px solid #000;
-                margin: 3px;
-                &:hover {
-                    border: 4px solid #000;
-                }
-                .image-card-selector-image-card-container-no-image {
-                    text-align: center;
-                    vertical-align: middle;
-                    padding: 10px;
-                    font-weight: 700;
-                    user-select: none;
-                }
-                .image-card-selector-image-card-container-image-with-cross {
-                    position: relative;
-                    background: #f10;
-                    width: 100%;
-                    height: 100%;
-                    .image-card-selector-image-card-container-image {
-                        width: 100%;
-                        height: 100%;
-                    }
-                    .image-card-selector-image-card-container-image-cross {
-                        position: absolute;
-                        top: 0px;
-                        right: 0px;
-                        margin: 2px;
-                        width: 30px;
-                        height: 30px;
-                        color: #321;
-                        background: rgba(200, 200, 200, 0.6);
-                        border-radius: 5px;
-                        /* border: 2px solid #000; */
-                        display: flex;
-                        justify-content: center;
-                        align-content: center;
-                        &:hover {
-                            background: rgba(200, 200, 200, 0.9);
-                        }
-                    }
+            .dialog-application-information-list-name {
+                width: 30%;
+                padding-left: 10px;
+            }
+            .dialog-application-information-list-description {
+                padding-left: 10px;
+                width: 60%;
+                .dialog-application-information-list-voice-vox-list {
+                    font-size: 0.5rem;
+                    padding-left: 5px;
                 }
             }
-        }
-        .dialog-message {
-            color: #000;
-            width: 50%;
-            margin: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-        .video {
-            width: 100%;
-            height: 300px;
+            .dialog-application-information-list-url {
+                padding-left: 10px;
+                width: 10%;
+            }
         }
     }
 }
 
-.state-control-checkbox:checked {
-    & ~ .button-container,
-    ~ .div-container {
-        display: block;
-        display: flex;
-        align-items: flex-end;
-    }
-}
-.state-control-checkbox {
-    & ~ .button-container,
-    ~ .div-container {
-        display: none;
-    }
-}
-.time-keeper-end-time-label {
-    color: #f00;
-}
-.time-keeper-end-time {
-    width: 30%;
-    border: 2px solid #000;
-}
-.time-keeper-trigger-label {
-    white-space: nowrap;
-}
 .app-info-dialog-section {
     display: flex;
     flex-direction: column;
@@ -490,13 +380,6 @@
 }
 .app-info-dialog-record-url {
     width: 30%;
-}
-
-.time-keeper-language-label {
-    margin: 3px;
-}
-.time-keeper-language {
-    border: 2px solid #000;
 }
 
 .setting-dialog-normal-button-container {
