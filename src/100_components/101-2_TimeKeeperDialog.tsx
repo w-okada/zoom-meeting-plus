@@ -14,36 +14,33 @@ export const TimeKeeperDialog = () => {
     ////////////////////////////
     const timePicker = useMemo(() => {
         return (
-            <>
-                <label htmlFor="time-keeper-end-time" className="time-keeper-end-time-label">
-                    Set end time
-                </label>
-                <input id="time-keeper-end-time" type="time" name="appt-time" className="time-keeper-end-time"></input>
-            </>
+            <div className="dialog-input-controls">
+                <div className="dialog-input-description-label">End Time</div>
+                <input id="time-keeper-end-time" type="time" name="appt-time" className="dialog-input-time"></input>
+            </div>
         );
     }, []);
     const triggers = useMemo(() => {
         return (
-            <div className="dialog-input-controls">
-                <div style={{ display: "flex", alignItems: "center" }}>
-                    <input className="checkbox" type="checkbox" id="time-keeper-one-minute-trigger" />
-                    <label htmlFor="time-keeper-one-minute-trigger" className="time-keeper-trigger-label">
-                        one minute
-                    </label>
+            <>
+                <div className="dialog-input-controls">
+                    <div className="dialog-input-description-label right">notify before 1min</div>
+                    <input id="time-keeper-one-minute-trigger" className="dialog-input-toggle" type="checkbox" />
+                    <label htmlFor="time-keeper-one-minute-trigger" className="dialog-input-toggle-label" />
                 </div>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                    <input className="checkbox" type="checkbox" id="time-keeper-three-minutes-trigger" />
-                    <label htmlFor="time-keeper-three-minutes-trigger" className="time-keeper-trigger-label">
-                        three minutes
-                    </label>
+
+                <div className="dialog-input-controls">
+                    <div className="dialog-input-description-label right">3min</div>
+                    <input id="time-keeper-three-minutes-trigger" className="dialog-input-toggle" type="checkbox" />
+                    <label htmlFor="time-keeper-three-minutes-trigger" className="dialog-input-toggle-label" />
                 </div>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                    <input className="checkbox" type="checkbox" id="time-keeper-five-minutes-trigger" />
-                    <label htmlFor="time-keeper-five-minutes-trigger" className="time-keeper-trigger-label">
-                        five minutes
-                    </label>
+
+                <div className="dialog-input-controls">
+                    <div className="dialog-input-description-label  right">5min</div>
+                    <input id="time-keeper-five-minutes-trigger" className="dialog-input-toggle" type="checkbox" />
+                    <label htmlFor="time-keeper-five-minutes-trigger" className="dialog-input-toggle-label" />
                 </div>
-            </div>
+            </>
         );
     }, []);
 
@@ -53,23 +50,19 @@ export const TimeKeeperDialog = () => {
     const langOptions = useMemo(() => {
         return (
             <div className="dialog-input-controls">
-                <div style={{ display: "flex", alignItems: "center" }}>
-                    <label htmlFor="time-keeper-language" className="time-keeper-language-label">
-                        Language(voice):
-                    </label>
+                <div className="dialog-input-description-label right">Language(voice):</div>
 
-                    <select
-                        id="time-keeper-language"
-                        className="time-keeper-language"
-                        defaultValue={timeKeeperState.lang}
-                        onChange={(ev) => {
-                            setLanguage(ev);
-                        }}
-                    >
-                        <option value="ja">ja</option>
-                        <option value="en">en</option>
-                    </select>
-                </div>
+                <select
+                    id="time-keeper-language"
+                    className="dialog-input-select"
+                    defaultValue={timeKeeperState.lang}
+                    onChange={(ev) => {
+                        setLanguage(ev);
+                    }}
+                >
+                    <option value="ja">ja</option>
+                    <option value="en">en</option>
+                </select>
             </div>
         );
     }, [timeKeeperState.lang]);
@@ -103,11 +96,11 @@ export const TimeKeeperDialog = () => {
 
     const buttons = useMemo(() => {
         return (
-            <div className="dialog-input-controls">
-                <div id="submit" className="submit-button" onClick={close}>
+            <div className="dialog-input-submit-buttons-container">
+                <div id="submit" className="dialog-input-cancel-button" onClick={close}>
                     close
                 </div>
-                <div id="submit" className="submit-button" onClick={setTimeKeeper}>
+                <div id="submit" className="dialog-input-submit-button" onClick={setTimeKeeper}>
                     ok
                 </div>
             </div>
@@ -117,7 +110,7 @@ export const TimeKeeperDialog = () => {
     const form = useMemo(() => {
         return (
             <div className="dialog-frame">
-                <div className="dialog-title">Setting</div>
+                <div className="dialog-title">TimeKeeper Setting</div>
                 <div className="dialog-content">
                     <div className={"dialog-application-title"}></div>
                     <div className="dialog-description">Set Timekeeper</div>

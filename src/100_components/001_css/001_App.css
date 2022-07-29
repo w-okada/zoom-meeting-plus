@@ -1,8 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Chicle&family=Poppins:ital,wght@0,200;0,400;0,600;1,200;1,400;1,600&display=swap");
 
 @import "./002_Frame.css";
-@import "./003_MainArea.css";
-@import "./004_MainVideoArea.css";
 
 @import "./010_Dialog.css";
 @import "./101_processing.css";
@@ -22,14 +20,14 @@
     --sidebar-transition-time: 0.3s;
     --sidebar-transition-animation: ease-in-out;
 
-    --header-height: 2rem;
+    --header-height: 1.5rem;
     --right-sidebar-width: 320px;
 
     --dialog-border-color: rgba(100, 100, 100, 1);
     --dialog-shadow-color: rgba(0, 0, 0, 0.3);
     --dialog-background-color: rgba(255, 255, 255, 1);
     --dialog-primary-color: rgba(19, 70, 209, 1);
-    --dialog-active-color: rgba(255, 70, 209, 1);
+    --dialog-active-color: rgba(40, 70, 209, 1);
     --dialog-input-border-color: rgba(200, 200, 200, 1);
     --dialog-submit-button-color: rgba(180, 190, 230, 1);
     --dialog-cancel-button-color: rgba(235, 80, 80, 1);

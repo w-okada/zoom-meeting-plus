@@ -8,111 +8,76 @@ import { useAppSetting } from "../003_provider/AppSettingProvider";
 import { SpeachRecognitionLanguagesKeys, useSpeachRecognition } from "./hooks/useSpeachRecognition";
 import { SpeachRecognitionLanguages } from "./hooks/SpeachRecognitherLanguages";
 import { VoskLanguages } from "../002_hooks/302_useVosk";
+import { Header } from "./100-1_Header";
 
 let GlobalLoopID = 0;
 
 export const RightSidebar = () => {
-    const { frontendManagerState, threeState, timeKeeperState, zoomSDKState, avatarControlState, browserProxyState, resourceManagerState, deviceManagerState, motionPlayerState, voskState } = useAppState();
+    const { frontendManagerState, threeState, timeKeeperState, avatarControlState, browserProxyState, resourceManagerState, deviceManagerState, motionPlayerState, voskState } = useAppState();
     const { applicationSetting } = useAppSetting();
     const voiceSetting = applicationSetting!.voice_setting;
     const [voice, setVoice] = useState<Blob | null>(null);
     const { languageKey, recognitionStartSync, setLanguageKey } = useSpeachRecognition();
     const isRecognitionEnabledRef = useRef<boolean>(false);
     const [isRecognitionEnableSync, setIsRecognitionEnableSync] = useState<boolean>(false);
-    const sidebarAccordionZoomCheckbox = useStateControlCheckbox("sidebar-accordion-zoom-checkbox");
+
     const sidebarAccordionAvatarCheckbox = useStateControlCheckbox("sidebar-accordion-avatar-checkbox");
     const sidebarAccordionAvatarVideoCheckbox = useStateControlCheckbox("sidebar-accordion-avatar-video-checkbox");
-    const sidebarAccoringTranscribeCheckbox = useStateControlCheckbox("sidebar-accordion-Transcribe-checkbox");
+    const sidebarAccordionTranscribeCheckbox = useStateControlCheckbox("sidebar-accordion-Transcribe-checkbox");
 
     /**
      * (1)According Actions
      */
-    //// (1-1) accordion button
-    const accodionButtonForZoom = useMemo(() => {
-        const accodionButtonForZoomProps: HeaderButtonProps = {
-            stateControlCheckbox: sidebarAccordionZoomCheckbox,
-            tooltip: "Open/Close",
-            onIcon: ["fas", "caret-down"],
-            offIcon: ["fas", "caret-down"],
-            animation: AnimationTypes.spinner,
-            tooltipClass: "tooltip-right",
-        };
-        return <HeaderButton {...accodionButtonForZoomProps}></HeaderButton>;
-    }, []);
-
-    //// (1-2) accordion button
+    //// (1-1) accordion button for avatar
     const accodionButtonForAvatar = useMemo(() => {
         const accodionButtonForAvatarProps: HeaderButtonProps = {
             stateControlCheckbox: sidebarAccordionAvatarCheckbox,
             tooltip: "Open/Close",
-            onIcon: ["fas", "caret-down"],
-            offIcon: ["fas", "caret-down"],
+            onIcon: ["fas", "caret-up"],
+            offIcon: ["fas", "caret-up"],
             animation: AnimationTypes.spinner,
             tooltipClass: "tooltip-right",
         };
         return <HeaderButton {...accodionButtonForAvatarProps}></HeaderButton>;
     }, []);
-    //// (1-3) accordion button
+    //// (1-2) accordion button for video
     const accodionButtonForAvatarVideo = useMemo(() => {
         const accodionButtonForAvatarVideoProps: HeaderButtonProps = {
             stateControlCheckbox: sidebarAccordionAvatarVideoCheckbox,
             tooltip: "Open/Close",
-            onIcon: ["fas", "caret-down"],
-            offIcon: ["fas", "caret-down"],
+            onIcon: ["fas", "caret-up"],
+            offIcon: ["fas", "caret-up"],
             animation: AnimationTypes.spinner,
             tooltipClass: "tooltip-right",
         };
         return <HeaderButton {...accodionButtonForAvatarVideoProps}></HeaderButton>;
     }, []);
-
+    //// (1-3) accordion button for transcribe
     const accodionButtonForTranscribe = useMemo(() => {
         const accodionButtonForTranscribeProps: HeaderButtonProps = {
-            stateControlCheckbox: sidebarAccoringTranscribeCheckbox,
+            stateControlCheckbox: sidebarAccordionTranscribeCheckbox,
             tooltip: "Open/Close",
-            onIcon: ["fas", "caret-down"],
-            offIcon: ["fas", "caret-down"],
+            onIcon: ["fas", "caret-up"],
+            offIcon: ["fas", "caret-up"],
             animation: AnimationTypes.spinner,
             tooltipClass: "tooltip-right",
         };
         return <HeaderButton {...accodionButtonForTranscribeProps}></HeaderButton>;
     }, []);
-    //// (1-4) accordion button
-    // const accodionButtonForSlack = useMemo(() => {
-    //     const accodionButtonForSlackProps: HeaderButtonProps = {
-    //         stateControlCheckbox: sidebarAccordionSlackCheckbox,
-    //         tooltip: "Open/Close",
-    //         onIcon: ["fas", "caret-down"],
-    //         offIcon: ["fas", "caret-down"],
-    //         animation: AnimationTypes.spinner,
-    //         tooltipClass: "tooltip-right",
-    //     };
-    //     return <HeaderButton {...accodionButtonForSlackProps}></HeaderButton>;
-    // }, []);
 
     /**
      * (2)According Initial State
      */
     useEffect(() => {
-        sidebarAccordionZoomCheckbox.updateState(true);
         sidebarAccordionAvatarCheckbox.updateState(true);
-        sidebarAccoringTranscribeCheckbox.updateState(true);
+        sidebarAccordionAvatarVideoCheckbox.updateState(true);
+        sidebarAccordionTranscribeCheckbox.updateState(false);
     }, []);
 
     /**
      * (3) User Operation
      */
-    //// (3-1) Join Operation
-    const joinClicked = async () => {
-        if (!zoomSDKState.joinZoom) {
-            return;
-        }
-        const usernameInput = document.getElementById("username") as HTMLInputElement;
-        const meetingId = document.getElementById("meeting-id") as HTMLInputElement;
-        const meetingPw = document.getElementById("meeting-pw") as HTMLInputElement;
-        const secret = document.getElementById("secret") as HTMLInputElement;
-        await zoomSDKState.joinZoom(usernameInput.value, meetingId.value, meetingPw.value, secret.value);
-    };
-    //// (3-2) Speak
+    //// (3-1) Speak
     const speakClicked = async () => {
         const text = document.getElementById("sidebar-avatar-area-voice-text") as HTMLInputElement;
         const lang = document.getElementById("sidebar-lang-selector") as HTMLInputElement;
@@ -139,7 +104,7 @@ export const RightSidebar = () => {
         play();
     }, [voice]);
 
-    ////// (3-3-1) Speaker Setting
+    ////// (3-1-1) Speaker Setting
     const [localLangSpeakerMap, setLocalLangSpeakerMap] = useState<{ [lang: string]: string[] }>({});
     const [selectedLang, setSelectedLang] = useState<string>(voiceSetting.default_voice_lang);
     const [selectedSpeaker, setSelectedSpeaker] = useState<string>(voiceSetting.default_voice_speaker);
@@ -158,7 +123,7 @@ export const RightSidebar = () => {
         const selector = (
             <select
                 id="sidebar-lang-selector"
-                className="sidebar-lang-selector"
+                className="sidebar-zoom-area-lang-selector"
                 onChange={(ev) => {
                     setSelectedLang(ev.target.value);
                 }}
@@ -182,7 +147,7 @@ export const RightSidebar = () => {
         const selector = (
             <select
                 id="sidebar-speaker-selector"
-                className="sidebar-speaker-selector"
+                className="sidebar-zoom-area-speaker-selector"
                 onChange={(ev) => {
                     setSelectedSpeaker(ev.target.value);
                 }}
@@ -200,12 +165,12 @@ export const RightSidebar = () => {
         return selector;
     }, [localLangSpeakerMap, selectedLang, selectedSpeaker]);
 
-    //// (3-3) Time Keeper
-    ////// (3-3-1) Show Dialog
+    //// (3-2) Time Keeper
+    ////// (3-2-1) Show Dialog
     const showTimeKeeperDialog = () => {
         frontendManagerState.stateControls.timeKeeperSettingDialogCheckbox.updateState(true);
     };
-    ////// (3-3-2) Remove TimeKeeper
+    ////// (3-2-2) Remove TimeKeeper
     const removeTimeKeep = () => {
         timeKeeperState.setTimeKeeperProps({
             endTime: "",
@@ -215,7 +180,7 @@ export const RightSidebar = () => {
             fiveMinutesEnable: false,
         });
     };
-    ////// (3-3-3) Update Label (end time)
+    ////// (3-2-3) Update Label (end time)
     const endTimeLabel = useMemo(() => {
         if (timeKeeperState.endTime.split(":").length == 2) {
             return `End Time:${timeKeeperState.endTime}`;
@@ -223,7 +188,7 @@ export const RightSidebar = () => {
             return `no time keep`;
         }
     }, [timeKeeperState]);
-    ////// (3-3-3) Update Label (remaining time)
+    ////// (3-2-4) Update Label (remaining time)
     useEffect(() => {
         const div = document.getElementById("sidebar-avatar-area-time-keeper-label-remain") as HTMLDivElement;
         let timeout: NodeJS.Timeout | null = null;
@@ -240,12 +205,12 @@ export const RightSidebar = () => {
         };
     }, [timeKeeperState]);
 
-    //// (3-4A-1)
+    //// (3-3)
     const speachRecognitonLanguagesSelector = useMemo(() => {
         const selector = (
             <select
                 id="sidebar-lang-selector"
-                className="sidebar-lang-selector"
+                className="sidebar-zoom-area-lang-selector"
                 onChange={(ev) => {
                     setLanguageKey(ev.target.value as SpeachRecognitionLanguagesKeys);
                 }}
@@ -305,8 +270,11 @@ export const RightSidebar = () => {
 
     //// (3-5) use Body Rig
     const useUpperBodyChanged = (ev: React.ChangeEvent<HTMLInputElement>) => {
-        console.log("UPPERBODY", ev.target.checked);
         avatarControlState.useBodyRig(ev.target.checked);
+    };
+
+    const updateSmaWindowSize = (ev: React.ChangeEvent<HTMLInputElement>) => {
+        avatarControlState.setSmaWinSize(Number(ev.target.value));
     };
 
     /**
@@ -423,25 +391,13 @@ export const RightSidebar = () => {
         };
     }, [threeState, motionPlayerState.motions, avatarControlState.isInitialized]);
 
-    //// (4-2) メインループ
+    //// (x) motion capture
     const setRecordingStart = (ev: React.ChangeEvent<HTMLInputElement>) => {
         recordMotionEnabledRef.current = ev.target.checked;
         setRecordMotionEnabled(recordMotionEnabledRef.current);
         if (ev.target.checked === true) {
             motionFramesForRec.current = [];
             currentTimeRef.current = new Date().getTime();
-        } else {
-            // const blob = new Blob([JSON.stringify(motionFramesForRec.current)], { type: "text/plain" });
-            // const url = URL.createObjectURL(blob);
-            // const a = document.createElement("a");
-            // document.body.appendChild(a);
-            // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // // @ts-ignore
-            // a.style = "display: none";
-            // a.href = url;
-            // a.download = "motion.json";
-            // a.click();
-            // window.URL.revokeObjectURL(url);
         }
     };
     const setNewMotion = () => {
@@ -451,10 +407,23 @@ export const RightSidebar = () => {
         if (motionFramesForRec.current.length > 0) {
             motionPlayerState.setMotion(motionName, motionFramesForRec.current);
         }
-        motionFramesForRec.current = [];
+        // motionFramesForRec.current = [];
     };
     const replayNewMotion = () => {
         console.log("not implemented");
+    };
+    const downloadMotion = () => {
+        const blob = new Blob([JSON.stringify(motionFramesForRec.current)], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        document.body.appendChild(a);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        a.style = "display: none";
+        a.href = url;
+        a.download = "motion.json";
+        a.click();
+        window.URL.revokeObjectURL(url);
     };
     // const openMotionDialog = () => {
     //     console.log("not implemented");
@@ -550,58 +519,30 @@ export const RightSidebar = () => {
         <>
             {frontendManagerState.stateControls.openRightSidebarCheckbox.trigger}
             <div className="right-sidebar">
-                {sidebarAccordionZoomCheckbox.trigger}
-                <div className="sidebar-partition">
-                    <div className="sidebar-header">
-                        <div className="title"> Zoom</div>
-                        <div className="caret"> {accodionButtonForZoom}</div>
-                    </div>
-                    <div className="sidebar-content">
-                        <div className="sidebar-zoom-area">
-                            <div className="sidebar-zoom-area-input">
-                                <input type="text" className="sidebar-zoom-area-text" id="username" />
-                                <div className="sidebar-zoom-area-label">username</div>
-                            </div>
-                            <div className="sidebar-zoom-area-input">
-                                <input type="text" className="sidebar-zoom-area-text" id="meeting-id" />
-                                <div className="sidebar-zoom-area-label">meeting num</div>
-                            </div>
-                            <div className="sidebar-zoom-area-input">
-                                <input type="password" className="sidebar-zoom-area-password" id="meeting-pw" />
-                                <div className="sidebar-zoom-area-label">password</div>
-                            </div>
-                            <div className="sidebar-zoom-area-input">
-                                <input type="password" className="sidebar-zoom-area-password" id="secret" />
-                                <div className="sidebar-zoom-area-label">secret</div>
-                            </div>
-                            <div className="sidebar-zoom-area-input">
-                                <div
-                                    className="sidebar-zoom-area-button"
-                                    onClick={() => {
-                                        joinClicked();
-                                    }}
-                                >
-                                    join
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <Header></Header>
                 {sidebarAccordionAvatarCheckbox.trigger}
                 <div className="sidebar-partition">
                     <div className="sidebar-header">
-                        <div className="title"> Avatar</div>
-                        <div className="caret"> {accodionButtonForAvatar}</div>
+                        <div className="sidebar-header-title"> Avatar</div>
+                        <div className="sidebar-header-caret"> {accodionButtonForAvatar}</div>
                     </div>
                     <div className="sidebar-content">
                         <div className="sidebar-avatar-area">
-                            <div id="sidebar-avatar-area" className="sidebar-avatar-canvas-container"></div>
-                            <div className="sidebar-avatar-area-time-keeper-container">
-                                <div className="sidebar-avatar-area-time-keeper-label">{endTimeLabel}</div>
-                                <div id="sidebar-avatar-area-time-keeper-label-remain" className="sidebar-avatar-area-time-keeper-label"></div>
-                                <div className="sidebar-avatar-area-time-keeper-buttons">
+                            <div id="sidebar-avatar-area" className="sidebar-avatar-area-canvas-container"></div>
+                            <div className="sidebar-zoom-area-input">
+                                <div className="sidebar-zoom-area-input-label">Time Keeper</div>
+                                <div className="sidebar-zoom-area-input-setter-container">
+                                    <div>
+                                        {endTimeLabel}(<span id="sidebar-avatar-area-time-keeper-label-remain"></span>)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="sidebar-zoom-area-input">
+                                <div className="sidebar-zoom-area-input-label"></div>
+                                <div className="sidebar-zoom-area-input-setter-container">
                                     <div
-                                        className="sidebar-avatar-area-time-keeper-button"
+                                        className="sidebar-zoom-area-input-setter-button1"
                                         onClick={() => {
                                             showTimeKeeperDialog();
                                         }}
@@ -609,7 +550,7 @@ export const RightSidebar = () => {
                                         set
                                     </div>
                                     <div
-                                        className="sidebar-avatar-area-time-keeper-button"
+                                        className="sidebar-zoom-area-input-setter-button1"
                                         onClick={() => {
                                             removeTimeKeep();
                                         }}
@@ -618,45 +559,58 @@ export const RightSidebar = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="sidebar-avatar-area-buttons">{motionButtons}</div>
 
                             <div className="sidebar-zoom-area-input">
-                                {langSelector}
-                                {speakerSelector}
-                                <div className="sidebar-zoom-area-label">speaker</div>
-                            </div>
-                            <div className="sidebar-zoom-area-input">
-                                <input type="text" className="sidebar-zoom-area-voice-text" id="sidebar-avatar-area-voice-text" />
-                                <div className="sidebar-zoom-area-label">text</div>
+                                <div className="sidebar-zoom-area-input-label">motions</div>
+                                <div className="sidebar-zoom-area-input-setter-container">{motionButtons}</div>
                             </div>
 
                             <div className="sidebar-zoom-area-input">
-                                <div
-                                    className="sidebar-zoom-area-button"
-                                    onClick={() => {
-                                        speakClicked();
-                                    }}
-                                >
-                                    speak
+                                <div className="sidebar-zoom-area-input-label">speaker</div>
+                                <div className="sidebar-zoom-area-input-setter-container">
+                                    {langSelector}
+                                    {speakerSelector}
                                 </div>
                             </div>
 
                             <div className="sidebar-zoom-area-input">
-                                {speachRecognitonLanguagesSelector}
-                                <input
-                                    type="checkbox"
-                                    id="sidebar-recognition-button-checkbox"
-                                    className="sidebar-recognition-button-checkbox"
-                                    onClick={() => {
-                                        if (isRecognitionEnableSync == isRecognitionEnabledRef.current) {
-                                            recognitionClicked();
-                                        }
-                                    }}
-                                />
-                                <label htmlFor="sidebar-recognition-button-checkbox" className={isRecognitionEnableSync ? "sidebar-recognition-button-label-on" : "sidebar-recognition-button-label-off"}>
-                                    {isRecognitionEnableSync ? "on" : "off"}
-                                </label>
-                                <div className="sidebar-zoom-area-label">recognition</div>
+                                <div className="sidebar-zoom-area-input-label">text</div>
+                                <div className="sidebar-zoom-area-input-setter-container">
+                                    <input type="text" className="sidebar-zoom-area-input-text" id="sidebar-avatar-area-voice-text" />
+                                </div>
+                            </div>
+
+                            <div className="sidebar-zoom-area-input">
+                                <div className="sidebar-zoom-area-input-label"></div>
+                                <div className="sidebar-zoom-area-input-setter-container sidebar-zoom-area-input-setter-right">
+                                    <div
+                                        className="sidebar-zoom-area-input-setter-button1"
+                                        onClick={() => {
+                                            speakClicked();
+                                        }}
+                                    >
+                                        speak
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="sidebar-zoom-area-input">
+                                <div className="sidebar-zoom-area-input-label">recognition</div>
+                                <div className="sidebar-zoom-area-input-setter-container">
+                                    {speachRecognitonLanguagesSelector}
+                                    <input
+                                        id="sidebar-recognition-button-toggle"
+                                        className="sidebar-zoom-area-input-setter-toggle"
+                                        type="checkbox"
+                                        onClick={() => {
+                                            if (isRecognitionEnableSync == isRecognitionEnabledRef.current) {
+                                                recognitionClicked();
+                                            }
+                                        }}
+                                    />
+                                    <label htmlFor="sidebar-recognition-button-toggle" className="sidebar-zoom-area-input-setter-toggle-label" />
+                                    <div className="sidebar-zoom-area-input-setter-text">{isRecognitionEnableSync ? "on" : "off"}</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -665,8 +619,8 @@ export const RightSidebar = () => {
                 {sidebarAccordionAvatarVideoCheckbox.trigger}
                 <div className="sidebar-partition">
                     <div className="sidebar-header">
-                        <div className="title"> Avatar Control</div>
-                        <div className="caret"> {accodionButtonForAvatarVideo}</div>
+                        <div className="sidebar-header-title"> Avatar Control</div>
+                        <div className="sidebar-header-caret"> {accodionButtonForAvatarVideo}</div>
                     </div>
                     <div className="sidebar-content">
                         <video id="sidebar-avatar-area-video" className="sidebar-avatar-area-video" controls autoPlay></video>
@@ -674,9 +628,10 @@ export const RightSidebar = () => {
                         <audio id="sidebar-generate-voice-player"></audio>
 
                         <div className="sidebar-zoom-area-input">
-                            <div className="sidebar-zoom-area-toggle-switch">
+                            <div className="sidebar-zoom-area-input-label">capture</div>
+                            <div className="sidebar-zoom-area-input-setter-container sidebar-zoom-area-input-setter-right">
                                 <input
-                                    id="use-upper-body-checkbox"
+                                    id="capture-checkbox"
                                     className="sidebar-zoom-area-toggle-input"
                                     type="checkbox"
                                     onChange={(ev) => {
@@ -684,10 +639,11 @@ export const RightSidebar = () => {
                                     }}
                                 />
                             </div>
-                            <div className="sidebar-zoom-area-label">motion capture</div>
                         </div>
+
                         <div className="sidebar-zoom-area-input">
-                            <div className="sidebar-zoom-area-toggle-switch">
+                            <div className="sidebar-zoom-area-input-label">upper body</div>
+                            <div className="sidebar-zoom-area-input-setter-container sidebar-zoom-area-input-setter-right">
                                 <input
                                     id="use-upper-body-checkbox"
                                     className="sidebar-zoom-area-toggle-input"
@@ -697,61 +653,81 @@ export const RightSidebar = () => {
                                     }}
                                 />
                             </div>
-                            <div className="sidebar-zoom-area-label">upper body(exp.)</div>
                         </div>
 
                         <div className="sidebar-zoom-area-input">
-                            <input
-                                type="checkbox"
-                                id="sidebar-motion-recorder-button-checkbox"
-                                className="sidebar-motion-recorder-button-checkbox"
-                                onChange={(ev) => {
-                                    setRecordingStart(ev);
-                                }}
-                            />
-                            <label htmlFor="sidebar-motion-recorder-button-checkbox" className={recordMotionEnabled ? "sidebar-motion-recorder-button-label-on" : "sidebar-motion-recorder-button-label-off"}>
-                                {recordMotionEnabled ? "on" : "off"}
-                            </label>
-
-                            <div className="sidebar-zoom-area-label">record motion</div>
+                            <div className="sidebar-zoom-area-input-label">SMA win size</div>
+                            <div className="sidebar-zoom-area-input-setter-container sidebar-zoom-area-input-setter-right">
+                                <input
+                                    id="moving-average-window-size"
+                                    className="sidebar-zoom-area-toggle-input"
+                                    type="number"
+                                    min="1"
+                                    max="20"
+                                    step="1"
+                                    defaultValue={avatarControlState.smaWinSize}
+                                    onChange={(ev) => {
+                                        updateSmaWindowSize(ev);
+                                    }}
+                                />
+                            </div>
                         </div>
+
                         <div className="sidebar-zoom-area-input">
-                            <div className="sidebar-motion-recorder-buttons">
-                                <div>name:</div>
-                                <input type="text" className="sidebar-motion-recorder-motion-name-text" id="motion-name" />
+                            <div className="sidebar-zoom-area-input-label">rec motion</div>
+                            <div className="sidebar-zoom-area-input-setter-container sidebar-zoom-area-input-setter-right">
+                                <input
+                                    id="sidebar-motion-recorder-button-toggle"
+                                    className="sidebar-zoom-area-input-setter-toggle"
+                                    type="checkbox"
+                                    onChange={(ev) => {
+                                        setRecordingStart(ev);
+                                    }}
+                                />
+                                <label htmlFor="sidebar-motion-recorder-button-toggle" className="sidebar-zoom-area-input-setter-toggle-label" />
+                                <div className="sidebar-zoom-area-input-setter-text">{recordMotionEnabled ? "on" : "off"}</div>
+
                                 <div
-                                    className="sidebar-motion-recorder-register-button"
+                                    className="sidebar-zoom-area-input-setter-button1"
+                                    onClick={() => {
+                                        replayNewMotion();
+                                    }}
+                                >
+                                    Re.
+                                </div>
+                                <div
+                                    className="sidebar-zoom-area-input-setter-button1"
+                                    onClick={() => {
+                                        downloadMotion();
+                                    }}
+                                >
+                                    DL.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="sidebar-zoom-area-input">
+                            <div className="sidebar-zoom-area-input-label"></div>
+                            <div className="sidebar-zoom-area-input-setter-container ">
+                                <div>name:</div>
+                                <input type="text" className="sidebar-zoom-area-input-text-small" id="motion-name" />
+                                <div
+                                    className="sidebar-zoom-area-input-setter-button1"
                                     onClick={() => {
                                         setNewMotion();
                                     }}
                                 >
                                     set
                                 </div>
-                                <div
-                                    className="sidebar-motion-recorder-replay-button"
-                                    onClick={() => {
-                                        replayNewMotion();
-                                    }}
-                                >
-                                    replay
-                                </div>
-                                {/* <div
-                                    className="sidebar-motion-recorder-open-dialog-button"
-                                    onClick={() => {
-                                        openMotionDialog();
-                                    }}
-                                >
-                                    config
-                                </div> */}
                             </div>
                         </div>
                     </div>
                 </div>
-                {sidebarAccoringTranscribeCheckbox.trigger}
+                {sidebarAccordionTranscribeCheckbox.trigger}
                 <div className="sidebar-partition">
                     <div className="sidebar-header">
-                        <div className="title"> Transcribe</div>
-                        <div className="caret"> {accodionButtonForTranscribe}</div>
+                        <div className="sidebar-header-title"> Transcribe</div>
+                        <div className="sidebar-header-caret"> {accodionButtonForTranscribe}</div>
                     </div>
                     <div className="sidebar-content">
                         <div className="sidebar-zoom-area-input">
@@ -760,10 +736,12 @@ export const RightSidebar = () => {
                             </div>
                         </div>
                         <div className="sidebar-zoom-area-input">
-                            <div className="sidebar-transcribe-button-container">
-                                {voskLanguageSelector}
-                                <div
-                                    className={voskState.isTranscribeStated ? "sidebar-transcribe-start-button-on" : "sidebar-transcribe-start-button-off"}
+                            {voskLanguageSelector}
+                            <div className="sidebar-zoom-area-input-setter-container ">
+                                <input
+                                    id="sidebar-transcribe-start-toggle"
+                                    className="sidebar-zoom-area-input-setter-toggle"
+                                    type="checkbox"
                                     onClick={() => {
                                         if (voskState.isTranscribeStated) {
                                             stopTranscribe();
@@ -771,25 +749,17 @@ export const RightSidebar = () => {
                                             startTranscribe();
                                         }
                                     }}
-                                >
-                                    {voskState.isTranscribeStated ? "on" : "off"}
-                                </div>
+                                />
+                                <label htmlFor="sidebar-transcribe-start-toggle" className="sidebar-zoom-area-input-setter-toggle-label" />
+                                <div className="sidebar-zoom-area-input-setter-text">{voskState.isTranscribeStated ? "on" : "off"}</div>
                                 <div
-                                    className="sidebar-transcribe-clear-button"
+                                    className="sidebar-zoom-area-input-setter-button1"
                                     onClick={() => {
                                         clearTranscribeResults();
                                     }}
                                 >
                                     clear
                                 </div>
-                                {/* <div
-                                    className="sidebar-transcribe-start-button"
-                                    onClick={() => {
-                                        console.log("click");
-                                    }}
-                                >
-                                    summary
-                                </div> */}
                             </div>
                         </div>
                     </div>

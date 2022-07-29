@@ -41,17 +41,18 @@ export const useAppState = (): AppStateValue => {
 };
 
 export const AppStateProvider = ({ children }: Props) => {
+    // (1) load data
     const backendManagerState = useBackendManager();
     const resourceManagerState = useResourceManager();
+    // (2) initialize
     const threeState = useThree();
     const avatarControlState = useAvatarControl({
         vrm: threeState.character,
         scene: threeState.scene,
     });
     const timeKeeperState = useTimeKeeper();
-    const zoomSDKState = useZoomSDK({ backendManagerState });
+    const zoomSDKState = useZoomSDK();
     const browserProxyState = useBrowserProxy({
-        isJoined: zoomSDKState.isJoined,
         threeState,
     });
     const deviceManagerState = useDeviceManager({ browserProxyState });
