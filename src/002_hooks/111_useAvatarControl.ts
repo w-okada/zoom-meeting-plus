@@ -23,11 +23,19 @@ export const useAvatarControl = (props: UseAvatarControlProps): AvatarControlSta
     const [smaWinSize, setSmaWinSize] = useState<number>(1)
     const detector = useMemo(() => {
         const d = new MotionDetector();
-        d.setEnableFullbodyCapture(false);
-        d.setMovingAverageWindow(smaWinSize)
-        d.initializeManagers();
+
         return d
     }, [])
+    useEffect(() => {
+        const initlizeMotionDetector = async () => {
+            await detector.initialize();
+            await detector.setEnableFullbodyCapture(false);
+            await detector.initializeManagers();
+            // detector.setMovingAverageWindow(smaWinSize)
+        }
+        initlizeMotionDetector()
+    }, [])
+
     useEffect(() => {
         detector.setMovingAverageWindow(smaWinSize)
     }, [smaWinSize])

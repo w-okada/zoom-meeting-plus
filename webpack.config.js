@@ -2,6 +2,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require("webpack");
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 module.exports = {
     // mode: "development",
@@ -10,6 +11,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "index.js",
+        assetModuleFilename: "assets/tflite/[name][ext]",
     },
     resolve: {
         modules: [path.resolve(__dirname, "node_modules")],
@@ -35,6 +37,8 @@ module.exports = {
                     },
                 ],
             },
+            { test: /\.bin$/, type: "asset/resource" },
+            { test: /\.wasm$/, type: "asset/resource" },
             {
                 test: /\.css$/,
                 use: ["style-loader", { loader: "css-loader", options: { importLoaders: 1 } }, "postcss-loader"],
@@ -53,6 +57,16 @@ module.exports = {
         new webpack.ProvidePlugin({
             Buffer: ["buffer", "Buffer"],
             process: "process/browser",
+        }),
+        new BundleAnalyzerPlugin({
+            analyzerMode: "static",
+            reportFilename: path.join(__dirname, "./build/stats/app.html"),
+            defaultSizes: "gzip",
+            openAnalyzer: false,
+            generateStatsFile: true,
+            statsFilename: path.join(__dirname, "./build/stats/app.json"),
+            statsOptions: null,
+            logLevel: "info",
         }),
     ],
     devServer: {
