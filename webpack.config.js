@@ -5,8 +5,8 @@ const webpack = require("webpack");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 module.exports = {
-    // mode: "development",
-    mode: "production",
+    mode: "development",
+    // mode: "production",
     entry: path.resolve(__dirname, "src/index.tsx"),
     output: {
         path: path.resolve(__dirname, "dist"),
@@ -43,10 +43,10 @@ module.exports = {
                 test: /\.css$/,
                 use: ["style-loader", { loader: "css-loader", options: { importLoaders: 1 } }, "postcss-loader"],
             },
-            {
-                test: /\.html$/,
-                loader: "html-loader",
-            },
+            // {
+            //     test: /\.html$/,
+            //     loader: "html-loader",
+            // },
         ],
     },
     plugins: [
