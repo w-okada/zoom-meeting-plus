@@ -6,10 +6,12 @@ const enumerateDevices = navigator.mediaDevices.enumerateDevices.bind(navigator.
 navigator.mediaDevices.enumerateDevices = async () => {
     const devices = await enumerateDevices();
     // return devices
-    // const newDevices = devices.filter(x => { return x.kind === "audiooutput" })
-    const newDevices = devices.filter((_x) => {
-        return true;
+    const newDevices = devices.filter((x) => {
+        return x.kind === "audiooutput";
     });
+    // const newDevices = devices.filter((_x) => {
+    //     return true;
+    // });
     newDevices.push({
         deviceId: "default_audioinput",
         groupId: "defaul_audioinput",
@@ -31,6 +33,67 @@ navigator.mediaDevices.enumerateDevices = async () => {
     console.log("CAMERA_DEVICES", devices);
     console.log("CAMERA_NEW_DEVICES", newDevices);
     return newDevices;
+};
+
+const getUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+
+navigator.mediaDevices.getUserMedia = async (params) => {
+    // console.log("GETUSERMEDIA", params)
+    const msForZoom = new MediaStream();
+    if (params?.audio) {
+        const ms = await getUserMedia(params);
+        ms.getAudioTracks().forEach((x) => {
+            msForZoom.addTrack(x);
+        });
+        // if (!audioContext) {
+        //     console.warn("audio context is not initialized", audioContext)
+        //     return msForZoom // no trakcs
+        // }
+        // if (!srcNodeDummyInput) {
+        //     console.warn("dummy audio device is not initialized", srcNodeDummyInput)
+        //     return msForZoom // no trakcs
+        // }
+
+        // // zoom-outgoingから切断
+        // // TODO: disconnect freeze?
+        // if (dstNodeForZoomRef.current) {
+        //     // srcNodeDummyInput.disconnect(dstNodeForZoomRef.current)
+        //     srcNodeAudioInputRef.current?.disconnect(dstNodeForZoomRef.current)
+        // }
+
+        // // zoom-outgoing再生成
+        // dstNodeForZoomRef.current = audioContext.createMediaStreamDestination();
+        // // zoom-outgoingへ再接続
+        // srcNodeDummyInput.connect(dstNodeForZoomRef.current)
+        // srcNodeAudioInputRef.current?.connect(dstNodeForZoomRef.current)
+
+        // // AudioのMediaTrackを追加
+        // dstNodeForZoomRef.current.stream.getAudioTracks().forEach((x) => {
+        //     msForZoom.addTrack(x);
+        // });
+    }
+
+    if (params?.video) {
+        const div = parent.document.getElementById("sidebar-avatar-area") as HTMLDivElement;
+        const canvas = div.firstChild as HTMLCanvasElement;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const avatarMediaStream = canvas.captureStream() as MediaStream;
+        avatarMediaStream.getVideoTracks().forEach((x) => {
+            msForZoom.addTrack(x);
+        });
+
+        // const testCanvas = document.getElementById("test") as HTMLCanvasElement;
+        //// Zoom用のストリーム作成
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // const avatarMediaStream = props.threeState.renderer.domElement.captureStream() as MediaStream;
+        // avatarMediaStream.getVideoTracks().forEach((x) => {
+        //     msForZoom.addTrack(x);
+        // });
+    }
+    // return transform(msForZoom);
+    return msForZoom;
 };
 
 const initZoomClient = async () => {
