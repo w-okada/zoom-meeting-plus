@@ -19,10 +19,10 @@ export const useApplicationSettingManager = () => {
             return
         }
         const getZak = async () => {
-            console.log("GET_ZAK_URL1", applicationSetting?.oauth)
             const getZakURL = applicationSetting?.oauth.get_zak_url || ""
-            console.log("GET_ZAK_URL2", getZakURL)
-            const zak = await fetchZak(getZakURL, code)
+            const url = `${getZakURL}?code=${code}`
+            console.log("URL", url)
+            const zak = await fetchZak(url)
             console.log("ZAK!!", zak)
             setZak(zak)
         }
