@@ -34,7 +34,6 @@ export type ApplicationSetting =
 
 
 
-
 export const fetchApplicationSetting = async (): Promise<ApplicationSetting> => {
     const url = `/api/setting`
     const res = await fetch(url, {
@@ -42,4 +41,16 @@ export const fetchApplicationSetting = async (): Promise<ApplicationSetting> => 
     });
     const setting = await res.json() as ApplicationSetting
     return setting;
+}
+
+export const fetchZak = async (token: string) => {
+    const url = `https://api.zoom.us/v2/users/me/token?type=zak`
+    const res = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${token}`,
+        },
+    });
+    const zak = await res.json()
+    return zak;
 }
