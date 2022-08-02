@@ -7,6 +7,7 @@ import { useFileInput } from "./hooks/useFileInput";
 const TabItems = {
     audioInput: "audioInput",
     videoInput: "videoInput",
+    audioOutput: "audioOutput",
     avatar: "avatar",
 } as const;
 type TabItems = typeof TabItems[keyof typeof TabItems];
@@ -74,6 +75,17 @@ const DialogTiles = (props: DialogTilesProps) => {
         };
         const videoInputIcon = <DialogTileIcon {...videoInputIconProps}></DialogTileIcon>;
 
+        const audioOutputIconProps: DialogTileIconProps = {
+            tabId: TabItems.audioOutput,
+            onChange: () => {
+                props.onChange(TabItems.audioOutput);
+            },
+            selected: props.currentTab == TabItems.audioOutput,
+            icon: <FontAwesomeIcon icon={["fas", "volume-high"]} size="3x" />,
+            label: "speaker",
+        };
+        const audioOutputIcon = <DialogTileIcon {...audioOutputIconProps}></DialogTileIcon>;
+
         const avatarIconProps: DialogTileIconProps = {
             tabId: TabItems.avatar,
             onChange: () => {
@@ -88,6 +100,7 @@ const DialogTiles = (props: DialogTilesProps) => {
             <div className="dialog-radio-tile-group">
                 {audioInputIcon}
                 {videoInputIcon}
+                {audioOutputIcon}
                 {avatarIcon}
             </div>
         );
@@ -126,6 +139,8 @@ export const SettingDialog = () => {
                 return "Audio input setting";
             case "videoInput":
                 return "Video input setting";
+            case "audioOutput":
+                return "Audio output setting";
             case "avatar":
                 return "Avatar setting";
             default:
@@ -274,6 +289,47 @@ export const SettingDialog = () => {
         );
     }, [showFileInputForVideo, tab]);
 
+    //// (2-2) Audio Output
+    const audioOutputOptions = useMemo(() => {
+        const options = deviceManagerState.audioOutputDevices.map((x) => {
+            return (
+                <option value={x.deviceId} key={x.deviceId}>
+                    {x.label}
+                </option>
+            );
+        });
+        return options;
+    }, [deviceManagerState.audioInputDevices]);
+    const audioOutputSelectField = useMemo(() => {
+        // see: https://nessssy.net/blog/2021/01/08/react-select-defaultvalue
+        if (deviceManagerState.audioOutputDevices.length == 0) {
+            return <></>;
+        }
+        if (tab != "audioOutput") {
+            return <></>;
+        }
+        return (
+            <div className="dialog-input-controls">
+                <div className="dialog-input-description-label">speaker for echoback</div>
+                <select
+                    id="setting-dialog-audio-input-select"
+                    className="dialog-input-select"
+                    required
+                    defaultValue={deviceManagerState.audioOutputDeviceId || "none"}
+                    onChange={(e) => {
+                        if (e.target.value == "none") {
+                            deviceManagerState.setAudioOutputDeviceId(null);
+                        } else {
+                            deviceManagerState.setAudioOutputDeviceId(e.target.value);
+                        }
+                    }}
+                >
+                    {audioOutputOptions}
+                </select>
+            </div>
+        );
+    }, [deviceManagerState.audioOutputDevices, tab]);
+
     //// (2-3) Avatar Input
     const fileButtonForAvatar = useMemo(() => {
         if (tab != "avatar") {
@@ -351,6 +407,7 @@ export const SettingDialog = () => {
                             {audioConnect}
                             {videoInputSelectField}
                             {fileInputButtonForVideo}
+                            {audioOutputSelectField}
                             {fileButtonForAvatar}
                             {/* {fileButtonForAvatarMotion} */}
                             {buttons}
@@ -359,7 +416,7 @@ export const SettingDialog = () => {
                 </div>
             </div>
         );
-    }, [tab, audioInputSelectField, videoInputSelectField, fileInputButtonForVideo, fileButtonForAvatar, fileButtonForAvatarMotion]);
+    }, [tab, audioInputSelectField, videoInputSelectField, fileInputButtonForVideo, audioOutputSelectField, fileButtonForAvatar, fileButtonForAvatarMotion]);
 
     return form;
 };
