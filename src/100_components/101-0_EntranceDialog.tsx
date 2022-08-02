@@ -10,7 +10,7 @@ export const EntranceDialog = () => {
     const defaultMeetingNumber = applicationSetting?.default_meeting.default_meeting_number || "";
     const defaultMeetingPassword = applicationSetting?.default_meeting.default_meeting_password || "";
     const defaultSecret = applicationSetting?.default_meeting.default_secret || "";
-    const oauthSettting = applicationSetting?.aouth;
+    const oauthSettting = applicationSetting?.oauth;
 
     ////////////////////////////
     //  Conponents

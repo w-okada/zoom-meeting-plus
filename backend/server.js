@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 require("dotenv").config({ path: "./.env/.env" });
 const express = require("express");
+const request = require("request");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 const bodyParser = require("body-parser");
@@ -24,10 +25,10 @@ if (process.env.OPEN_TTS_URL) {
     setting.voice_setting.open_tts_url = process.env.OPEN_TTS_URL;
 }
 if (process.env.OAUTH_CLIENT_ID) {
-    setting.aouth.client_id = process.env.OAUTH_CLIENT_ID;
+    setting.oauth.client_id = process.env.OAUTH_CLIENT_ID;
 }
 if (process.env.OAUTH_REDIRECT_URL) {
-    setting.aouth.redirect_url = process.env.OAUTH_REDIRECT_URL;
+    setting.oauth.redirect_url = process.env.OAUTH_REDIRECT_URL;
 }
 
 // app.use("/", express.static("dist"));
@@ -52,6 +53,21 @@ app.get("/api/redirect", (req, res) => {
     const appURL = req.query.state;
     const redirectURL = `${appURL}?code=${code}`;
     res.redirect(redirectURL);
+});
+app.get("/api/get_zak", (req, res) => {
+    const code = req.query.code;
+    let url = `https://zoom.us/oauth/token?grant_type=authorization_code&code=${code}&redirect_uri=${code}`;
+    console.log("GET_TOKEN_URL", url);
+    request
+        .post(url, (error, response, body) => {
+            // Parse response to JSON
+            body = JSON.parse(body);
+
+            // Logs your access and refresh tokens in the browser
+            console.log(`access_token: ${body.access_token}`);
+            console.log(`refresh_token: ${body.refresh_token}`);
+        })
+        .auth(setting.oauth.client_id, process.env.OAUTH_CLIENT_SECRET);
 });
 
 app.get("/api/generateSignature", (req, res) => {

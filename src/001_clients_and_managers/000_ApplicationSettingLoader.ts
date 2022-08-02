@@ -18,7 +18,7 @@ export type ApplicationSetting =
             "use_local_sign_server": boolean,
             "sign_server_url": string
         },
-        "aouth": {
+        "oauth": {
             "oauth_url": string,
             "client_id": string,
             "redirect_url": string,
@@ -45,13 +45,11 @@ export const fetchApplicationSetting = async (): Promise<ApplicationSetting> => 
     return setting;
 }
 
-export const fetchZak = async (url: string, token: string) => {
+export const fetchZak = async (url: string) => {
     const res = await fetch(url, {
         method: "GET",
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        },
     });
     const zak = await res.json()
+    console.log("zak", zak)
     return zak;
 }
