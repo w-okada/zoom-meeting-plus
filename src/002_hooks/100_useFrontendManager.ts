@@ -25,7 +25,16 @@ export type FrontendManagerStateAndMethod = FrontendManagerState & {
 }
 export const useFrontendManager = (props: UseFrontendManagerProps): FrontendManagerStateAndMethod => {
     // (1) Controller Switch
-    const openRightSidebarCheckbox = useStateControlCheckbox("open-right-sidebar-checkbox");
+    const openRightSidebarCheckbox = useStateControlCheckbox("open-right-sidebar-checkbox", (val: boolean) => {
+        const inner = document.getElementById("inner-index-container")
+        if (inner) {
+            if (val) {
+                inner.style.paddingRight = `320px`
+            } else {
+                inner.style.paddingRight = `0px`
+            }
+        }
+    });
 
     // (2) Dialog
     const entranceDialogCheckbox = useStateControlCheckbox("entrance-dialog-checkbox");

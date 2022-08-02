@@ -14,12 +14,12 @@ export const Frame = () => {
         frontendManagerState.stateControls.entranceDialogCheckbox.updateState(true);
     }, []);
     const iframe = useMemo(() => {
-        return (
-            <></>
-            // <div className="inner-index-container">
-            //     <iframe id="inner-index" title="inner" className="inner-index" src="./inner-index.html"></iframe>
-            // </div>
-        );
+        return <></>;
+        // return (
+        //     <div className="inner-index-container">
+        //         <iframe id="inner-index" title="inner" className="inner-index" src="./inner-index.html"></iframe>
+        //     </div>
+        // );
     }, []);
     return (
         <>
