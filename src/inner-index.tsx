@@ -224,7 +224,7 @@ const updateZoomIncomingNode = () => {
         return;
     }
     // 切断処理
-    srcNodeZoomIncomming?.disconnect(dstNodeForInternal);
+    // srcNodeZoomIncomming?.disconnect(dstNodeForInternal);
     // 再生成
     const zoomIncomingMS = new MediaStream();
     referableAudios.forEach((x) => {
