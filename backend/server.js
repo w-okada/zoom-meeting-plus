@@ -46,8 +46,12 @@ app.get("/api/setting", (req, res) => {
     res.json(setting);
 });
 
-app.get("/api/auth", (req, res) => {
-    res.json(setting);
+app.get("/api/redirect", (req, res) => {
+    // res.json(setting);
+    const code = req.query.code;
+    const appURL = req.query.state;
+    const redirectURL = `${appURL}?code=${code}`;
+    res.redirect(redirectURL);
 });
 
 app.get("/api/generateSignature", (req, res) => {

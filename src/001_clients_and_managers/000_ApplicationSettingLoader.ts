@@ -19,6 +19,7 @@ export type ApplicationSetting =
             "sign_server_url": string
         },
         "aouth": {
+            "oauth_url": string,
             "client_id": string,
             "redirect_url": string
         },
