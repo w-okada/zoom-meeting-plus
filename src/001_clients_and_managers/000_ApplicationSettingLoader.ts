@@ -21,7 +21,8 @@ export type ApplicationSetting =
         "aouth": {
             "oauth_url": string,
             "client_id": string,
-            "redirect_url": string
+            "redirect_url": string,
+            "get_zak_url": string,
         },
         "voice_setting": {
             "default_voice_vox_enabled": boolean,
@@ -44,8 +45,7 @@ export const fetchApplicationSetting = async (): Promise<ApplicationSetting> => 
     return setting;
 }
 
-export const fetchZak = async (token: string) => {
-    const url = `https://api.zoom.us/v2/users/me/token?type=zak`
+export const fetchZak = async (url: string, token: string) => {
     const res = await fetch(url, {
         method: "GET",
         headers: {

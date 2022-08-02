@@ -19,7 +19,8 @@ export const useApplicationSettingManager = () => {
             return
         }
         const getZak = async () => {
-            const zak = await fetchZak(accessToken)
+            const getZakURL = applicationSetting?.aouth.get_zak_url || ""
+            const zak = await fetchZak(getZakURL, accessToken)
             console.log("ZAK!!", zak)
             setZak(zak)
         }
