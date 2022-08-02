@@ -33,21 +33,21 @@ export const useDeviceManager = (props: UseDeviceManagerProps): DeviceManagerSta
                 setLastUpdateTime(new Date().getTime())
             }
         })
-        manager.reloadDevices(props.browserProxyState.enumerateDevices)
+        manager.reloadDevices()
         return manager
-    }, [props.browserProxyState.enumerateDevices])
+    }, [])
 
     // () Enumerate
     const reloadDevices = useMemo(() => {
         return async () => {
-            deviceManager.reloadDevices(props.browserProxyState.enumerateDevices)
+            deviceManager.reloadDevices()
         }
-    }, [props.browserProxyState.enumerateDevices])
+    }, [])
 
     // () set video
     const setVideoElement = async (elem: HTMLVideoElement) => {
         if (videoInputDeviceId) {
-            const ms = await props.browserProxyState.getUserMedia({
+            const ms = await navigator.mediaDevices.getUserMedia({
                 video: {
                     deviceId: videoInputDeviceId
                 }
@@ -58,7 +58,7 @@ export const useDeviceManager = (props: UseDeviceManagerProps): DeviceManagerSta
     }
     const setVideoInputDeviceId = async (val: string | null) => {
         if (val && videoElement) {
-            const ms = await props.browserProxyState.getUserMedia({
+            const ms = await navigator.mediaDevices.getUserMedia({
                 video: {
                     deviceId: val
                 }

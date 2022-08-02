@@ -49,9 +49,6 @@ export const EntranceDialog = () => {
 
     const enterMeeting = useMemo(() => {
         return async () => {
-            // get first user gesture!!
-            browserProxyState.initBrowserProxy();
-
             const usernameInput = document.getElementById("entrance-dialog-username") as HTMLInputElement;
             const meetingNumberInput = document.getElementById("entrance-dialog-meeting-number") as HTMLInputElement;
             const passwordInput = document.getElementById("entrance-dialog-password") as HTMLInputElement;

@@ -56,11 +56,7 @@ export const AppStateProvider = ({ children }: Props) => {
         threeState,
     });
     const deviceManagerState = useDeviceManager({ browserProxyState });
-    const voskState = useVosk({
-        audioContext: browserProxyState.audioContext,
-        dstNodeForInternal: browserProxyState.dstNodeForInternal,
-        referableAudios: browserProxyState.referableAudios,
-    });
+    const voskState = useVosk();
     const frontendManagerState = useFrontendManager({
         setStartTranscribe: voskState.setIsTranscribeStated,
     });

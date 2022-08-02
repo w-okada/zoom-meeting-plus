@@ -1,3 +1,16 @@
+.inner-index-container {
+    position: fixed;
+    width: 100%;
+    padding-right: 0;
+    height: 100%;
+    /* transition: 0.4s; */
+}
+
+.inner-index {
+    width: 100%;
+    height: 100%;
+}
+
 /** (1) right-sidebar **/
 /*** (1-1) container ***/
 .right-sidebar {

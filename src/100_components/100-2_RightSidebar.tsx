@@ -312,16 +312,16 @@ export const RightSidebar = () => {
         /// アバターのポーズ更新の内部関数
         const updatePose = (_poses: PosePredictionEx | null, faceRig: TFace | null, leftHandRig: THand<Side> | null, rightHandRig: THand<Side> | null, poseRig: TPose | null) => {
             if (faceRig) {
-                if (browserProxyState.voiceDiffRef.current > 40) {
+                if (browserProxyState.voiceValue > 40) {
+                    faceRig.mouth.shape.A = 1;
+                } else if (browserProxyState.voiceValue > 30) {
                     faceRig.mouth.shape.A = 0.5;
-                } else if (browserProxyState.voiceDiffRef.current > 30) {
-                    faceRig.mouth.shape.A = 0.3;
-                } else if (browserProxyState.voiceDiffRef.current > 20) {
-                    faceRig.mouth.shape.I = 0.4;
-                } else if (browserProxyState.voiceDiffRef.current > 10) {
-                    faceRig.mouth.shape.U = 0.6;
-                } else if (browserProxyState.voiceDiffRef.current > 1) {
-                    faceRig.mouth.shape.O = 0.3;
+                } else if (browserProxyState.voiceValue > 20) {
+                    faceRig.mouth.shape.I = 0.6;
+                } else if (browserProxyState.voiceValue > 10) {
+                    faceRig.mouth.shape.U = 0.5;
+                } else if (browserProxyState.voiceValue > 1) {
+                    faceRig.mouth.shape.O = 0.2;
                 }
             }
             // avatarControlState.avatar.updatePose(faceRig, poseRig, leftHandRig, rightHandRig);

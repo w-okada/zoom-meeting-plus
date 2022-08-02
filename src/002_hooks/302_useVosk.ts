@@ -10,11 +10,6 @@ export const VoskLanguages = {
 } as const
 export type VoskLanguages = typeof VoskLanguages[keyof typeof VoskLanguages]
 
-export type UseVoskProps = {
-    dstNodeForInternal: MediaStreamAudioDestinationNode | null
-    referableAudios: HTMLAudioElement[]
-    audioContext: AudioContext | null
-}
 class AudioStreamer extends Duplex {
     constructor(public recognizer: KaldiRecognizer, options?: DuplexOptions) {
         super(options);
@@ -40,7 +35,7 @@ export type VoskStateAndMethod = VoskState & {
     setLanguage: (val: VoskLanguages) => void
 }
 
-export const useVosk = (props: UseVoskProps): VoskStateAndMethod => {
+export const useVosk = (): VoskStateAndMethod => {
     const [language, setLanguage] = useState<VoskLanguages>("jp")
     const [recognizer, setRecognizer] = useState<KaldiRecognizer>();
     const resultRef = useRef<string[]>([]);
@@ -71,7 +66,12 @@ export const useVosk = (props: UseVoskProps): VoskStateAndMethod => {
     }, [language]);
 
     const micStream = useMemo(() => {
-        if (!recognizer || !props.dstNodeForInternal) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const ifrm = document.getElementById('inner-index')!.contentWindow as Window;
+        const dstNodeForInternal = ifrm.getDstNodeForInternal();
+
+        if (!recognizer || !dstNodeForInternal) {
             return null;
         }
 
@@ -82,32 +82,39 @@ export const useVosk = (props: UseVoskProps): VoskStateAndMethod => {
             objectMode: true,
             bufferSize: 1024,
         });
-        micStream.setStream(props.dstNodeForInternal.stream);
+        micStream.setStream(dstNodeForInternal.stream);
 
         micStream.pipe(audioStreamer);
         micStream.pause();
         return micStream
-    }, [recognizer, props.dstNodeForInternal])
+    }, [isTranscribeStated])
 
 
     ///// (X) Start Transcribe
     useEffect(() => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const ifrm = document.getElementById('inner-index')!.contentWindow as Window;
+        const dstNodeForInternal = ifrm.getDstNodeForInternal();
+        const audioContext = ifrm.getAudioContext();
+        const referableAudios = ifrm.getReferableAudios()
+
         console.log("TRANSCIBE START?", isTranscribeStated);
         if (!micStream) {
             return
         }
-        if (!props.dstNodeForInternal) {
+        if (!dstNodeForInternal) {
             return
         }
         const startT = async () => {
-            for (const x of props.referableAudios) {
+            for (const x of referableAudios) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 const ms = x.captureStream() as MediaStream;
                 // TODO: disconnect old mediastream ?
-                if (props.audioContext && ms.getAudioTracks().length > 0) {
-                    const src = props.audioContext.createMediaStreamSource(ms);
-                    src.connect(props.dstNodeForInternal!);
+                if (audioContext && ms.getAudioTracks().length > 0) {
+                    const src = audioContext.createMediaStreamSource(ms);
+                    src.connect(dstNodeForInternal);
                 }
             }
             micStream.resume();
@@ -120,7 +127,7 @@ export const useVosk = (props: UseVoskProps): VoskStateAndMethod => {
             console.log("TRANSCRIBE STOP")
             micStream?.pause()
         }
-    }, [isTranscribeStated, micStream, props.audioContext, props.dstNodeForInternal, props.referableAudios]);
+    }, [isTranscribeStated, micStream]);
 
     const clearResults = () => {
         resultRef.current = [];

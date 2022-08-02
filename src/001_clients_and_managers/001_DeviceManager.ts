@@ -22,13 +22,13 @@ export class DeviceManager {
 
 
     // (A) Device List生成
-    reloadDevices = async (enumerateDevices: () => Promise<MediaDeviceInfo[]>) => {
+    reloadDevices = async () => {
         try {
             await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         } catch (e) {
             console.warn("Enumerate device error::", e)
         }
-        const mediaDeviceInfos = await enumerateDevices();
+        const mediaDeviceInfos = await navigator.mediaDevices.enumerateDevices();
 
         this.realAudioInputDevices = mediaDeviceInfos.filter(x => { return x.kind === "audioinput" }).map(x => { return { label: x.label, deviceId: x.deviceId } })
         this.realVideoInputDevices = mediaDeviceInfos.filter(x => { return x.kind === "videoinput" }).map(x => { return { label: x.label, deviceId: x.deviceId } })
