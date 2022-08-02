@@ -18,6 +18,10 @@ export type ApplicationSetting =
             "use_local_sign_server": boolean,
             "sign_server_url": string
         },
+        "aouth": {
+            "client_id": string,
+            "redirect_url": string
+        },
         "voice_setting": {
             "default_voice_vox_enabled": boolean,
             "voice_vox_url": string,

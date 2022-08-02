@@ -23,6 +23,12 @@ if (process.env.VOICE_VOX_URL) {
 if (process.env.OPEN_TTS_URL) {
     setting.voice_setting.open_tts_url = process.env.OPEN_TTS_URL;
 }
+if (process.env.OAUTH_CLIENT_ID) {
+    setting.aouth.client_id = process.env.OAUTH_CLIENT_ID;
+}
+if (process.env.OAUTH_REDIRECT_URLOPEN_TTS_URL) {
+    setting.aouth.redirect_url = process.env.OAUTH_REDIRECT_URLOPEN_TTS_URL;
+}
 
 // app.use("/", express.static("dist"));
 app.use(
@@ -37,6 +43,10 @@ app.use(
 
 app.options("*", cors());
 app.get("/api/setting", (req, res) => {
+    res.json(setting);
+});
+
+app.get("/api/auth", (req, res) => {
     res.json(setting);
 });
 

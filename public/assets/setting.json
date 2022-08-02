@@ -33,6 +33,10 @@
         "use_local_sign_server": false,
         "sign_server_url": "https://zoom-meeting-sdk-demo.herokuapp.com/api/generateSignature"
     },
+    "aouth": {
+        "client_id": "",
+        "redirect_url": ""
+    },
     "voice_setting": {
         "default_voice_vox_enabled": true,
         "voice_vox_url": "http://localhost:50021",

@@ -10,6 +10,7 @@ export const EntranceDialog = () => {
     const defaultMeetingNumber = applicationSetting?.default_meeting.default_meeting_number || "";
     const defaultMeetingPassword = applicationSetting?.default_meeting.default_meeting_password || "";
     const defaultSecret = applicationSetting?.default_meeting.default_secret || "";
+    const oauthSettting = applicationSetting?.aouth;
 
     ////////////////////////////
     //  Conponents
@@ -94,6 +95,18 @@ export const EntranceDialog = () => {
         );
     }, []);
 
+    const oauth = useMemo(() => {
+        const clientId = oauthSettting?.client_id || "";
+        const redirectURL = oauthSettting?.redirect_url || "";
+        if (clientId.length > 0 && redirectURL.length > 0) {
+            const encodedRedirectURL = encodeURIComponent(redirectURL);
+            const oauthURL = `https://zoom.us/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodedRedirectURL}`;
+            return <a href={oauthURL}>oauth</a>;
+        } else {
+            return <></>;
+        }
+    }, []);
+
     const form = useMemo(() => {
         return (
             <div className="dialog-frame">
@@ -111,6 +124,7 @@ export const EntranceDialog = () => {
                         </div>
                     </form>
                 </div>
+                {oauth}
             </div>
         );
     }, []);
