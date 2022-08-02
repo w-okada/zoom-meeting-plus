@@ -248,6 +248,9 @@
             left: 300%;
             width: 20%;
         }
+        .sidebar-zoom-area-checkbox {
+            margin-left: 5px;
+        }
     }
     .sidebar-zoom-area-input-setter-right {
         justify-content: end;

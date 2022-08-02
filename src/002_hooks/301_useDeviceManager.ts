@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { DeviceInfo, DeviceManager } from "../001_clients_and_managers/001_DeviceManager"
 import { BrowserProxyStateAndMethod } from "./300_useBrowserProxy";
 
@@ -13,18 +13,21 @@ type DeviceManagerState = {
     audioOutputDevices: DeviceInfo[]
 
     videoInputDeviceId: string | null
+    audioOutputDeviceId: string | null
 }
 export type DeviceManagerStateAndMethod = DeviceManagerState & {
     reloadDevices: () => Promise<void>
     setVideoElement: (elem: HTMLVideoElement) => Promise<void>
     setVideoInputDeviceId: (val: string | null) => void
     setVideoFileURL: (val: string) => void
+    setAudioOutputDeviceId: (val: string | null) => void
 
 }
 export const useDeviceManager = (props: UseDeviceManagerProps): DeviceManagerStateAndMethod => {
     const [lastUpdateTime, setLastUpdateTime] = useState(0)
     const [videoInputDeviceId, _setVideoInputDeviceId] = useState<string | null>(null)
     const [videoElement, _setVideoElement] = useState<HTMLVideoElement | null>(null)
+    const [audioOutputDeviceId, _setAudioOutputDeviceId] = useState<string | null>(null)
 
     const deviceManager = useMemo(() => {
         const manager = new DeviceManager()
@@ -76,6 +79,26 @@ export const useDeviceManager = (props: UseDeviceManagerProps): DeviceManagerSta
         }
     }
 
+
+    const setAudioOutputDeviceId = async (val: string | null) => {
+        localStorage.audioOutputDevice = val;
+        const echobackAudio = document.getElementById("sidebar-generate-voice-player") as HTMLAudioElement;
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        echobackAudio.setSinkId(val)
+        _setAudioOutputDeviceId(val)
+    }
+    useEffect(() => {
+        const audioOutputDeviceId = localStorage.audioOutputDevice || null
+        const echobackAudio = document.getElementById("sidebar-generate-voice-player") as HTMLAudioElement;
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        echobackAudio.setSinkId(audioOutputDeviceId)
+        _setAudioOutputDeviceId(audioOutputDeviceId)
+    }, [])
+
     return {
         lastUpdateTime,
         audioInputDevices: deviceManager.realAudioInputDevices,
@@ -83,9 +106,11 @@ export const useDeviceManager = (props: UseDeviceManagerProps): DeviceManagerSta
         audioOutputDevices: deviceManager.realAudioOutputDevices,
 
         videoInputDeviceId,
+        audioOutputDeviceId,
         reloadDevices,
         setVideoElement,
         setVideoInputDeviceId,
-        setVideoFileURL
+        setVideoFileURL,
+        setAudioOutputDeviceId,
     }
 }
