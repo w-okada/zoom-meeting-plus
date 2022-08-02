@@ -39,11 +39,22 @@ export const useZoomSDK = (): ZoomSDKStateAndMethod => {
                 type: "ZoomMeetingPlusInitEvent",
             }
             const origin = `${location.protocol}//${location.host}/`
-            ifrm.postMessage(message, "*");
+            ifrm.postMessage(message, origin);
+
             const p = new Promise<void>((resolve) => {
-                setTimeout(resolve, 1000 * 4)
+                const checkZoomInitialized = () => {
+                    if (ifrm.isZoomInitialized()) {
+                        resolve()
+                    } else {
+                        setTimeout(() => {
+                            checkZoomInitialized()
+                        }, 200)
+                    }
+                }
+                checkZoomInitialized()
             })
             await p
+
             console.log("init_zoom", origin)
         }
     }, [])
@@ -86,6 +97,19 @@ export const useZoomSDK = (): ZoomSDKStateAndMethod => {
             }
             const origin = `${location.protocol}//${location.host}/`
             ifrm.postMessage(message, origin);
+            const p = new Promise<void>((resolve) => {
+                const checkZoomJoined = () => {
+                    if (ifrm.isZoomJoined()) {
+                        resolve()
+                    } else {
+                        setTimeout(() => {
+                            checkZoomJoined()
+                        }, 200)
+                    }
+                }
+                checkZoomJoined()
+            })
+            await p
             console.log("join_zoom", origin)
         };
     }, [])

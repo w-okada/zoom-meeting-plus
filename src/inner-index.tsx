@@ -1,6 +1,84 @@
 import { ZoomMeetingPlusInitEvent, ZoomMeetingPlusJoinEvent } from "./sharedTypes";
 
 console.log("test.js");
+let zoomInitCompleted = false;
+let zoomJoinCompleted = false;
+
+const referableAudios: ReferableAudio[] = [];
+class ReferableAudio extends Audio {
+    constructor(src?: string | undefined) {
+        super(src);
+        console.log("REFEREABLE AUDIO");
+        referableAudios.push(this);
+        this.crossOrigin = "anonymous";
+        updateZoomIncomingNode();
+    }
+}
+global.Audio = ReferableAudio;
+
+// 固定ノード(固定だが、audioContextがuser-gestureが必要なので、初期値はnull)
+let audioContext: AudioContext | null = null;
+let dummyMediaStream: MediaStream | null = null;
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+let srcNodeDummyInput: MediaStreamAudioSourceNode | null = null;
+let dstNodeForInternal: MediaStreamAudioDestinationNode | null = null;
+let analyzerNode: AnalyserNode | null;
+
+// 可変ノード
+let srcNodeAudioInput: MediaStreamAudioSourceNode | null = null;
+let srcNodeZoomIncomming: MediaStreamAudioSourceNode | null = null;
+let dstNodeForZoom: MediaStreamAudioDestinationNode | null = null;
+
+const initializeAudio = () => {
+    audioContext = new AudioContext();
+    dummyMediaStream = createDummyMediaStream();
+    srcNodeDummyInput = createSrcNodeDummyInput();
+
+    dstNodeForInternal = createDstNodeForInternal();
+    analyzerNode = createAnalyzerNode();
+};
+
+const createDummyMediaStream = () => {
+    if (!audioContext) {
+        return null;
+    }
+    const dummyOutputNode = audioContext.createMediaStreamDestination();
+
+    const gainNode = audioContext.createGain();
+    gainNode.gain.value = 0.0;
+    gainNode.connect(dummyOutputNode);
+    const oscillatorNode = audioContext.createOscillator();
+    oscillatorNode.frequency.value = 440;
+    oscillatorNode.connect(gainNode);
+    oscillatorNode.start();
+    return dummyOutputNode.stream;
+};
+
+const createSrcNodeDummyInput = () => {
+    if (!dummyMediaStream || !audioContext) {
+        return null;
+    }
+    return audioContext.createMediaStreamSource(dummyMediaStream);
+};
+
+const createDstNodeForInternal = () => {
+    if (!audioContext) {
+        return null;
+    }
+    return audioContext.createMediaStreamDestination();
+};
+
+const createAnalyzerNode = () => {
+    if (!audioContext) {
+        return null;
+    }
+    return audioContext.createAnalyser();
+};
+
+let intervalTimerAvatar: NodeJS.Timer | null = null;
+let intervalTimerAudioInput: NodeJS.Timer | null = null;
+
 const enumerateDevices = navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices);
 
 navigator.mediaDevices.enumerateDevices = async () => {
@@ -41,39 +119,46 @@ navigator.mediaDevices.getUserMedia = async (params) => {
     // console.log("GETUSERMEDIA", params)
     const msForZoom = new MediaStream();
     if (params?.audio) {
-        const ms = await getUserMedia(params);
-        ms.getAudioTracks().forEach((x) => {
-            msForZoom.addTrack(x);
-        });
-        // if (!audioContext) {
-        //     console.warn("audio context is not initialized", audioContext)
-        //     return msForZoom // no trakcs
-        // }
-        // if (!srcNodeDummyInput) {
-        //     console.warn("dummy audio device is not initialized", srcNodeDummyInput)
-        //     return msForZoom // no trakcs
-        // }
-
-        // // zoom-outgoingから切断
-        // // TODO: disconnect freeze?
-        // if (dstNodeForZoomRef.current) {
-        //     // srcNodeDummyInput.disconnect(dstNodeForZoomRef.current)
-        //     srcNodeAudioInputRef.current?.disconnect(dstNodeForZoomRef.current)
-        // }
-
-        // // zoom-outgoing再生成
-        // dstNodeForZoomRef.current = audioContext.createMediaStreamDestination();
-        // // zoom-outgoingへ再接続
-        // srcNodeDummyInput.connect(dstNodeForZoomRef.current)
-        // srcNodeAudioInputRef.current?.connect(dstNodeForZoomRef.current)
-
-        // // AudioのMediaTrackを追加
-        // dstNodeForZoomRef.current.stream.getAudioTracks().forEach((x) => {
+        // const ms = await getUserMedia(params);
+        // ms.getAudioTracks().forEach((x) => {
         //     msForZoom.addTrack(x);
         // });
+        if (!audioContext) {
+            console.warn("audio context is not initialized", audioContext);
+            return msForZoom; // no trakcs
+        }
+        if (!srcNodeDummyInput) {
+            console.warn("dummy audio device is not initialized", srcNodeDummyInput);
+            return msForZoom; // no trakcs
+        }
+
+        // zoom-outgoingから切断
+        // TODO: disconnect freeze?
+        if (dstNodeForZoom && srcNodeAudioInput) {
+            console.log("CAMERA_DEVICES1");
+            srcNodeAudioInput.disconnect(dstNodeForZoom);
+            console.log("CAMERA_DEVICES2");
+        }
+        if (dstNodeForZoom && srcNodeDummyInput) {
+            console.log("CAMERA_DEVICES3");
+            srcNodeDummyInput.disconnect(dstNodeForZoom);
+            console.log("CAMERA_DEVICES4");
+        }
+
+        // zoom-outgoing再生成
+        dstNodeForZoom = audioContext.createMediaStreamDestination();
+        // zoom-outgoingへ再接続
+        srcNodeDummyInput.connect(dstNodeForZoom);
+        srcNodeAudioInput?.connect(dstNodeForZoom);
+
+        // AudioのMediaTrackを追加
+        dstNodeForZoom.stream.getAudioTracks().forEach((x) => {
+            msForZoom.addTrack(x);
+        });
     }
 
     if (params?.video) {
+        //// Zoom用のストリーム作成
         const div = parent.document.getElementById("sidebar-avatar-area") as HTMLDivElement;
         const canvas = div.firstChild as HTMLCanvasElement;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -82,18 +167,123 @@ navigator.mediaDevices.getUserMedia = async (params) => {
         avatarMediaStream.getVideoTracks().forEach((x) => {
             msForZoom.addTrack(x);
         });
-
-        // const testCanvas = document.getElementById("test") as HTMLCanvasElement;
-        //// Zoom用のストリーム作成
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        // const avatarMediaStream = props.threeState.renderer.domElement.captureStream() as MediaStream;
-        // avatarMediaStream.getVideoTracks().forEach((x) => {
-        //     msForZoom.addTrack(x);
-        // });
     }
     // return transform(msForZoom);
     return msForZoom;
+};
+
+// Audio Inputが更新されたとき
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+const reconstructAudioInputNode = async (audioInputDeviceId: string | null, audioInputEnabled: boolean) => {
+    if (!audioContext || !dstNodeForZoom || !dstNodeForInternal || !analyzerNode) {
+        console.warn("audio node is not initialized");
+        return;
+    }
+    // 切断処理
+    try {
+        if (intervalTimerAudioInput) {
+            clearInterval(intervalTimerAudioInput);
+            intervalTimerAudioInput = null;
+        }
+        if (srcNodeAudioInput) {
+            srcNodeAudioInput.disconnect(dstNodeForZoom);
+            srcNodeAudioInput.disconnect(dstNodeForInternal);
+            srcNodeAudioInput.disconnect(analyzerNode);
+        }
+    } catch (e) {
+        console.warn("disconnect failed. ignore this.", e);
+    }
+
+    //再生成
+    if (audioInputDeviceId && audioInputEnabled) {
+        const ms = await getUserMedia({ audio: { deviceId: audioInputDeviceId } });
+        srcNodeAudioInput = audioContext.createMediaStreamSource(ms);
+        srcNodeAudioInput.connect(dstNodeForZoom);
+        srcNodeAudioInput.connect(dstNodeForInternal);
+        srcNodeAudioInput.connect(analyzerNode);
+
+        if (intervalTimerAudioInput) {
+            clearInterval(intervalTimerAudioInput);
+            intervalTimerAudioInput = null;
+        }
+        const times = new Uint8Array(analyzerNode.fftSize);
+        intervalTimerAudioInput = setInterval(() => {
+            analyzerNode!.getByteTimeDomainData(times);
+            const max = Math.max(...times);
+            const min = Math.min(...times);
+            // voiceDiffRef = max - min
+            // console.log("ANALYZER(TBD:callback):", max, min, max - min);
+            voiceCallback(max - min);
+        }, 50);
+    }
+};
+// Referable Audio が更新されたとき
+const updateZoomIncomingNode = () => {
+    if (!audioContext || !dstNodeForInternal) {
+        return;
+    }
+    // 切断処理
+    srcNodeZoomIncomming?.disconnect(dstNodeForInternal);
+    // 再生成
+    const zoomIncomingMS = new MediaStream();
+    referableAudios.forEach((x) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const ms = x.captureStream() as MediaStream;
+        ms.getAudioTracks().forEach((track) => {
+            zoomIncomingMS.addTrack(track);
+        });
+    });
+    if (zoomIncomingMS.getAudioTracks().length > 0) {
+        srcNodeZoomIncomming = audioContext.createMediaStreamSource(zoomIncomingMS);
+
+        console.log("Generate Zoom Incoming.");
+    } else {
+        console.warn("zoom incoming audio is not initialized. ignore this.");
+    }
+};
+
+// Avatar の発話
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+const playAudio = async (audioData: ArrayBuffer) => {
+    // decode処理
+    if (!audioContext || !dstNodeForZoom || !dstNodeForInternal || !analyzerNode) {
+        console.warn("audio context is not initialized (playAudio) ", audioContext, analyzerNode, dstNodeForZoom);
+        return;
+    }
+
+    if (intervalTimerAvatar) {
+        clearInterval(intervalTimerAvatar);
+        intervalTimerAvatar = null;
+    }
+    const times = new Uint8Array(analyzerNode.fftSize);
+    intervalTimerAvatar = setInterval(() => {
+        analyzerNode!.getByteTimeDomainData(times);
+        const max = Math.max(...times);
+        const min = Math.min(...times);
+        // voiceDiffRef.current = max - min;
+        // console.log("ANALYZER(TBD:callback):", max, min, max - min);
+        voiceCallback(max - min);
+    }, 50);
+
+    // Source Node生成
+    const srcBufferNode = audioContext.createBufferSource();
+    const audioBuffer = await audioContext.decodeAudioData(audioData);
+    srcBufferNode.buffer = audioBuffer;
+    srcBufferNode.onended = () => {
+        console.log("Buffer_end");
+        if (intervalTimerAvatar) {
+            clearInterval(intervalTimerAvatar);
+            intervalTimerAvatar = null;
+        }
+    };
+    // 接続処理
+    srcBufferNode.connect(dstNodeForZoom);
+    srcBufferNode.connect(dstNodeForInternal);
+    srcBufferNode.connect(analyzerNode);
+    srcBufferNode.start();
 };
 
 const initZoomClient = async () => {
@@ -144,28 +334,55 @@ const joinZoom = async (username: string, meetingNumber: string, password: strin
     await p;
 };
 
+export const isZoomInitialized = () => {
+    return zoomInitCompleted;
+};
+export const isZoomJoined = () => {
+    return zoomJoinCompleted;
+};
+let voiceCallback: (val: number) => void = (val: number) => {
+    console.warn("voice callback is not set");
+};
+
+export const setVoiceCallback = (callback: (val: number) => void) => {
+    voiceCallback = callback;
+};
+
+window.isZoomInitialized = isZoomInitialized;
+window.isZoomJoined = isZoomJoined;
+window.playAudio = playAudio;
+window.reconstructAudioInputNode = reconstructAudioInputNode;
+window.setVoiceCallback = setVoiceCallback;
+window.getDstNodeForInternal = () => {
+    return dstNodeForInternal;
+};
+window.getAudioContext = () => {
+    return audioContext;
+};
+window.getReferableAudios = () => {
+    return referableAudios;
+};
+
 window.addEventListener("message", function (event: MessageEvent<any>) {
     console.log("EVENT_MESSAGE", event);
     const data = event.data;
-    initZoomClient();
-    // joinZoom(
-    //     "ab",
-    //     "7176502271",
-    //     "358414",
-    //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZGtLZXkiOiJLZmFPd0dHVTl3ZUdWaHl3eHdWTnNISTF6STZvNEkxeHRaRVgiLCJtbiI6IjcxNzY1MDIyNzEiLCJyb2xlIjoiMCIsImlhdCI6MTY1OTM2Mzg1NCwiZXhwIjoxNjU5MzcxMDU0LCJhcHBLZXkiOiJLZmFPd0dHVTl3ZUdWaHl3eHdWTnNISTF6STZvNEkxeHRaRVgiLCJ0b2tlbkV4cCI6MTY1OTM3MTA1NH0.1HRBel2PZZTfOd_STYzGC-pr-vOzxmZQnVb8kzgeh74",
-    //     "KfaOwGGU9weGVhywxwVNsHI1zI6o4I1xtZEX"
-    // );
-    if (data.type === "ZoomMeetingPlusInitEvent") {
-        const zoomData = data as ZoomMeetingPlusInitEvent;
-        console.log("event:", zoomData.type);
-        initZoomClient();
-    } else if (data.type === "ZoomMeetingPlusJoinEvent") {
-        const zoomData = data as ZoomMeetingPlusJoinEvent;
-        console.log("event:", zoomData.type);
-        const div = parent.document.getElementById("sidebar-avatar-area");
-        console.log("DIV_ELEMENT", div);
-        joinZoom(zoomData.data.username, zoomData.data.meetingNumber, zoomData.data.password, zoomData.data.signature, zoomData.data.sdkKey);
-    }
+    const handleEvent = async (data: any) => {
+        if (data.type === "ZoomMeetingPlusInitEvent") {
+            const zoomData = data as ZoomMeetingPlusInitEvent;
+            console.log("event:", zoomData.type);
+            initializeAudio();
+            await initZoomClient();
+            zoomInitCompleted = true;
+        } else if (data.type === "ZoomMeetingPlusJoinEvent") {
+            const zoomData = data as ZoomMeetingPlusJoinEvent;
+            console.log("event:", zoomData.type);
+            const div = parent.document.getElementById("sidebar-avatar-area");
+            console.log("DIV_ELEMENT", div);
+            await joinZoom(zoomData.data.username, zoomData.data.meetingNumber, zoomData.data.password, zoomData.data.signature, zoomData.data.sdkKey);
+            zoomJoinCompleted = true;
+        }
+    };
+    handleEvent(data);
 });
 
 console.log("inner-html-loaded");
