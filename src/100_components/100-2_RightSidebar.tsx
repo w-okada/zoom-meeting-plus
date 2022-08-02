@@ -20,6 +20,7 @@ export const RightSidebar = () => {
     const { languageKey, recognitionStartSync, setLanguageKey } = useSpeachRecognition();
     const isRecognitionEnabledRef = useRef<boolean>(false);
     const [isRecognitionEnableSync, setIsRecognitionEnableSync] = useState<boolean>(false);
+    const [echoBack, setEchoback] = useState<boolean>(true);
 
     const sidebarAccordionAvatarCheckbox = useStateControlCheckbox("sidebar-accordion-avatar-checkbox");
     const sidebarAccordionAvatarVideoCheckbox = useStateControlCheckbox("sidebar-accordion-avatar-video-checkbox");
@@ -100,9 +101,15 @@ export const RightSidebar = () => {
         }
         const play = async () => {
             browserProxyState.playAudio(await voice.arrayBuffer());
+            if (echoBack) {
+                const echobackAudio = document.getElementById("sidebar-generate-voice-player") as HTMLAudioElement;
+                echobackAudio.src = URL.createObjectURL(voice);
+                echobackAudio.play();
+            }
+            setVoice(null);
         };
         play();
-    }, [voice]);
+    }, [voice, echoBack]);
 
     ////// (3-1-1) Speaker Setting
     const [localLangSpeakerMap, setLocalLangSpeakerMap] = useState<{ [lang: string]: string[] }>({});
@@ -581,6 +588,7 @@ export const RightSidebar = () => {
                             </div>
 
                             <div className="sidebar-zoom-area-input">
+                                {" "}
                                 <div className="sidebar-zoom-area-input-label"></div>
                                 <div className="sidebar-zoom-area-input-setter-container sidebar-zoom-area-input-setter-right">
                                     <div
@@ -591,6 +599,16 @@ export const RightSidebar = () => {
                                     >
                                         speak
                                     </div>
+                                    <input
+                                        id="capture-checkbox"
+                                        className="sidebar-zoom-area-checkbox"
+                                        type="checkbox"
+                                        defaultChecked={echoBack}
+                                        onChange={(ev) => {
+                                            setEchoback(ev.target.checked);
+                                        }}
+                                    />
+                                    : echo
                                 </div>
                             </div>
 
