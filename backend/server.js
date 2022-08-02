@@ -26,8 +26,8 @@ if (process.env.OPEN_TTS_URL) {
 if (process.env.OAUTH_CLIENT_ID) {
     setting.aouth.client_id = process.env.OAUTH_CLIENT_ID;
 }
-if (process.env.OAUTH_REDIRECT_URLOPEN_TTS_URL) {
-    setting.aouth.redirect_url = process.env.OAUTH_REDIRECT_URLOPEN_TTS_URL;
+if (process.env.OAUTH_REDIRECT_URL) {
+    setting.aouth.redirect_url = process.env.OAUTH_REDIRECT_URL;
 }
 
 // app.use("/", express.static("dist"));
