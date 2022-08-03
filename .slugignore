@@ -1,8 +1,4 @@
 /.vscode
-/build/stats
 /doc
-/node_modules
-/public
-/src
-/resources
-/uploads
+/frontend
+/backend/node_modules
