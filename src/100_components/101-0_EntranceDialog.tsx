@@ -98,12 +98,8 @@ export const EntranceDialog = () => {
     const oauth = useMemo(() => {
         const clientId = oauthSettting?.client_id || "";
         const redirectURL = oauthSettting?.redirect_url || "";
-        const oauthURL = oauthSettting?.oauth_url || "";
         if (clientId.length > 0 && redirectURL.length > 0) {
-            // const encodedRedirectURL = encodeURIComponent(redirectURL);
             const origin = `${location.protocol}//${location.host}/`;
-            // const oauthURL = `${oauthURL}`; //`https://zoom.us/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodedRedirectURL}`;
-            // const oauthURL = `https://zoom.us/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodedRedirectURL}`;
             const oauthURL = `https://zoom.us/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectURL}&state=${origin}`;
             return <a href={oauthURL}>oauth</a>;
         } else {
