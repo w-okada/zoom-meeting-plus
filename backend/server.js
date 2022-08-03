@@ -24,12 +24,16 @@ if (process.env.VOICE_VOX_URL) {
 if (process.env.OPEN_TTS_URL) {
     setting.voice_setting.open_tts_url = process.env.OPEN_TTS_URL;
 }
+
 if (process.env.OAUTH_CLIENT_ID) {
     setting.oauth.client_id = process.env.OAUTH_CLIENT_ID;
 }
 if (process.env.OAUTH_REDIRECT_URL) {
     setting.oauth.redirect_url = process.env.OAUTH_REDIRECT_URL;
 }
+// if (process.env.OAUTH_GET_ZAK_URL) {
+//     setting.oauth.get_zak_url = process.env.OAUTH_GET_ZAK_URL;
+// }
 
 // app.use("/", express.static("dist"));
 app.use(
@@ -43,29 +47,96 @@ app.use(
 );
 
 app.options("*", cors());
+// 設定取得
 app.get("/api/setting", (req, res) => {
     res.json(setting);
 });
 
-app.get("/api/redirect", (req, res) => {
+// OAUTHリダイレクト先URL. Stateに呼び出し元のURLを設定しておく。再リダイレクトしてクライアントにcodeを通知する。
+app.get("/api/redirect2", (req, res) => {
     // res.json(setting);
     const code = req.query.code;
     const appURL = req.query.state;
     const redirectURL = `${appURL}?code=${code}`;
     res.redirect(redirectURL);
 });
-app.get("/api/get_zak", (req, res) => {
+app.get("/api/get_zak2", (req, res) => {
     const code = req.query.code;
-    let url = `https://zoom.us/oauth/token?grant_type=authorization_code&code=${code}&redirect_uri=${code}`;
+    let url = `https://zoom.us/oauth/token?grant_type=authorization_code&code=${code}&redirect_uri=${setting.oauth.redirect_url}`;
     console.log("GET_TOKEN_URL", url);
+    console.log("client_id", setting.oauth.client_id);
+    if (process.env.OAUTH_CLIENT_SECRET) {
+        console.warn("client_secret is not set.");
+    }
     request
         .post(url, (error, response, body) => {
             // Parse response to JSON
+            console.log("ERROR:", JSON.stringify(error));
+            console.log("RESPONSE:", JSON.stringify(response));
             body = JSON.parse(body);
 
             // Logs your access and refresh tokens in the browser
             console.log(`access_token: ${body.access_token}`);
             console.log(`refresh_token: ${body.refresh_token}`);
+
+            request
+                .get(`https://api.zoom.us/v2/users/me/token?type=zak`, (error, response, body) => {
+                    if (error) {
+                        console.log("API Response Error: ", error);
+                    } else {
+                        body = JSON.parse(body);
+                        console.log("RESPONSE:", JSON.stringify(response));
+                        console.log("ERROR:", JSON.stringify(error));
+                        console.log("ZAK:: ", body.token);
+                        res.json(body);
+                    }
+                })
+                .auth(null, null, true, body.access_token);
+        })
+        .auth(setting.oauth.client_id, process.env.OAUTH_CLIENT_SECRET);
+});
+
+// OAUTHリダイレクト先URL. Stateに呼び出し元のURLを設定しておく。再リダイレクトしてクライアントにzakを通知する。
+app.get("/api/redirect", (req, res) => {
+    // res.json(setting);
+    const code = req.query.code;
+    const appURL = req.query.state;
+
+    const url = `https://zoom.us/oauth/token?grant_type=authorization_code&code=${code}&redirect_uri=${setting.oauth.redirect_url}`;
+    console.log("GET_TOKEN_URL:", url);
+    console.log("GET_TOKEN AUTH PARAM (ClientID):", setting.oauth.client_id);
+    if (process.env.OAUTH_CLIENT_SECRET) {
+        console.warn("GET_TOKEN AUTH PARAM (ClientSecret): NOT INITIALIZED!. Maybe config is not valid.");
+    } else {
+        console.log("GET_TOKEN AUTH PARAM (ClientSecret): exists(hidden)");
+    }
+    request
+        .post(url, (error, response, body) => {
+            // Parse response to JSON
+            // console.log("ERROR:", JSON.stringify(error));
+            // console.log("RESPONSE:", JSON.stringify(response));
+
+            body = JSON.parse(body);
+            const accessToken = body.access_token;
+            const refreshToken = body.refresh_token;
+            console.log(`access_token: ${accessToken}`);
+            console.log(`refresh_token: ${refreshToken}`);
+
+            request
+                .get(`https://api.zoom.us/v2/users/me/token?type=zak`, (error, response, body) => {
+                    if (error) {
+                        console.log("API Response Error: ", error);
+                    } else {
+                        body = JSON.parse(body);
+                        // console.log("RESPONSE:", JSON.stringify(response));
+                        // console.log("ERROR:", JSON.stringify(error));
+                        const zak = body.token;
+                        console.log(`zak: ${zak}`);
+                        const redirectURL = `${appURL}?accessToken=${accessToken}&zak=${zak}`;
+                        res.redirect(redirectURL);
+                    }
+                })
+                .auth(null, null, true, body.access_token);
         })
         .auth(setting.oauth.client_id, process.env.OAUTH_CLIENT_SECRET);
 });

@@ -66,12 +66,16 @@ export const useVosk = (): VoskStateAndMethod => {
     }, [language]);
 
     const micStream = useMemo(() => {
+        if (!recognizer) {
+            return null;
+        }
+
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const ifrm = document.getElementById('inner-index')!.contentWindow as Window;
         const dstNodeForInternal = ifrm.getDstNodeForInternal();
 
-        if (!recognizer || !dstNodeForInternal) {
+        if (!dstNodeForInternal) {
             return null;
         }
 
@@ -92,6 +96,9 @@ export const useVosk = (): VoskStateAndMethod => {
 
     ///// (X) Start Transcribe
     useEffect(() => {
+        if (!micStream) {
+            return
+        }
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const ifrm = document.getElementById('inner-index')!.contentWindow as Window;
@@ -99,13 +106,12 @@ export const useVosk = (): VoskStateAndMethod => {
         const audioContext = ifrm.getAudioContext();
         const referableAudios = ifrm.getReferableAudios()
 
-        console.log("TRANSCIBE START?", isTranscribeStated);
-        if (!micStream) {
-            return
-        }
+
         if (!dstNodeForInternal) {
             return
         }
+        console.log("TRANSCIBE START?", isTranscribeStated);
+
         const startT = async () => {
             for (const x of referableAudios) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment

@@ -27,14 +27,24 @@ export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateA
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const ifrm = document.getElementById('inner-index')!.contentWindow as Window;
+        if (typeof ifrm.reconstructAudioInputNode !== "function") {
+            return
+        }
         ifrm.reconstructAudioInputNode(audioInputDeviceId, audioInputEnabled);
     }, [audioInputDeviceId, audioInputEnabled])
     useEffect(() => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        const ifrm = document.getElementById('inner-index')!.contentWindow as Window;
-        ifrm.setVoiceCallback(setVoiceValue)
-    })
+        const setVoiceCallback = async () => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            const ifrm = document.getElementById('inner-index')!.contentWindow as Window;
+            if (typeof ifrm.setVoiceCallback !== "function") {
+                setTimeout(setVoiceCallback, 1000 * 1)
+            } else {
+                ifrm.setVoiceCallback(setVoiceValue)
+            }
+        }
+        setVoiceCallback()
+    }, [])
 
 
     // Avatar の発話    
