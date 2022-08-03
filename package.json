@@ -5,6 +5,8 @@
     "main": "server.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
+        "build:docker": "date +%Y%m%d%H%M%S > dummy && DOCKER_BUILDKIT=1 docker build --ssh default  . -t zoom-meeting-plus",
+        "deploy": "git push heroku master",
         "start": "node backend/server.js"
     },
     "keywords": [],
