@@ -1,0 +1,23 @@
+{
+    "name": "zoom-meeting-plus",
+    "version": "1.0.0",
+    "description": "You can join the zoom meeting with avatar as you like.",
+    "main": "backend/server.js",
+    "directories": {
+        "doc": "doc"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/w-okada/zoom-meeting-plus.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/w-okada/zoom-meeting-plus/issues"
+    },
+    "homepage": "https://github.com/w-okada/zoom-meeting-plus#readme"
+}
