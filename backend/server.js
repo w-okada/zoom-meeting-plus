@@ -52,50 +52,6 @@ app.get("/api/setting", (req, res) => {
     res.json(setting);
 });
 
-// OAUTHリダイレクト先URL. Stateに呼び出し元のURLを設定しておく。再リダイレクトしてクライアントにcodeを通知する。
-app.get("/api/redirect2", (req, res) => {
-    // res.json(setting);
-    const code = req.query.code;
-    const appURL = req.query.state;
-    const redirectURL = `${appURL}?code=${code}`;
-    res.redirect(redirectURL);
-});
-app.get("/api/get_zak2", (req, res) => {
-    const code = req.query.code;
-    let url = `https://zoom.us/oauth/token?grant_type=authorization_code&code=${code}&redirect_uri=${setting.oauth.redirect_url}`;
-    console.log("GET_TOKEN_URL", url);
-    console.log("client_id", setting.oauth.client_id);
-    if (!process.env.OAUTH_CLIENT_SECRET) {
-        console.warn("client_secret is not set.");
-    }
-    request
-        .post(url, (error, response, body) => {
-            // Parse response to JSON
-            console.log("ERROR:", JSON.stringify(error));
-            console.log("RESPONSE:", JSON.stringify(response));
-            body = JSON.parse(body);
-
-            // Logs your access and refresh tokens in the browser
-            console.log(`access_token: ${body.access_token}`);
-            console.log(`refresh_token: ${body.refresh_token}`);
-
-            request
-                .get(`https://api.zoom.us/v2/users/me/token?type=zak`, (error, response, body) => {
-                    if (error) {
-                        console.log("API Response Error: ", error);
-                    } else {
-                        body = JSON.parse(body);
-                        console.log("RESPONSE:", JSON.stringify(response));
-                        console.log("ERROR:", JSON.stringify(error));
-                        console.log("ZAK:: ", body.token);
-                        res.json(body);
-                    }
-                })
-                .auth(null, null, true, body.access_token);
-        })
-        .auth(setting.oauth.client_id, process.env.OAUTH_CLIENT_SECRET);
-});
-
 // OAUTHリダイレクト先URL. Stateに呼び出し元のURLを設定しておく。再リダイレクトしてクライアントにzakを通知する。
 app.get("/api/redirect", (req, res) => {
     // res.json(setting);
@@ -141,12 +97,14 @@ app.get("/api/redirect", (req, res) => {
         .auth(setting.oauth.client_id, process.env.OAUTH_CLIENT_SECRET);
 });
 
+// テスト用
 app.get("/api/generateSignature", (req, res) => {
     res.json({
         signature: "TEST",
     });
 });
 
+// Signature生成
 app.post("/api/generateSignature", (req, res) => {
     const iat = Math.round(new Date().getTime() / 1000) - 30;
     const exp = iat + 60 * 60 * 2;
@@ -182,6 +140,7 @@ app.post("/api/generateSignature", (req, res) => {
         sdkKey: process.env.ZOOM_SDK_KEY,
     });
 });
+
 app.post("/api/transcribe", upload.single("audio"), function (req, res, next) {
     console.log(req.body);
     console.log(req.file);

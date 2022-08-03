@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { ApplicationSetting, fetchApplicationSetting, fetchZak } from "../001_clients_and_managers/000_ApplicationSettingLoader"
+import { ApplicationSetting, fetchApplicationSetting } from "../001_clients_and_managers/000_ApplicationSettingLoader"
 
 export type ApplicationSettingManagerStateAndMethod = {
     applicationSetting: ApplicationSetting | null
