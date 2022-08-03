@@ -65,7 +65,7 @@ app.get("/api/get_zak2", (req, res) => {
     let url = `https://zoom.us/oauth/token?grant_type=authorization_code&code=${code}&redirect_uri=${setting.oauth.redirect_url}`;
     console.log("GET_TOKEN_URL", url);
     console.log("client_id", setting.oauth.client_id);
-    if (process.env.OAUTH_CLIENT_SECRET) {
+    if (!process.env.OAUTH_CLIENT_SECRET) {
         console.warn("client_secret is not set.");
     }
     request
@@ -105,7 +105,7 @@ app.get("/api/redirect", (req, res) => {
     const url = `https://zoom.us/oauth/token?grant_type=authorization_code&code=${code}&redirect_uri=${setting.oauth.redirect_url}`;
     console.log("GET_TOKEN_URL:", url);
     console.log("GET_TOKEN AUTH PARAM (ClientID):", setting.oauth.client_id);
-    if (process.env.OAUTH_CLIENT_SECRET) {
+    if (!process.env.OAUTH_CLIENT_SECRET) {
         console.warn("GET_TOKEN AUTH PARAM (ClientSecret): NOT INITIALIZED!. Maybe config is not valid.");
     } else {
         console.log("GET_TOKEN AUTH PARAM (ClientSecret): exists(hidden)");
@@ -113,8 +113,8 @@ app.get("/api/redirect", (req, res) => {
     request
         .post(url, (error, response, body) => {
             // Parse response to JSON
-            // console.log("ERROR:", JSON.stringify(error));
-            // console.log("RESPONSE:", JSON.stringify(response));
+            console.log("ERROR:", JSON.stringify(error));
+            console.log("RESPONSE:", JSON.stringify(response));
 
             body = JSON.parse(body);
             const accessToken = body.access_token;

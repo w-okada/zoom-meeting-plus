@@ -1,5 +1,8 @@
 /.vscode
+/build/stats
+/doc
+/node_modules
 /public
-/resources
-/script
 /src
+/resources
+/uploads
