@@ -4,30 +4,19 @@ import { ApplicationSetting, fetchApplicationSetting, fetchZak } from "../001_cl
 export type ApplicationSettingManagerStateAndMethod = {
     applicationSetting: ApplicationSetting | null
     accessToken: string
+    zak: string
 }
 
 export const useApplicationSettingManager = () => {
     const [applicationSetting, setApplicationSetting] = useState<ApplicationSetting | null>(null)
-    const [zak, setZak] = useState<string>("")
-    const code = useMemo(() => {
+    const accessToken = useMemo(() => {
         const params = new URLSearchParams(window.location.search);
-        return params.get('code') || ""
+        return params.get('accessToken') || ""
     }, [])
-
-    useEffect(() => {
-        if (code.length === 0 || !applicationSetting) {
-            return
-        }
-        const getZak = async () => {
-            const getZakURL = applicationSetting?.oauth.get_zak_url || ""
-            const url = `${getZakURL}?code=${code}`
-            console.log("URL", url)
-            const zak = await fetchZak(url)
-            console.log("ZAK!!", zak)
-            setZak(zak)
-        }
-        getZak();
-    }, [code, applicationSetting])
+    const zak = useMemo(() => {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('zak') || ""
+    }, [])
 
     useEffect(() => {
         const loadApplicationSetting = async () => {
@@ -39,7 +28,7 @@ export const useApplicationSettingManager = () => {
 
     return {
         applicationSetting,
-        code,
+        accessToken,
         zak
     }
 }

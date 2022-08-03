@@ -45,11 +45,3 @@ export const fetchApplicationSetting = async (): Promise<ApplicationSetting> => 
     return setting;
 }
 
-export const fetchZak = async (url: string) => {
-    const res = await fetch(url, {
-        method: "GET",
-    });
-    const zak = await res.json()
-    console.log("zak", zak)
-    return zak;
-}
