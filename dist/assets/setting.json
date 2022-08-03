@@ -35,7 +35,7 @@
     },
     "oauth": {
         "client_id": "",
-        "redirect_url": ""
+        "redirect_url": "https://zoom-meeting-plus.herokuapp.com/api/redirect"
     },
     "voice_setting": {
         "default_voice_vox_enabled": true,

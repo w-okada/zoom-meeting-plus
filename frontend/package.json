@@ -4,8 +4,8 @@
     "description": "",
     "main": ".eslintrc.js",
     "scripts": {
-        "clean": "rimraf dist/*",
-        "copy:resources": "mkdir -p dist && cp -r public/* dist/",
+        "clean": "rimraf ../dist/*",
+        "copy:resources": "mkdir -p ../dist && cp -r public/* ../dist/",
         "tsc": "tsc",
         "tsc:watch": "tsc -w",
         "build:outer": "webpack --config webpack.config.js",
