@@ -5,8 +5,8 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 // const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 module.exports = {
-    mode: "development",
-    // mode: "production",
+    // mode: "development",
+    mode: "production",
     entry: path.resolve(__dirname, "src/inner-index.tsx"),
     output: {
         path: path.resolve(__dirname, "../dist"),

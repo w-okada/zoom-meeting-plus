@@ -8,6 +8,7 @@ type Props = {
 
 interface AppSettingValue {
     applicationSetting: ApplicationSetting | null;
+    zak: string;
 }
 
 const AppSettingContext = React.createContext<AppSettingValue | null>(null);
@@ -20,10 +21,11 @@ export const useAppSetting = (): AppSettingValue => {
 };
 
 export const AppSettingProvider = ({ children }: Props) => {
-    const { applicationSetting } = useApplicationSettingManager();
+    const { applicationSetting, zak } = useApplicationSettingManager();
 
     const providerValue = {
         applicationSetting,
+        zak,
     };
 
     return <AppSettingContext.Provider value={providerValue}>{children}</AppSettingContext.Provider>;

@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { useAppSetting } from "../003_provider/AppSettingProvider";
-const AVATAR_AREA_WIDTH = 480;
-const AVATAR_AREA_HEIGHT = 320;
+const AVATAR_AREA_WIDTH = 480 * 2;
+const AVATAR_AREA_HEIGHT = 360 * 2;
 
 export type ThreeState = {
     scene: THREE.Scene,
@@ -45,7 +45,7 @@ export const useThree = (): ThreeStateAndMethods => {
     }, [])
     //// (2)カメラの生成
     const camera = useMemo(() => {
-        const camera = new THREE.PerspectiveCamera(45, AVATAR_AREA_WIDTH / AVATAR_AREA_HEIGHT, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(45, AVATAR_AREA_WIDTH / AVATAR_AREA_HEIGHT, 0.1, 10);
         camera.position.set(0, 1.5, -0.5);
         return camera
     }, [])

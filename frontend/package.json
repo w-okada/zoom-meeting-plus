@@ -10,7 +10,7 @@
         "tsc:watch": "tsc -w",
         "build:outer": "webpack --config webpack.config.js",
         "build:inner": "webpack --config webpack.config.inner.js",
-        "build": "run-s clean copy:resources build:inner build:outer ",
+        "build": "run-s clean copy:resources tsc build:inner build:outer ",
         "start:backend": "node ../backend/server.js",
         "start:outer": "webpack serve --config webpack.config.js",
         "start:pre": "run-s build start:outer",

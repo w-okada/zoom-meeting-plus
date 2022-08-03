@@ -25,14 +25,16 @@ ADD dummy /
 RUN mkdir ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 RUN --mount=type=ssh git clone git@github.com:w-okada/zoom-meeting-plus.git app
 
-WORKDIR /app
+WORKDIR /app/frontend
 RUN npm ci
 RUN npm run build
+
+WORKDIR /app
+RUN npm ci
 
 FROM base as prod
 COPY --from=dev /app/backend /app/backend
 COPY --from=dev /app/dist /app/dist
-#COPY --from=dev /app/node_modules /app/node_modules
 COPY --from=dev /app/package.json /app/package.json
 COPY --from=dev /app/package-lock.json /app/package-lock.json
 

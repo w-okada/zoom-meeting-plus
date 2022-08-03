@@ -52,10 +52,8 @@ export const AppStateProvider = ({ children }: Props) => {
     });
     const timeKeeperState = useTimeKeeper();
     const zoomSDKState = useZoomSDK();
-    const browserProxyState = useBrowserProxy({
-        threeState,
-    });
-    const deviceManagerState = useDeviceManager({ browserProxyState });
+    const browserProxyState = useBrowserProxy();
+    const deviceManagerState = useDeviceManager();
     const voskState = useVosk();
     const frontendManagerState = useFrontendManager({
         setStartTranscribe: voskState.setIsTranscribeStated,

@@ -4,8 +4,8 @@ import { useAppSetting } from "../003_provider/AppSettingProvider";
 import { useAppState } from "../003_provider/AppStateProvider";
 
 export const EntranceDialog = () => {
-    const { frontendManagerState, backendManagerState, zoomSDKState, browserProxyState } = useAppState();
-    const { applicationSetting } = useAppSetting();
+    const { frontendManagerState, backendManagerState, zoomSDKState } = useAppState();
+    const { applicationSetting, zak } = useAppSetting();
     const defaultUsername = applicationSetting?.default_meeting.default_username || "";
     const defaultMeetingNumber = applicationSetting?.default_meeting.default_meeting_number || "";
     const defaultMeetingPassword = applicationSetting?.default_meeting.default_meeting_password || "";
@@ -77,7 +77,7 @@ export const EntranceDialog = () => {
             frontendManagerState.stateControls.entranceDialogCheckbox.updateState(false);
             try {
                 await zoomSDKState.initZoomClient();
-                await zoomSDKState.joinZoom(username, meetingNumber, password, signature.signature, signature.sdkKey);
+                await zoomSDKState.joinZoom(username, meetingNumber, password, signature.signature, signature.sdkKey, zak);
             } catch (error: any) {
                 console.log(error);
                 frontendManagerState.stateControls.entranceDialogCheckbox.updateState(true);

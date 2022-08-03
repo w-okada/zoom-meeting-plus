@@ -3,7 +3,7 @@ import { ZoomMeetingPlusInitEvent, ZoomMeetingPlusJoinEvent } from "../sharedTyp
 
 export type ZoomSDKStateAndMethod = {
     initZoomClient: () => Promise<void>
-    joinZoom: (username: string, meetingNumber: string, password: string, signature: string, sdkKey: string) => Promise<void>
+    joinZoom: (username: string, meetingNumber: string, password: string, signature: string, sdkKey: string, zak: string) => Promise<void>
 }
 export const useZoomSDK = (): ZoomSDKStateAndMethod => {
 
@@ -60,7 +60,7 @@ export const useZoomSDK = (): ZoomSDKStateAndMethod => {
     }, [])
 
     const joinZoom = useMemo(() => {
-        return async (username: string, meetingNumber: string, password: string, signature: string, sdkKey: string) => {
+        return async (username: string, meetingNumber: string, password: string, signature: string, sdkKey: string, zak: string) => {
             // const p = new Promise<void>((resolve, reject) => {
             //     window.ZoomMtg.join({
             //         signature: signature,
@@ -92,7 +92,8 @@ export const useZoomSDK = (): ZoomSDKStateAndMethod => {
                     meetingNumber,
                     password,
                     signature,
-                    sdkKey
+                    sdkKey,
+                    zak,
                 }
             }
             const origin = `${location.protocol}//${location.host}/`

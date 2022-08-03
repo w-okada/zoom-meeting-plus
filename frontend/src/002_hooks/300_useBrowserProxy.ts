@@ -1,9 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { ThreeStateAndMethods } from "./110_useThree";
-
-export type UseBrowserProxyProps = {
-    threeState: ThreeStateAndMethods;
-}
+import { useEffect, useState } from "react";
 
 export type BrowserProxyState = {
     audioInputDeviceId: string | null
@@ -16,7 +11,7 @@ export type BrowserProxyStateAndMethod = BrowserProxyState & {
     setAudioInputEnabled: (val: boolean) => void
 
 }
-export const useBrowserProxy = (props: UseBrowserProxyProps): BrowserProxyStateAndMethod => {
+export const useBrowserProxy = (): BrowserProxyStateAndMethod => {
     const [voiceValue, setVoiceValue] = useState<number>(0)
     const [audioInputDeviceId, setAudioInputDeviceId] = useState<string | null>(null)
     const [audioInputEnabled, setAudioInputEnabled] = useState<boolean>(false)

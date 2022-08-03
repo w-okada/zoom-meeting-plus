@@ -1,10 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { DeviceInfo, DeviceManager } from "../001_clients_and_managers/001_DeviceManager"
-import { BrowserProxyStateAndMethod } from "./300_useBrowserProxy";
 
-export type UseDeviceManagerProps = {
-    browserProxyState: BrowserProxyStateAndMethod;
-}
 
 type DeviceManagerState = {
     lastUpdateTime: number
@@ -23,7 +19,7 @@ export type DeviceManagerStateAndMethod = DeviceManagerState & {
     setAudioOutputDeviceId: (val: string | null) => void
 
 }
-export const useDeviceManager = (props: UseDeviceManagerProps): DeviceManagerStateAndMethod => {
+export const useDeviceManager = (): DeviceManagerStateAndMethod => {
     const [lastUpdateTime, setLastUpdateTime] = useState(0)
     const [videoInputDeviceId, _setVideoInputDeviceId] = useState<string | null>(null)
     const [videoElement, _setVideoElement] = useState<HTMLVideoElement | null>(null)

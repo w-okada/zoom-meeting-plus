@@ -11,7 +11,7 @@ class ReferableAudio extends Audio {
         console.log("REFEREABLE AUDIO");
         referableAudios.push(this);
         this.crossOrigin = "anonymous";
-        updateZoomIncomingNode();
+        // updateZoomIncomingNode();
     }
 }
 global.Audio = ReferableAudio;
@@ -27,7 +27,7 @@ let analyzerNode: AnalyserNode | null;
 
 // 可変ノード
 let srcNodeAudioInput: MediaStreamAudioSourceNode | null = null;
-let srcNodeZoomIncomming: MediaStreamAudioSourceNode | null = null;
+// let srcNodeZoomIncomming: MediaStreamAudioSourceNode | null = null;
 let dstNodeForZoom: MediaStreamAudioDestinationNode | null = null;
 
 const initializeAudio = () => {
@@ -116,7 +116,7 @@ navigator.mediaDevices.enumerateDevices = async () => {
 const getUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
 
 navigator.mediaDevices.getUserMedia = async (params) => {
-    // console.log("GETUSERMEDIA", params)
+    // console.log("GETUSERMEDIA", params);
     const msForZoom = new MediaStream();
     if (params?.audio) {
         // const ms = await getUserMedia(params);
@@ -163,9 +163,12 @@ navigator.mediaDevices.getUserMedia = async (params) => {
         const canvas = div.firstChild as HTMLCanvasElement;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        const avatarMediaStream = canvas.captureStream() as MediaStream;
+        const avatarMediaStream = canvas.captureStream(30) as MediaStream;
         avatarMediaStream.getVideoTracks().forEach((x) => {
             msForZoom.addTrack(x);
+            // console.log("VIDEO_CAP", x.getCapabilities());
+            // console.log("VIDEO_CAP", x.getConstraints);
+            // console.log("VIDEO_CAP", x.getSettings());
         });
     }
     // return transform(msForZoom);
@@ -218,31 +221,31 @@ const reconstructAudioInputNode = async (audioInputDeviceId: string | null, audi
         }, 50);
     }
 };
-// Referable Audio が更新されたとき
-const updateZoomIncomingNode = () => {
-    if (!audioContext || !dstNodeForInternal) {
-        return;
-    }
-    // 切断処理
-    // srcNodeZoomIncomming?.disconnect(dstNodeForInternal);
-    // 再生成
-    const zoomIncomingMS = new MediaStream();
-    referableAudios.forEach((x) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        const ms = x.captureStream() as MediaStream;
-        ms.getAudioTracks().forEach((track) => {
-            zoomIncomingMS.addTrack(track);
-        });
-    });
-    if (zoomIncomingMS.getAudioTracks().length > 0) {
-        srcNodeZoomIncomming = audioContext.createMediaStreamSource(zoomIncomingMS);
+// // Referable Audio が更新されたとき
+// const updateZoomIncomingNode = () => {
+//     if (!audioContext || !dstNodeForInternal) {
+//         return;
+//     }
+//     // 切断処理
+//     // srcNodeZoomIncomming?.disconnect(dstNodeForInternal);
+//     // 再生成
+//     const zoomIncomingMS = new MediaStream();
+//     referableAudios.forEach((x) => {
+//         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//         // @ts-ignore
+//         const ms = x.captureStream() as MediaStream;
+//         ms.getAudioTracks().forEach((track) => {
+//             zoomIncomingMS.addTrack(track);
+//         });
+//     });
+//     if (zoomIncomingMS.getAudioTracks().length > 0) {
+//         srcNodeZoomIncomming = audioContext.createMediaStreamSource(zoomIncomingMS);
 
-        console.log("Generate Zoom Incoming.");
-    } else {
-        console.warn("zoom incoming audio is not initialized. ignore this.");
-    }
-};
+//         console.log("Generate Zoom Incoming.");
+//     } else {
+//         console.warn("zoom incoming audio is not initialized. ignore this.");
+//     }
+// };
 
 // Avatar の発話
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -311,7 +314,7 @@ const initZoomClient = async () => {
     await p;
 };
 
-const joinZoom = async (username: string, meetingNumber: string, password: string, signature: string, sdkKey: string) => {
+const joinZoom = async (username: string, meetingNumber: string, password: string, signature: string, sdkKey: string, zak: string) => {
     const p = new Promise<void>((resolve, reject) => {
         window.ZoomMtg.join({
             signature: signature,
@@ -319,6 +322,7 @@ const joinZoom = async (username: string, meetingNumber: string, password: strin
             userName: username,
             sdkKey: sdkKey,
             passWord: password,
+            zak: zak,
             success: (success: any) => {
                 console.log("ZOOM_MTG_INIT3");
                 console.log(success);
@@ -341,7 +345,7 @@ export const isZoomJoined = () => {
     return zoomJoinCompleted;
 };
 let voiceCallback: (val: number) => void = (val: number) => {
-    console.warn("voice callback is not set");
+    console.warn("voice callback is not set", val);
 };
 
 export const setVoiceCallback = (callback: (val: number) => void) => {
@@ -376,9 +380,10 @@ window.addEventListener("message", function (event: MessageEvent<any>) {
         } else if (data.type === "ZoomMeetingPlusJoinEvent") {
             const zoomData = data as ZoomMeetingPlusJoinEvent;
             console.log("event:", zoomData.type);
+            console.log("event:", zoomData);
             const div = parent.document.getElementById("sidebar-avatar-area");
             console.log("DIV_ELEMENT", div);
-            await joinZoom(zoomData.data.username, zoomData.data.meetingNumber, zoomData.data.password, zoomData.data.signature, zoomData.data.sdkKey);
+            await joinZoom(zoomData.data.username, zoomData.data.meetingNumber, zoomData.data.password, zoomData.data.signature, zoomData.data.sdkKey, zoomData.data.zak);
             zoomJoinCompleted = true;
         }
     };
