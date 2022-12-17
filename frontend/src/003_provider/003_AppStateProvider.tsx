@@ -34,7 +34,6 @@ export const AppStateProvider = ({ children }: Props) => {
     // (1) load data
     const backendManagerState = useBackendManager();
     const resourceManagerState = useResourceManager();
-    // (2) initialize
     const zoomSDKState = useZoomSDK();
     const browserProxyState = useBrowserProxy();
     const deviceManagerState = useDeviceManager();
