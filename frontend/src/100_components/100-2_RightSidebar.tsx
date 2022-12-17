@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useAppState } from "../003_provider/AppStateProvider";
+import { useAppState } from "../003_provider/003_AppStateProvider";
 import { useStateControlCheckbox } from "./hooks/useStateControlCheckbox";
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./parts/002_HeaderButton";
 import { PosePredictionEx } from "@dannadori/mediapipe-avatar-js/dist/MotionDetector";
 import { Side, TFace, THand, TPose } from "@dannadori/mediapipe-avatar-js/dist/kalido";
-import { useAppSetting } from "../003_provider/AppSettingProvider";
+import { useAppSetting } from "../003_provider/001_AppSettingProvider";
 import { SpeachRecognitionLanguagesKeys, useSpeachRecognition } from "./hooks/useSpeachRecognition";
 import { SpeachRecognitionLanguages } from "./hooks/SpeachRecognitherLanguages";
 import { VoskLanguages } from "../002_hooks/302_useVosk";

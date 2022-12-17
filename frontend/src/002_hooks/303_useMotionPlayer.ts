@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useAppSetting } from "../003_provider/AppSettingProvider"
+import { useAppSetting } from "../003_provider/001_AppSettingProvider"
 import { ResourceManagerStateAndMethod } from "./003_useResourceManager"
 
 export type UseMotionPlayerProps = {

@@ -6,6 +6,49 @@
         "default_meeting_password": "358414",
         "default_secret": ""
     },
+    "majar_mode": "docker",
+    "voice_changer_server_url": "/test",
+    "sample_rate": 48000,
+    "buffer_size": 1024,
+    "prefix_chunk_size": 24,
+    "chunk_size": 24,
+    "speakers": [
+        {
+            "id": 100,
+            "name": "ずんだもん"
+        },
+        {
+            "id": 107,
+            "name": "user"
+        },
+        {
+            "id": 101,
+            "name": "そら"
+        },
+        {
+            "id": 102,
+            "name": "めたん"
+        },
+        {
+            "id": 103,
+            "name": "つむぎ"
+        }
+    ],
+    "src_id": 107,
+    "dst_id": 100,
+    "vf_enable": true,
+    "voice_changer_mode": "realtime",
+    "gpu": 0,
+    "available_gpus": [-1, 0, 1, 2, 3, 4],
+    "advance": {
+        "avatar_draw_skip_rate": 3,
+        "screen_draw_skip_rate": 3,
+        "visualizer_draw_skip_rate": 3,
+        "cross_fade_lower_value": 0.1,
+        "cross_fade_offset_rate": 0.3,
+        "cross_fade_end_rate": 0.6,
+        "cross_fade_type": 2
+    },
     "vrm_path": "./assets/vrm/AliciaSolid.vrm",
     "vrm_motions": [
         {

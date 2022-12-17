@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import * as ResourceLoader from "../001_clients_and_managers/009_ResourceLoader"
-import { useAppSetting } from "../003_provider/AppSettingProvider";
+import { useAppSetting } from "../003_provider/001_AppSettingProvider";
 
 
 export type ResourceManagerState = {

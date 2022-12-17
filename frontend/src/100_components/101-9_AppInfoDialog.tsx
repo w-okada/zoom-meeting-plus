@@ -1,6 +1,6 @@
 import React from "react";
 import { useMemo } from "react";
-import { useAppState } from "../003_provider/AppStateProvider";
+import { useAppState } from "../003_provider/003_AppStateProvider";
 import { Credit, CreditProps } from "./parts/003_Credit";
 
 export const AppInfoDialog = () => {

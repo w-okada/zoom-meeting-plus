@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
-import { useAppSetting } from "../003_provider/AppSettingProvider";
-import { useAppState } from "../003_provider/AppStateProvider";
+import { useAppSetting } from "../003_provider/001_AppSettingProvider";
+import { useAppState } from "../003_provider/003_AppStateProvider";
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./parts/002_HeaderButton";
 
 type HeaderButtons = {

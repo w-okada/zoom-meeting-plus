@@ -3,7 +3,7 @@ import { VRM } from "@pixiv/three-vrm";
 import { useEffect, useMemo, useState } from "react";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { useAppSetting } from "../003_provider/AppSettingProvider";
+import { useAppSetting } from "../003_provider/001_AppSettingProvider";
 const AVATAR_AREA_WIDTH = 480 * 2;
 const AVATAR_AREA_HEIGHT = 360 * 2;
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import { useAppState } from "../003_provider/AppStateProvider";
+import { useAppState } from "../003_provider/003_AppStateProvider";
 import { RightSidebar } from "./100-2_RightSidebar";
 import { Dialog } from "./101_Dialog";
 import { useTimeKeeperClient } from "./hooks/useTimeKeeperClient";

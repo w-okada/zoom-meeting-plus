@@ -1,5 +1,5 @@
 import React from "react";
-import { useAppState } from "../003_provider/AppStateProvider";
+import { useAppState } from "../003_provider/003_AppStateProvider";
 import { EntranceDialog } from "./101-0_EntranceDialog";
 import { SettingDialog } from "./101-1_SettingDialog";
 import { TimeKeeperDialog } from "./101-2_TimeKeeperDialog";

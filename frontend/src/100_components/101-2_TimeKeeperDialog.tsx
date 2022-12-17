@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useMemo } from "react";
 import { TimeKeeperClientLangTypes } from "../002_hooks/120_useTimeKeeper";
-import { useAppState } from "../003_provider/AppStateProvider";
+import { useAppState } from "../003_provider/003_AppStateProvider";
 
 export const TimeKeeperDialog = () => {
     const { timeKeeperState, frontendManagerState } = useAppState();

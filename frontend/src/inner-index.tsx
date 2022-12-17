@@ -2,6 +2,9 @@ import { ZoomMeetingPlusInitEvent, ZoomMeetingPlusJoinEvent } from "./sharedType
 // @ts-ignore
 import wasm from "../resources/converter.wasm";
 
+//@ts-ignore // audio worklet
+import workerjs from "raw-loader!../wasm/dist/index.js";
+import { MMVCClient } from "./900_inner_utils/000_MMVCClient";
 
 export interface Converter extends EmscriptenModule {
     _getInputImageBufferOffset(): number
@@ -25,8 +28,11 @@ const loadConverter = () => {
         resolve()
     });
 }
-
 loadConverter()
+
+
+
+
 
 let zoomInitCompleted = false;
 let zoomJoinCompleted = false;
@@ -58,8 +64,20 @@ let srcNodeAudioInput: MediaStreamAudioSourceNode | null = null;
 // let srcNodeZoomIncomming: MediaStreamAudioSourceNode | null = null;
 let dstNodeForZoom: MediaStreamAudioDestinationNode | null = null;
 
-const initializeAudio = () => {
+// MMVC
+let mmvcClient: MMVCClient | null = null
+
+const initializeAudio = async () => {
     audioContext = new AudioContext();
+    // Worklet
+    const scriptUrl = URL.createObjectURL(new Blob([workerjs], { type: "text/javascript" }));
+    console.log("[inner] voice-player-worklet-processor is loaeded. start...", scriptUrl)
+    await audioContext.audioWorklet.addModule(scriptUrl)
+    console.log("[inner] voice-player-worklet-processor is loaeded.", audioContext!.audioWorklet)
+    // MMVCClient
+    console.log("[inner] voice-player-worklet-processor is loaeded. start...2")
+    mmvcClient = new MMVCClient(audioContext, true)
+
     dummyMediaStream = createDummyMediaStream();
     srcNodeDummyInput = createSrcNodeDummyInput();
 
@@ -295,7 +313,10 @@ const reconstructAudioInputNode = async (audioInputDeviceId: string | null, audi
     //再生成
     if (audioInputDeviceId && audioInputEnabled) {
         const ms = await getUserMedia({ audio: { deviceId: audioInputDeviceId } });
-        srcNodeAudioInput = audioContext.createMediaStreamSource(ms);
+        await mmvcClient!.connect(ms)
+        mmvcClient!.startRealtimeConvert() // TBD: トグルとかで制御。
+        const mmvcMs = mmvcClient!.getOutputMediaStream()
+        srcNodeAudioInput = audioContext.createMediaStreamSource(mmvcMs);
         srcNodeAudioInput.connect(dstNodeForZoom);
         srcNodeAudioInput.connect(dstNodeForInternal);
         srcNodeAudioInput.connect(analyzerNode);
@@ -471,7 +492,7 @@ window.addEventListener("message", function (event: MessageEvent<any>) {
         if (data.type === "ZoomMeetingPlusInitEvent") {
             const zoomData = data as ZoomMeetingPlusInitEvent;
             console.log("event:", zoomData.type);
-            initializeAudio();
+            await initializeAudio();
             await initZoomClient();
             zoomInitCompleted = true;
         } else if (data.type === "ZoomMeetingPlusJoinEvent") {
