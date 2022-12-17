@@ -6,7 +6,6 @@ import { FrontendManagerStateAndMethod, useFrontendManager } from "../002_hooks/
 import { ResourceManagerStateAndMethod, useResourceManager } from "../002_hooks/003_useResourceManager";
 import { useZoomSDK, ZoomSDKStateAndMethod } from "../002_hooks/200_useZoomSDK";
 import { BrowserProxyStateAndMethod, useBrowserProxy } from "../002_hooks/300_useBrowserProxy";
-import { MotionPlayerStateAndMethod, useMotionPlayer } from "../002_hooks/303_useMotionPlayer";
 type Props = {
     children: ReactNode;
 };
@@ -18,7 +17,6 @@ interface AppStateValue {
     zoomSDKState: ZoomSDKStateAndMethod;
     browserProxyState: BrowserProxyStateAndMethod;
     deviceManagerState: DeviceManagerStateAndMethod;
-    motionPlayerState: MotionPlayerStateAndMethod;
 
     frontendManagerState: FrontendManagerStateAndMethod;
 }
@@ -41,7 +39,6 @@ export const AppStateProvider = ({ children }: Props) => {
     const browserProxyState = useBrowserProxy();
     const deviceManagerState = useDeviceManager();
     const frontendManagerState = useFrontendManager();
-    const motionPlayerState = useMotionPlayer({ resourceManagerState });
 
     const providerValue = {
         deviceManagerState,
@@ -49,7 +46,6 @@ export const AppStateProvider = ({ children }: Props) => {
         resourceManagerState,
         zoomSDKState,
         browserProxyState,
-        motionPlayerState,
         frontendManagerState,
     };
 

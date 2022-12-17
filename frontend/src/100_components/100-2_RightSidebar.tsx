@@ -12,7 +12,7 @@ import { AnimationInfo } from "./100-2_RightSidebarAnimation";
 
 
 export const RightSidebar = () => {
-    const { frontendManagerState, browserProxyState, resourceManagerState, motionPlayerState } = useAppState();
+    const { frontendManagerState, browserProxyState, resourceManagerState } = useAppState();
     const { applicationSetting } = useAppSetting();
     const voiceSetting = applicationSetting!.voice_setting;
     const [voice, setVoice] = useState<Blob | null>(null);
@@ -263,7 +263,7 @@ export const RightSidebar = () => {
 
     const motionButtons = useMemo(() => {
         return <></>
-    }, [motionPlayerState.motions]);
+    }, []);
 
     //////////////////
     // Rendering   ///
