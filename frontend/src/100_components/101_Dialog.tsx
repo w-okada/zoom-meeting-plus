@@ -2,7 +2,6 @@ import React from "react";
 import { useAppState } from "../003_provider/003_AppStateProvider";
 import { EntranceDialog } from "./101-0_EntranceDialog";
 import { SettingDialog } from "./101-1_SettingDialog";
-import { TimeKeeperDialog } from "./101-2_TimeKeeperDialog";
 import { AppInfoDialog } from "./101-9_AppInfoDialog";
 
 export const Dialog = () => {
@@ -18,11 +17,8 @@ export const Dialog = () => {
             <div className="dialog-container">
                 {frontendManagerState.stateControls.entranceDialogCheckbox.trigger}
                 <EntranceDialog />
-
                 {frontendManagerState.stateControls.settingDialogCheckbox.trigger}
                 <SettingDialog />
-                {frontendManagerState.stateControls.timeKeeperSettingDialogCheckbox.trigger}
-                <TimeKeeperDialog />
                 {frontendManagerState.stateControls.appInfoDialogCheckbox.trigger}
                 <AppInfoDialog />
             </div>

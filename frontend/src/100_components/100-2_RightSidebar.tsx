@@ -2,8 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAppState } from "../003_provider/003_AppStateProvider";
 import { useStateControlCheckbox } from "./hooks/useStateControlCheckbox";
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./parts/002_HeaderButton";
-import { PosePredictionEx } from "@dannadori/mediapipe-avatar-js/dist/MotionDetector";
-import { Side, TFace, THand, TPose } from "@dannadori/mediapipe-avatar-js/dist/kalido";
 import { useAppSetting } from "../003_provider/001_AppSettingProvider";
 import { SpeachRecognitionLanguagesKeys, useSpeachRecognition } from "./hooks/useSpeachRecognition";
 import { SpeachRecognitionLanguages } from "./hooks/SpeachRecognitherLanguages";
@@ -12,10 +10,9 @@ import { Header } from "./100-1_Header";
 import { generateConfig, OperationParams, WorkerManager } from "@dannadori/psdanimator";
 import { AnimationInfo } from "./100-2_RightSidebarAnimation";
 
-let GlobalLoopID = 0;
 
 export const RightSidebar = () => {
-    const { frontendManagerState, threeState, timeKeeperState, avatarControlState, browserProxyState, resourceManagerState, deviceManagerState, motionPlayerState } = useAppState();
+    const { frontendManagerState, browserProxyState, resourceManagerState, motionPlayerState } = useAppState();
     const { applicationSetting } = useAppSetting();
     const voiceSetting = applicationSetting!.voice_setting;
     const [voice, setVoice] = useState<Blob | null>(null);
@@ -204,45 +201,7 @@ export const RightSidebar = () => {
         return selector;
     }, [localLangSpeakerMap, selectedLang, selectedSpeaker]);
 
-    //// (3-2) Time Keeper
-    ////// (3-2-1) Show Dialog
-    const showTimeKeeperDialog = () => {
-        frontendManagerState.stateControls.timeKeeperSettingDialogCheckbox.updateState(true);
-    };
-    ////// (3-2-2) Remove TimeKeeper
-    const removeTimeKeep = () => {
-        timeKeeperState.setTimeKeeperProps({
-            endTime: "",
-            enable: false,
-            oneMinuteEnable: false,
-            threeMinutesEnable: false,
-            fiveMinutesEnable: false,
-        });
-    };
-    ////// (3-2-3) Update Label (end time)
-    const endTimeLabel = useMemo(() => {
-        if (timeKeeperState.endTime.split(":").length == 2) {
-            return `End Time:${timeKeeperState.endTime}`;
-        } else {
-            return `no time keep`;
-        }
-    }, [timeKeeperState]);
-    ////// (3-2-4) Update Label (remaining time)
-    useEffect(() => {
-        const div = document.getElementById("sidebar-avatar-area-time-keeper-label-remain") as HTMLDivElement;
-        let timeout: NodeJS.Timeout | null = null;
-        const updateRemainTime = () => {
-            const remain = timeKeeperState.calcRemainTime(timeKeeperState.endTime) / 1000;
-            div.innerText = `${remain}`;
-            if (timeKeeperState.enable) {
-                timeout = setTimeout(updateRemainTime, 1000 * 1);
-            }
-        };
-        updateRemainTime();
-        return () => {
-            clearTimeout(timeout!);
-        };
-    }, [timeKeeperState]);
+
 
     //// (3-3)
     const speachRecognitonLanguagesSelector = useMemo(() => {
@@ -301,214 +260,10 @@ export const RightSidebar = () => {
         }
     };
 
-    //// (3-4) Motion Capture
-    const motionCaptureEnableRef = useRef(false);
-    const useMotionCapture = (ev: React.ChangeEvent<HTMLInputElement>) => {
-        motionCaptureEnableRef.current = ev.target.checked;
-    };
 
-    //// (3-5) use Body Rig
-    const useUpperBodyChanged = (ev: React.ChangeEvent<HTMLInputElement>) => {
-        avatarControlState.useBodyRig(ev.target.checked);
-    };
-
-    const updateSmaWindowSize = (ev: React.ChangeEvent<HTMLInputElement>) => {
-        avatarControlState.setSmaWinSize(Number(ev.target.value));
-    };
-
-    /**
-     * (4) Avatar Motion Loop
-     */
-    const recordMotionEnabledRef = useRef(false);
-    const [recordMotionEnabled, setRecordMotionEnabled] = useState<boolean>(false);
-    const motionFramesForRec = useRef<any[]>([]);
-    const motionFramesForPlay = useRef<any[]>([]);
-    const currentTimeRef = useRef<number>(0);
-    //// (4-0) アバター格納用div登録
-    useEffect(() => {
-        const avatarDiv = document.getElementById("sidebar-avatar-area") as HTMLDivElement;
-        threeState.setParentDiv(avatarDiv);
-    }, []);
-
-    //// (4-1) メインループ
-    useEffect(() => {
-        console.log("Renderer Initialized");
-        let renderRequestId: number;
-        const LOOP_ID = performance.now();
-        GlobalLoopID = LOOP_ID;
-
-        const snap = document.createElement("canvas");
-        // const snap = document.getElementById("snap") as HTMLCanvasElement;
-        const snapCtx = snap.getContext("2d")!;
-        // snapCtx.setTransform(1, 0, 0, 1, 0, 0);
-
-        const input = document.getElementById("sidebar-avatar-area-video") as HTMLVideoElement;
-        snap.width = 300;
-        snap.height = 300;
-        // snapCtx.translate(snap.width, 0);
-        // snapCtx.scale(-1, 1);
-
-        /// アバターのポーズ更新の内部関数
-        let open = false
-        const updatePose = (_poses: PosePredictionEx | null, faceRig: TFace | null, leftHandRig: THand<Side> | null, rightHandRig: THand<Side> | null, poseRig: TPose | null) => {
-            if (faceRig) {
-                if (open == false) {
-                    if (browserProxyState.voiceValue > 40) {
-                        faceRig.mouth.shape.A = 1;
-                        open = true
-                    } else if (browserProxyState.voiceValue > 30) {
-                        faceRig.mouth.shape.A = 0.5;
-                        open = true
-                    } else if (browserProxyState.voiceValue > 20) {
-                        faceRig.mouth.shape.I = 0.6;
-                        open = true
-                    } else if (browserProxyState.voiceValue > 10) {
-                        faceRig.mouth.shape.U = 0.5;
-                        open = true
-                    } else if (browserProxyState.voiceValue > 5) {
-                        faceRig.mouth.shape.O = 0.2;
-                        open = true
-                    }
-                } else {
-                    open = false
-                }
-            }
-            // avatarControlState.avatar.updatePose(faceRig, poseRig, leftHandRig, rightHandRig);
-            if (avatarControlState.isInitialized) {
-                avatarControlState.avatar.isTargetVisible = false;
-                // avatarControlState.avatar.updatePoseWithRaw(faceRig, poseRig, leftHandRig, rightHandRig, _poses);
-                avatarControlState.avatar.updatePose(faceRig, poseRig, leftHandRig, rightHandRig);
-            }
-        };
-
-        //// レンダリングループ
-
-        const render = async () => {
-            if (motionCaptureEnableRef.current) {
-                snapCtx.drawImage(input, 0, 0, snap.width, snap.height);
-                try {
-                    if (snap.width > 0 && snap.height > 0) {
-                        const { poses, faceRig, leftHandRig, rightHandRig, poseRig } = await avatarControlState.detector.predict(snap);
-                        updatePose(poses, faceRig, leftHandRig, rightHandRig, poseRig);
-                        if (recordMotionEnabledRef.current) {
-                            const currentTime = new Date().getTime();
-                            const interval = currentTime - currentTimeRef.current;
-                            motionFramesForRec.current.push({ poses, faceRig, leftHandRig, rightHandRig, poseRig, interval: interval });
-                            currentTimeRef.current = currentTime;
-                        }
-                    }
-                } catch (error) {
-                    console.log(error);
-                }
-            } else {
-                if (motionFramesForPlay.current.length > 0) {
-                    const frame = JSON.parse(JSON.stringify(motionFramesForPlay.current.shift()));
-                    updatePose(frame.poses, frame.faceRig, frame.leftHandRig, frame.rightHandRig, frame.poseRig);
-                    //// Motion Replayの場合は、フレーム間のインターバル分のウェイトをかける。
-                    if (motionFramesForPlay.current.length > 0) {
-                        const interval = motionFramesForPlay.current[0].interval;
-                        await new Promise((resolve) => {
-                            setTimeout(resolve, interval);
-                        });
-                    }
-                } else {
-                    //// フレームがなくなった場合、次のデフォルト動作を積み込む。
-                    if (motionPlayerState.motions.length > 0) {
-                        motionFramesForPlay.current = [...motionPlayerState.motions[0].motion];
-                    }
-                }
-            }
-
-            threeState.controls.update();
-            threeState.character?.springBoneManager?.springBoneGroupList.forEach((element) => {
-                element.forEach((node) => {
-                    node.update(2);
-                });
-            });
-            threeState.character?.springBoneManager?.lateUpdate(10);
-
-            threeState.renderer?.render(threeState.scene!, threeState.camera!);
-            if (GlobalLoopID === LOOP_ID) {
-                renderRequestId = requestAnimationFrame(render);
-            }
-        };
-        render();
-
-        return () => {
-            console.log("CANCEL", renderRequestId);
-            cancelAnimationFrame(renderRequestId);
-        };
-    }, [threeState, motionPlayerState.motions, avatarControlState.isInitialized]);
-
-    //// (x) motion capture
-    const setRecordingStart = (ev: React.ChangeEvent<HTMLInputElement>) => {
-        recordMotionEnabledRef.current = ev.target.checked;
-        setRecordMotionEnabled(recordMotionEnabledRef.current);
-        if (ev.target.checked === true) {
-            motionFramesForRec.current = [];
-            currentTimeRef.current = new Date().getTime();
-        }
-    };
-    const setNewMotion = () => {
-        const motionNameInput = document.getElementById("motion-name") as HTMLInputElement;
-        console.log(motionFramesForRec.current);
-        const motionName = motionNameInput.value.length > 0 ? motionNameInput.value : "new";
-        if (motionFramesForRec.current.length > 0) {
-            motionPlayerState.setMotion(motionName, motionFramesForRec.current);
-        }
-        // motionFramesForRec.current = [];
-    };
-    const replayNewMotion = () => {
-        console.log("not implemented");
-    };
-    const downloadMotion = () => {
-        const blob = new Blob([JSON.stringify(motionFramesForRec.current)], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        document.body.appendChild(a);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        a.style = "display: none";
-        a.href = url;
-        a.download = "motion.json";
-        a.click();
-        window.URL.revokeObjectURL(url);
-    };
-
-    // (5) video initialize
-    useEffect(() => {
-        const videoElem = document.getElementById("sidebar-avatar-area-video") as HTMLVideoElement;
-        deviceManagerState.setVideoElement(videoElem);
-    }, []);
     const motionButtons = useMemo(() => {
-        const b = motionPlayerState.motions.map((m) => {
-            const button = (
-                <div
-                    key={m.name}
-                    className="sidebar-zoom-area-motion-button"
-                    onClick={async () => {
-                        motionFramesForPlay.current = [...m.motion];
-                    }}
-                >
-                    {m.name.split(".")[0]}
-                </div>
-            );
-            return button;
-        });
-        b.unshift(
-            <div
-                key={"rest"}
-                className="sidebar-zoom-area-motion-button"
-                onClick={async () => {
-                    console.log("rest");
-                    threeState.resetAvatar();
-                }}
-            >
-                reset
-            </div>
-        );
-        return b;
-    }, [motionPlayerState.motions, threeState.character]);
+        return <></>
+    }, [motionPlayerState.motions]);
 
     //////////////////
     // Rendering   ///
@@ -529,37 +284,6 @@ export const RightSidebar = () => {
                             <div id="sidebar-avatar-area" className="sidebar-avatar-area-canvas-container"></div>
                             <div id="sidebar-avatar-area2" className="sidebar-avatar-area-canvas-container">
                                 <canvas id="test-canvas"></canvas>
-                            </div>
-
-                            <div className="sidebar-zoom-area-input">
-                                <div className="sidebar-zoom-area-input-label">Time Keeper</div>
-                                <div className="sidebar-zoom-area-input-setter-container">
-                                    <div>
-                                        {endTimeLabel}(<span id="sidebar-avatar-area-time-keeper-label-remain"></span>)
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="sidebar-zoom-area-input">
-                                <div className="sidebar-zoom-area-input-label"></div>
-                                <div className="sidebar-zoom-area-input-setter-container">
-                                    <div
-                                        className="sidebar-zoom-area-input-setter-button1"
-                                        onClick={() => {
-                                            showTimeKeeperDialog();
-                                        }}
-                                    >
-                                        set
-                                    </div>
-                                    <div
-                                        className="sidebar-zoom-area-input-setter-button1"
-                                        onClick={() => {
-                                            removeTimeKeep();
-                                        }}
-                                    >
-                                        remove
-                                    </div>
-                                </div>
                             </div>
 
                             <div className="sidebar-zoom-area-input">
@@ -628,7 +352,6 @@ export const RightSidebar = () => {
                         </div>
                     </div>
                 </div>
-
                 {sidebarAccordionAvatarVideoCheckbox.trigger}
                 <div className="sidebar-partition">
                     <div className="sidebar-header">
@@ -636,104 +359,7 @@ export const RightSidebar = () => {
                         <div className="sidebar-header-caret"> {accodionButtonForAvatarVideo}</div>
                     </div>
                     <div className="sidebar-content">
-                        <video id="sidebar-avatar-area-video" className="sidebar-avatar-area-video" controls autoPlay></video>
-                        {/* <canvas id="snap"></canvas> */}
                         <audio id="sidebar-generate-voice-player"></audio>
-
-                        <div className="sidebar-zoom-area-input">
-                            <div className="sidebar-zoom-area-input-label">capture</div>
-                            <div className="sidebar-zoom-area-input-setter-container sidebar-zoom-area-input-setter-right">
-                                <input
-                                    id="capture-checkbox"
-                                    className="sidebar-zoom-area-toggle-input"
-                                    type="checkbox"
-                                    onChange={(ev) => {
-                                        useMotionCapture(ev);
-                                    }}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="sidebar-zoom-area-input">
-                            <div className="sidebar-zoom-area-input-label">upper body</div>
-                            <div className="sidebar-zoom-area-input-setter-container sidebar-zoom-area-input-setter-right">
-                                <input
-                                    id="use-upper-body-checkbox"
-                                    className="sidebar-zoom-area-toggle-input"
-                                    type="checkbox"
-                                    onChange={(ev) => {
-                                        useUpperBodyChanged(ev);
-                                    }}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="sidebar-zoom-area-input">
-                            <div className="sidebar-zoom-area-input-label">SMA win size</div>
-                            <div className="sidebar-zoom-area-input-setter-container sidebar-zoom-area-input-setter-right">
-                                <input
-                                    id="moving-average-window-size"
-                                    className="sidebar-zoom-area-toggle-input"
-                                    type="number"
-                                    min="1"
-                                    max="20"
-                                    step="1"
-                                    defaultValue={avatarControlState.smaWinSize}
-                                    onChange={(ev) => {
-                                        updateSmaWindowSize(ev);
-                                    }}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="sidebar-zoom-area-input">
-                            <div className="sidebar-zoom-area-input-label">rec motion</div>
-                            <div className="sidebar-zoom-area-input-setter-container sidebar-zoom-area-input-setter-right">
-                                <input
-                                    id="sidebar-motion-recorder-button-toggle"
-                                    className="sidebar-zoom-area-input-setter-toggle"
-                                    type="checkbox"
-                                    onChange={(ev) => {
-                                        setRecordingStart(ev);
-                                    }}
-                                />
-                                <label htmlFor="sidebar-motion-recorder-button-toggle" className="sidebar-zoom-area-input-setter-toggle-label" />
-                                <div className="sidebar-zoom-area-input-setter-text">{recordMotionEnabled ? "on" : "off"}</div>
-
-                                <div
-                                    className="sidebar-zoom-area-input-setter-button1"
-                                    onClick={() => {
-                                        replayNewMotion();
-                                    }}
-                                >
-                                    Re.
-                                </div>
-                                <div
-                                    className="sidebar-zoom-area-input-setter-button1"
-                                    onClick={() => {
-                                        downloadMotion();
-                                    }}
-                                >
-                                    DL.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="sidebar-zoom-area-input">
-                            <div className="sidebar-zoom-area-input-label"></div>
-                            <div className="sidebar-zoom-area-input-setter-container ">
-                                <div>name:</div>
-                                <input type="text" className="sidebar-zoom-area-input-text-small" id="motion-name" />
-                                <div
-                                    className="sidebar-zoom-area-input-setter-button1"
-                                    onClick={() => {
-                                        setNewMotion();
-                                    }}
-                                >
-                                    set
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
