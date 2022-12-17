@@ -31,8 +31,6 @@ export const RightSidebar = () => {
 
     useEffect(() => {
         const load = async () => {
-            // const canvasElement = document.getElementById("test-canvas") as HTMLCanvasElement;
-            // const psdFile = await resourceManagerState.fetchPSD("zundamonB.psd")
             const canvasElement = document.getElementById("psd-animation-canvas") as HTMLCanvasElement;
             const psdFile = await resourceManagerState.fetchPSD(applicationSettingState.applicationSetting.psd_animator_setting.psd_url)
 
