@@ -209,11 +209,11 @@ export const useApplicationSettingManager = (): ApplicationSettingManagerStateAn
         updateApplicationSetting()
     }
     const setVoiceVoxEnable = (val: boolean) => {
-        applicationSettingRef.current.voicevox_setting.voice_vox_enabled = val
+        applicationSettingRef.current.voicevox_setting.voicevox_enabled = val
         updateApplicationSetting()
     }
     const setVoiceVoxUrl = (url: string) => {
-        applicationSettingRef.current.voicevox_setting.voice_vox_url = url
+        applicationSettingRef.current.voicevox_setting.voicevox_url = url
         updateApplicationSetting()
     }
 

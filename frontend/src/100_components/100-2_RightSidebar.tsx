@@ -33,6 +33,7 @@ export const RightSidebar = () => {
         const load = async () => {
             const canvasElement = document.getElementById("psd-animation-canvas") as HTMLCanvasElement;
             const psdFile = await resourceManagerState.fetchPSD(applicationSettingState.applicationSetting.psd_animator_setting.psd_url)
+
             const config = generateConfig(psdFile, canvasElement, 1024, 960, true)
             // const config = generateConfig(psdFile, canvasElement, 640, 480, false)
             await psdAnimator.init(config)

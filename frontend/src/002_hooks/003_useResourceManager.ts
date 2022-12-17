@@ -37,7 +37,7 @@ export const useResourceManager = (): ResourceManagerStateAndMethod => {
     }
 
     const refreshSpeakersInVoiceVox = async () => {
-        const speakers = await ResourceLoader.getSpeakerListFromVoiceVox(voiceSetting.voice_vox_url)
+        const speakers = await ResourceLoader.getSpeakerListFromVoiceVox(voiceSetting.voicevox_url)
         const tmpSpekaers: { [name: string]: number } = {}
         speakers.map((x: any) => {
             const name = x.name as string
@@ -72,7 +72,7 @@ export const useResourceManager = (): ResourceManagerStateAndMethod => {
     }, [])
 
     const generateVoiceWithVoiceVox = (speakerId: number, text: string) => {
-        return ResourceLoader.generateVoiceWithVoiceVox(voiceSetting.voice_vox_url, speakerId, text)
+        return ResourceLoader.generateVoiceWithVoiceVox(voiceSetting.voicevox_url, speakerId, text)
     }
     const generateVoiceWithOpenTTS = (lang: string, speakerId: string, text: string) => {
         return ResourceLoader.generateVoiceWithOpenTTS(voiceSetting.open_tts_url, lang, speakerId, text)
