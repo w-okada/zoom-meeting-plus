@@ -6,8 +6,8 @@ import { useAppSetting } from "../003_provider/001_AppSettingProvider";
 export type ResourceManagerState = {
     speakersInOpenTTS: { [lang: string]: string[]; }
     speakersInVoiceVox: { [name: string]: number; }
-    voiceVoxEnabled: boolean
-    openTTSEnabled: boolean
+    // voiceVoxEnabled: boolean
+    // openTTSEnabled: boolean
 }
 
 export type ResourceManagerStateAndMethod = ResourceManagerState & {
@@ -19,18 +19,18 @@ export type ResourceManagerStateAndMethod = ResourceManagerState & {
     // VOICE GENERATOR
     generateVoiceWithVoiceVox: (speakerId: number, text: string) => Promise<Blob>
     generateVoiceWithOpenTTS: (lang: string, speakerId: string, text: string) => Promise<Blob>
-    setVoiceVoxEnabled: (val: boolean) => void
-    setOpenTTSEnabled: (val: boolean) => void
+    // setVoiceVoxEnabled: (val: boolean) => void
+    // setOpenTTSEnabled: (val: boolean) => void
     refreshSpeakersInVoiceVox: () => Promise<void>
     refreshLanguageAndSpeakersInOpenTTS: () => Promise<void>
 }
 export const useResourceManager = (): ResourceManagerStateAndMethod => {
     const { applicationSetting } = useAppSetting()
-    const [voiceVoxEnabled, setVoiceVoxEnabled] = useState<boolean>(applicationSetting!.voicevox_setting.voicevox_enabled)
-    const [openTTSEnabled, setOpenTTSEnabled] = useState<boolean>(applicationSetting!.voicevox_setting.open_tts_enabled)
+    // const [voiceVoxEnabled, setVoiceVoxEnabled] = useState<boolean>(applicationSettingState.applicationSetting.voicevox_setting.default_voice_vox_enabled)
+    // const [openTTSEnabled, setOpenTTSEnabled] = useState<boolean>(applicationSettingState.applicationSetting.voicevox_setting.default_open_tts_enabled)
     const [speakersInOpenTTS, setSpeakers] = useState<{ [lang: string]: string[] }>({})
     const [speakersInVoiceVox, setSpeakersInVoiceVox] = useState<{ [name: string]: number }>({})
-    const voiceSetting = applicationSetting!.voicevox_setting
+    const voiceSetting = applicationSetting.voicevox_setting
 
     const fetchPSD = async (filename: string) => {
         return ResourceLoader.fetchPSD(filename)
@@ -81,11 +81,11 @@ export const useResourceManager = (): ResourceManagerStateAndMethod => {
     return {
         speakersInOpenTTS,
         speakersInVoiceVox,
-        voiceVoxEnabled,
-        openTTSEnabled,
+        // voiceVoxEnabled,
+        // openTTSEnabled,
         fetchPSD,
-        setVoiceVoxEnabled,
-        setOpenTTSEnabled,
+        // setVoiceVoxEnabled,
+        // setOpenTTSEnabled,
         fetchMotion: ResourceLoader.fetchMotion,
         fetchVoice: ResourceLoader.fetchVoice,
         generateVoiceWithVoiceVox,

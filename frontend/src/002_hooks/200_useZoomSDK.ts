@@ -38,6 +38,7 @@ export const useZoomSDK = (): ZoomSDKStateAndMethod => {
 
     const joinZoom = useMemo(() => {
         return async (username: string, meetingNumber: string, password: string, signature: string, sdkKey: string, zak: string) => {
+
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             const ifrm = document.getElementById('inner-index')!.contentWindow;

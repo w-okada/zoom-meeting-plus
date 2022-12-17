@@ -6,8 +6,6 @@ export type AudioRootState = {
 export type AudioRootStateAndMethod = AudioRootState & {
     dummy: () => void
 }
-// //@ts-ignore
-// import workerjs from "raw-loader!../../wasm/dist/index.js";
 
 export const useAudioRoot = (): AudioRootStateAndMethod => {
     const audioContext = useMemo(() => {
