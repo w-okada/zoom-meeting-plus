@@ -14,9 +14,6 @@ type Props = {
 interface AppStateValue {
     backendManagerState: BackendManagerStateAndMethod;
     resourceManagerState: ResourceManagerStateAndMethod;
-    // threeState: ThreeStateAndMethods;
-    // avatarControlState: AvatarControlStateAndMethod;
-    // timeKeeperState: TimeKeeperStateAndMethod;
 
     zoomSDKState: ZoomSDKStateAndMethod;
     browserProxyState: BrowserProxyStateAndMethod;
@@ -40,12 +37,6 @@ export const AppStateProvider = ({ children }: Props) => {
     const backendManagerState = useBackendManager();
     const resourceManagerState = useResourceManager();
     // (2) initialize
-    // const threeState = useThree();
-    // const avatarControlState = useAvatarControl({
-    //     vrm: threeState.character,
-    //     scene: threeState.scene,
-    // });
-    // const timeKeeperState = useTimeKeeper();
     const zoomSDKState = useZoomSDK();
     const browserProxyState = useBrowserProxy();
     const deviceManagerState = useDeviceManager();
@@ -56,9 +47,6 @@ export const AppStateProvider = ({ children }: Props) => {
         deviceManagerState,
         backendManagerState,
         resourceManagerState,
-        // threeState,
-        // avatarControlState,
-        // timeKeeperState,
         zoomSDKState,
         browserProxyState,
         motionPlayerState,

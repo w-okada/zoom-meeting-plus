@@ -500,8 +500,6 @@ window.addEventListener("message", function (event: MessageEvent<any>) {
             const zoomData = data as ZoomMeetingPlusJoinEvent;
             console.log("event:", zoomData.type);
             console.log("event:", zoomData);
-            const div = parent.document.getElementById("sidebar-avatar-area");
-            console.log("DIV_ELEMENT", div);
             await joinZoom(zoomData.data.username, zoomData.data.meetingNumber, zoomData.data.password, zoomData.data.signature, zoomData.data.sdkKey, zoomData.data.zak);
             zoomJoinCompleted = true;
         }
