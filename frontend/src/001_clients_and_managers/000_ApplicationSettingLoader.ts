@@ -1,6 +1,10 @@
 import { MMVCSetting } from "./000-01_ApplicationSettingLoader_MMVC"
 import { PSDAnimatorSetting } from "./000-02_ApplicationSettingLoader_PSDAnimator"
 import { VoiceVoxSetting } from "./000-03_ApplicationSettingLoader_VoiceVox"
+
+export * from "./000-01_ApplicationSettingLoader_MMVC"
+export * from "./000-02_ApplicationSettingLoader_PSDAnimator"
+
 export type ApplicationSetting =
     {
         "app_title": string,
@@ -25,7 +29,7 @@ export type ApplicationSetting =
         "psd_animator_setting": PSDAnimatorSetting
     }
 
-
+export const InitialApplicationSetting = require("../../public/assets/setting.json")
 
 export const fetchApplicationSetting = async (): Promise<ApplicationSetting> => {
     const url = `/api/setting`

@@ -7,7 +7,7 @@ type Props = {
 };
 
 interface AppSettingValue {
-    applicationSetting: ApplicationSetting | null;
+    applicationSetting: ApplicationSetting;
     zak: string;
 }
 

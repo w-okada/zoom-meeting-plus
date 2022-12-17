@@ -2,21 +2,16 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import { AppStateProvider } from "./003_provider/003_AppStateProvider";
-import { AppSettingProvider, useAppSetting } from "./003_provider/001_AppSettingProvider";
+import { AppSettingProvider } from "./003_provider/001_AppSettingProvider";
 import { AppRootStateProvider } from "./003_provider/002_AppRootStateProvider";
 import { useMemo } from "react";
 
 const AppStateProviderWrapper = () => {
-    const { applicationSetting } = useAppSetting();
-    if (!applicationSetting) {
-        return <></>;
-    } else {
-        return (
-            <AppStateProvider>
-                <App />
-            </AppStateProvider>
-        );
-    }
+    return (
+        <AppStateProvider>
+            <App />
+        </AppStateProvider>
+    );
 };
 
 
@@ -50,7 +45,6 @@ const NormalFrontPageDescription = () => {
 };
 
 const AppRootStateProviderWrapper = () => {
-    const { applicationSetting } = useAppSetting();
     const [firstTach, setFirstTouch] = React.useState<boolean>(false);
 
     // useEffect(() => {
@@ -75,7 +69,7 @@ const AppRootStateProviderWrapper = () => {
         return "front-start-button-color"
     }, [])
 
-    if (!applicationSetting || !firstTach) {
+    if (!firstTach) {
         return (
             <div className="front-container">
                 <div className="front-title">{applicationTitle}</div>

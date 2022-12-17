@@ -1,6 +1,6 @@
 import { VoiceFocusDeviceTransformer, VoiceFocusTransformDevice } from "amazon-chime-sdk-js"
 import MicrophoneStream from "microphone-stream"
-import { MajarModeTypes, VoiceChangerMode } from "../001_clients_and_managers/000-01_ApplicationSettingLoader_MMVC"
+import { MajarModeTypes, VoiceChangerMode } from "../001_clients_and_managers/000_ApplicationSettingLoader"
 import { VoicePlayerWorkletNode } from "./001_VoicePlayerWorkletNode"
 import { AudioStreamer } from "./002_AudioStreamer"
 import { createDummyMediaStream } from "./999_Utils"

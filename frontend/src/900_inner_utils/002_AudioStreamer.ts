@@ -1,8 +1,8 @@
 import { io, Socket } from "socket.io-client";
 import { DefaultEventsMap } from "@socket.io/component-emitter";
 import { Duplex, DuplexOptions } from "readable-stream";
+import { MajarModeTypes, VoiceChangerMode } from "../001_clients_and_managers/000_ApplicationSettingLoader";
 import { postVoice } from "../001_clients_and_managers/009_ResourceLoader";
-import { MajarModeTypes, VoiceChangerMode } from "../001_clients_and_managers/000-01_ApplicationSettingLoader_MMVC";
 
 
 
