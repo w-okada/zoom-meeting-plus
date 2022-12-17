@@ -56,19 +56,12 @@ export const AppInfoDialog = () => {
                         <div className="dialog-application-information-title">Acknowledgments</div>
                         <div className="dialog-application-information-list-container">
                             <div className="dialog-application-information-list">
-                                <div className="dialog-application-information-list-name">燐酸様</div>
-                                <div className="dialog-application-information-list-description">VRM</div>
-                                <div className="dialog-application-information-list-url">
-                                    <a href="https://hub.vroid.com/characters/3590580643081577083/models/4344551722337138718" rel="noreferrer" target="_blank">
-                                        HP
-                                    </a>
-                                </div>
                             </div>
                             <div className="dialog-application-information-list">
-                                <div className="dialog-application-information-list-name">音読さん様</div>
-                                <div className="dialog-application-information-list-description">Voice is generated in 音読さん</div>
+                                <div className="dialog-application-information-list-name">MMVC</div>
+                                <div className="dialog-application-information-list-description">Realtime Voice Changer</div>
                                 <div className="dialog-application-information-list-url">
-                                    <a href="https://ondoku3.com/ja/" rel="noreferrer" target="_blank">
+                                    <a href="https://github.com/isletennos/MMVC_Trainer" rel="noreferrer" target="_blank">
                                         HP
                                     </a>
                                 </div>
