@@ -269,7 +269,7 @@ navigator.mediaDevices.getUserMedia = async (params) => {
     if (params?.video) {
         //// Zoom用のストリーム作成
 
-        const canvas = parent.document.getElementById("test-canvas") as HTMLCanvasElement;
+        const canvas = parent.document.getElementById("psd-animation-canvas") as HTMLCanvasElement;
         // const div = parent.document.getElementById("sidebar-avatar-area") as HTMLDivElement;
         // const canvas = div.firstChild as HTMLCanvasElement;
         // const canvas = parent.document.getElementById("test-canvas") as HTMLCanvasElement;
