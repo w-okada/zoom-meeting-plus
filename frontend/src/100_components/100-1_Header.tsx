@@ -12,7 +12,7 @@ type HeaderButtons = {
 export const Header = () => {
     const { frontendManagerState } = useAppState();
     const { applicationSetting } = useAppSetting();
-    const applicationTitle = applicationSetting!.app_title;
+    const applicationTitle = applicationSetting.app_title;
 
     const buttons: HeaderButtons = useMemo(() => {
         //// (1) Frame

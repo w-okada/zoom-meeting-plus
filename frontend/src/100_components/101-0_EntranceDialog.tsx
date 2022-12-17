@@ -6,11 +6,11 @@ import { useAppState } from "../003_provider/003_AppStateProvider";
 export const EntranceDialog = () => {
     const { frontendManagerState, backendManagerState, zoomSDKState } = useAppState();
     const { applicationSetting, zak } = useAppSetting();
-    const defaultUsername = applicationSetting?.default_meeting.default_username || "";
-    const defaultMeetingNumber = applicationSetting?.default_meeting.default_meeting_number || "";
-    const defaultMeetingPassword = applicationSetting?.default_meeting.default_meeting_password || "";
-    const defaultSecret = applicationSetting?.default_meeting.default_secret || "";
-    const oauthSettting = applicationSetting?.oauth;
+    const defaultUsername = applicationSetting.default_meeting.default_username || "";
+    const defaultMeetingNumber = applicationSetting.default_meeting.default_meeting_number || "";
+    const defaultMeetingPassword = applicationSetting.default_meeting.default_meeting_password || "";
+    const defaultSecret = applicationSetting.default_meeting.default_secret || "";
+    const oauthSettting = applicationSetting.oauth;
 
     ////////////////////////////
     //  Conponents
@@ -60,8 +60,8 @@ export const EntranceDialog = () => {
             const password = passwordInput.value;
             const secret = 1000; //secretInput.value;
 
-            const useLocalServer = applicationSetting?.sign_server.use_local_sign_server || false;
-            const serverUrl = applicationSetting?.sign_server.sign_server_url || "";
+            const useLocalServer = applicationSetting.sign_server.use_local_sign_server || false;
+            const serverUrl = applicationSetting.sign_server.sign_server_url || "";
 
             const role = 0; // join
 
