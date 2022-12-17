@@ -7,7 +7,7 @@ export type ApplicationSettingManagerStateAndMethod = {
     zak: string
 }
 
-export const useApplicationSettingManager = () => {
+export const useApplicationSettingManager = (): ApplicationSettingManagerStateAndMethod => {
     const [applicationSetting, setApplicationSetting] = useState<ApplicationSetting>(InitialApplicationSetting)
     const accessToken = useMemo(() => {
         const params = new URLSearchParams(window.location.search);

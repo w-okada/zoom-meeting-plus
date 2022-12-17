@@ -13,8 +13,8 @@ import { AnimationInfo } from "./100-2_RightSidebarAnimation";
 
 export const RightSidebar = () => {
     const { frontendManagerState, browserProxyState, resourceManagerState } = useAppState();
-    const { applicationSetting } = useAppSetting();
-    const voiceSetting = applicationSetting!.voicevox_setting;
+    const { applicationSettingState } = useAppSetting();
+    const voiceSetting = applicationSettingState.applicationSetting.voicevox_setting;
     const [voice, setVoice] = useState<Blob | null>(null);
     const { languageKey, recognitionStartSync, setLanguageKey } = useSpeachRecognition();
     const isRecognitionEnabledRef = useRef<boolean>(false);

@@ -5,12 +5,12 @@ import { useAppState } from "../003_provider/003_AppStateProvider";
 
 export const EntranceDialog = () => {
     const { frontendManagerState, backendManagerState, zoomSDKState } = useAppState();
-    const { applicationSetting, zak } = useAppSetting();
-    const defaultUsername = applicationSetting.default_meeting.default_username || "";
-    const defaultMeetingNumber = applicationSetting.default_meeting.default_meeting_number || "";
-    const defaultMeetingPassword = applicationSetting.default_meeting.default_meeting_password || "";
-    const defaultSecret = applicationSetting.default_meeting.default_secret || "";
-    const oauthSettting = applicationSetting.oauth;
+    const { applicationSettingState } = useAppSetting();
+    const defaultUsername = applicationSettingState.applicationSetting.default_meeting.default_username || "";
+    const defaultMeetingNumber = applicationSettingState.applicationSetting.default_meeting.default_meeting_number || "";
+    const defaultMeetingPassword = applicationSettingState.applicationSetting.default_meeting.default_meeting_password || "";
+    const defaultSecret = applicationSettingState.applicationSetting.default_meeting.default_secret || "";
+    const oauthSettting = applicationSettingState.applicationSetting.oauth;
 
     ////////////////////////////
     //  Conponents
@@ -60,8 +60,8 @@ export const EntranceDialog = () => {
             const password = passwordInput.value;
             const secret = 1000; //secretInput.value;
 
-            const useLocalServer = applicationSetting.sign_server.use_local_sign_server || false;
-            const serverUrl = applicationSetting.sign_server.sign_server_url || "";
+            const useLocalServer = applicationSettingState.applicationSetting.sign_server.use_local_sign_server || false;
+            const serverUrl = applicationSettingState.applicationSetting.sign_server.sign_server_url || "";
 
             const role = 0; // join
 
@@ -77,7 +77,7 @@ export const EntranceDialog = () => {
             frontendManagerState.stateControls.entranceDialogCheckbox.updateState(false);
             try {
                 await zoomSDKState.initZoomClient();
-                await zoomSDKState.joinZoom(username, meetingNumber, password, signature.signature, signature.sdkKey, zak);
+                await zoomSDKState.joinZoom(username, meetingNumber, password, signature.signature, signature.sdkKey, applicationSettingState.zak);
             } catch (error: any) {
                 console.log("JOIN ZOOM EXCEPTION!")
                 console.log(error);
