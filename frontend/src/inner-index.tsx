@@ -1,6 +1,33 @@
 import { ZoomMeetingPlusInitEvent, ZoomMeetingPlusJoinEvent } from "./sharedTypes";
+// @ts-ignore
+import wasm from "../resources/converter.wasm";
 
-console.log("test.js");
+
+export interface Converter extends EmscriptenModule {
+    _getInputImageBufferOffset(): number
+    _getOutputImageBufferOffset(): number
+    _exec(widht: number, height: number): number
+}
+
+let converter: Converter | null = null
+let inputBufferOffset = 0
+let outputBufferOffset = 0
+
+const loadConverter = () => {
+    return new Promise<void>(async (resolve) => {
+        const mod = require("../resources/converter.js");
+        const wasmBase64 = wasm.split(",")[1]
+        const b = Buffer.from(wasmBase64, "base64");
+        converter = await mod({ wasmBinary: b }) as Converter;
+        inputBufferOffset = converter._getInputImageBufferOffset()
+        outputBufferOffset = converter._getOutputImageBufferOffset()
+        console.log("converter is loaded.", converter, inputBufferOffset, outputBufferOffset)
+        resolve()
+    });
+}
+
+loadConverter()
+
 let zoomInitCompleted = false;
 let zoomJoinCompleted = false;
 
@@ -14,6 +41,7 @@ class ReferableAudio extends Audio {
         // updateZoomIncomingNode();
     }
 }
+
 global.Audio = ReferableAudio;
 
 // 固定ノード(固定だが、audioContextがuser-gestureが必要なので、初期値はnull)
@@ -113,6 +141,73 @@ navigator.mediaDevices.enumerateDevices = async () => {
     return newDevices;
 };
 
+// let color = 0
+let perf: number[] = []
+const convertI420AFrameToI420Frame = (frame: any) => {
+    const { width, height } = frame.codedRect;
+    // console.log("Frame", frame.format, frame.colorSpace, width, height)
+    const bgraBuffer = new Uint8Array(width * height * 4);
+    frame.copyTo(bgraBuffer, { rect: frame.codedRect });
+    converter!.HEAPU8.set(bgraBuffer, inputBufferOffset)
+
+    const start = performance.now()
+    converter!._exec(width, height)
+    const end = performance.now()
+    perf.push(end - start)
+
+    if (perf.length > 100) {
+        const avr = perf.reduce((prev, cur) => {
+            return prev + cur
+        }, 0) / perf.length
+
+        console.log(`Performance: ${avr}ms`)
+        perf = []
+    }
+
+    const buf = new Uint8ClampedArray(converter!.HEAPU8.slice(outputBufferOffset, outputBufferOffset + width * height * 3 / 2))
+
+    const init = {
+        timestamp: 0,
+        codedWidth: width,
+        codedHeight: height,
+        format: "I420" // OK
+        // format: "NV12" // OK
+        // format: "I444" // NG
+        //format: "RGBX" // NG
+        // format: "BGRA" // NG
+    };
+    // @ts-ignore
+    const f = new VideoFrame(buf, init);
+    return f
+}
+
+const transform = (stream: MediaStream) => {
+    const videoTrack = stream.getVideoTracks()[0];
+
+    // @ts-ignore
+    const trackProcessor = new MediaStreamTrackProcessor({
+        track: videoTrack
+    });
+    // @ts-ignore
+    const trackGenerator = new MediaStreamTrackGenerator({ kind: "video" });
+
+    const transformer = new TransformStream({
+        async transform(videoFrame, controller) {
+            const newFrame = convertI420AFrameToI420Frame(videoFrame);
+            videoFrame.close();
+            controller.enqueue(newFrame);
+        }
+    });
+
+    trackProcessor.readable
+        .pipeThrough(transformer)
+        .pipeTo(trackGenerator.writable);
+
+    const processedStream = new MediaStream();
+    processedStream.addTrack(trackGenerator);
+    return processedStream;
+}
+
 const getUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
 
 navigator.mediaDevices.getUserMedia = async (params) => {
@@ -135,14 +230,10 @@ navigator.mediaDevices.getUserMedia = async (params) => {
         // zoom-outgoingから切断
         // TODO: disconnect freeze?
         if (dstNodeForZoom && srcNodeAudioInput) {
-            console.log("CAMERA_DEVICES1");
             srcNodeAudioInput.disconnect(dstNodeForZoom);
-            console.log("CAMERA_DEVICES2");
         }
         if (dstNodeForZoom && srcNodeDummyInput) {
-            console.log("CAMERA_DEVICES3");
             srcNodeDummyInput.disconnect(dstNodeForZoom);
-            console.log("CAMERA_DEVICES4");
         }
 
         // zoom-outgoing再生成
@@ -159,12 +250,15 @@ navigator.mediaDevices.getUserMedia = async (params) => {
 
     if (params?.video) {
         //// Zoom用のストリーム作成
-        const div = parent.document.getElementById("sidebar-avatar-area") as HTMLDivElement;
-        const canvas = div.firstChild as HTMLCanvasElement;
+
+        const canvas = parent.document.getElementById("test-canvas") as HTMLCanvasElement;
+        // const div = parent.document.getElementById("sidebar-avatar-area") as HTMLDivElement;
+        // const canvas = div.firstChild as HTMLCanvasElement;
+        // const canvas = parent.document.getElementById("test-canvas") as HTMLCanvasElement;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const avatarMediaStream = canvas.captureStream(30) as MediaStream;
-        avatarMediaStream.getVideoTracks().forEach((x) => {
+        transform(avatarMediaStream).getVideoTracks().forEach((x) => {
             msForZoom.addTrack(x);
             // console.log("VIDEO_CAP", x.getCapabilities());
             // console.log("VIDEO_CAP", x.getConstraints);
@@ -220,6 +314,7 @@ const reconstructAudioInputNode = async (audioInputDeviceId: string | null, audi
             voiceCallback(max - min);
         }, 50);
     }
+
 };
 // // Referable Audio が更新されたとき
 // const updateZoomIncomingNode = () => {
@@ -269,7 +364,7 @@ const playAudio = async (audioData: ArrayBuffer) => {
         // voiceDiffRef.current = max - min;
         // console.log("ANALYZER(TBD:callback):", max, min, max - min);
         voiceCallback(max - min);
-    }, 50);
+    }, 5);
 
     // Source Node生成
     const srcBufferNode = audioContext.createBufferSource();
@@ -279,6 +374,7 @@ const playAudio = async (audioData: ArrayBuffer) => {
         console.log("Buffer_end");
         if (intervalTimerAvatar) {
             clearInterval(intervalTimerAvatar);
+            voiceCallback(0);
             intervalTimerAvatar = null;
         }
     };
@@ -316,6 +412,7 @@ const initZoomClient = async () => {
 
 const joinZoom = async (username: string, meetingNumber: string, password: string, signature: string, sdkKey: string, zak: string) => {
     const p = new Promise<void>((resolve, reject) => {
+        console.log("JOIN WAITING.....")
         window.ZoomMtg.join({
             signature: signature,
             meetingNumber: meetingNumber,

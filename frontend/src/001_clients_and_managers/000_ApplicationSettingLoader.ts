@@ -32,9 +32,20 @@ export type ApplicationSetting =
             "default_voice_lang": string,
             "default_voice_speaker": string
         }
+        "psd_animation": PSDAnimationFrame[]
     }
 
 
+export const PSDAnimationMode = {
+    "normal": "normal"
+} as const
+export type PSDAnimationMode = typeof PSDAnimationMode[keyof typeof PSDAnimationMode]
+export type PSDAnimationFrame = {
+    "mode": PSDAnimationMode,
+    "z_index": number,
+    "number": number,
+    "layer_path": string
+}
 
 export const fetchApplicationSetting = async (): Promise<ApplicationSetting> => {
     const url = `/api/setting`

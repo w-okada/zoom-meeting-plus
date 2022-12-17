@@ -10,6 +10,9 @@ import { SpeachRecognitionLanguages } from "./hooks/SpeachRecognitherLanguages";
 import { VoskLanguages } from "../002_hooks/302_useVosk";
 import { Header } from "./100-1_Header";
 
+import { generateConfig, OperationParams, WorkerManager } from "@dannadori/psdanimator";
+import { AnimationInfo } from "./100-2_RightSidebarAnimation";
+
 let GlobalLoopID = 0;
 
 export const RightSidebar = () => {
@@ -25,6 +28,50 @@ export const RightSidebar = () => {
     const sidebarAccordionAvatarCheckbox = useStateControlCheckbox("sidebar-accordion-avatar-checkbox");
     const sidebarAccordionAvatarVideoCheckbox = useStateControlCheckbox("sidebar-accordion-avatar-video-checkbox");
     const sidebarAccordionTranscribeCheckbox = useStateControlCheckbox("sidebar-accordion-Transcribe-checkbox");
+
+    const psdAnimator = useMemo(() => {
+        return new WorkerManager()
+    }, [])
+
+
+    useEffect(() => {
+        const load = async () => {
+            const canvasElement = document.getElementById("test-canvas") as HTMLCanvasElement;
+            const psdFile = await resourceManagerState.fetchPSD("zundamonB.psd")
+            const config = generateConfig(psdFile, canvasElement, 1024, 960, true)
+            // const config = generateConfig(psdFile, canvasElement, 640, 480, false)
+            await psdAnimator.init(config)
+            const p1: OperationParams = {
+                type: "SET_MOTION",
+                motion: AnimationInfo
+            }
+            await psdAnimator.execute(p1)
+            console.log("set motion")
+            const p2: OperationParams = {
+                type: "SWITCH_MOTION_MODE",
+                // motionMode: "talking",
+                motionMode: "normal",
+            }
+            await psdAnimator.execute(p2)
+            console.log("set motion mode")
+
+            const p3: OperationParams = {
+                type: "START",
+            }
+            await psdAnimator.execute(p3)
+            console.log("start motion")
+
+
+            const p4: OperationParams = {
+                type: "SET_WAIT_RATE",
+                waitRate: 1
+            }
+            await psdAnimator.execute(p4)
+            console.log("start wait rate")
+        }
+        load()
+
+    }, [])
 
     /**
      * (1)According Actions
@@ -317,18 +364,28 @@ export const RightSidebar = () => {
         // snapCtx.scale(-1, 1);
 
         /// アバターのポーズ更新の内部関数
+        let open = false
         const updatePose = (_poses: PosePredictionEx | null, faceRig: TFace | null, leftHandRig: THand<Side> | null, rightHandRig: THand<Side> | null, poseRig: TPose | null) => {
             if (faceRig) {
-                if (browserProxyState.voiceValue > 40) {
-                    faceRig.mouth.shape.A = 1;
-                } else if (browserProxyState.voiceValue > 30) {
-                    faceRig.mouth.shape.A = 0.5;
-                } else if (browserProxyState.voiceValue > 20) {
-                    faceRig.mouth.shape.I = 0.6;
-                } else if (browserProxyState.voiceValue > 10) {
-                    faceRig.mouth.shape.U = 0.5;
-                } else if (browserProxyState.voiceValue > 1) {
-                    faceRig.mouth.shape.O = 0.2;
+                if (open == false) {
+                    if (browserProxyState.voiceValue > 40) {
+                        faceRig.mouth.shape.A = 1;
+                        open = true
+                    } else if (browserProxyState.voiceValue > 30) {
+                        faceRig.mouth.shape.A = 0.5;
+                        open = true
+                    } else if (browserProxyState.voiceValue > 20) {
+                        faceRig.mouth.shape.I = 0.6;
+                        open = true
+                    } else if (browserProxyState.voiceValue > 10) {
+                        faceRig.mouth.shape.U = 0.5;
+                        open = true
+                    } else if (browserProxyState.voiceValue > 5) {
+                        faceRig.mouth.shape.O = 0.2;
+                        open = true
+                    }
+                } else {
+                    open = false
                 }
             }
             // avatarControlState.avatar.updatePose(faceRig, poseRig, leftHandRig, rightHandRig);
@@ -519,6 +576,7 @@ export const RightSidebar = () => {
         obj.scrollTop = obj.scrollHeight;
     }, [voskState.results]);
 
+
     //////////////////
     // Rendering   ///
     //////////////////
@@ -536,6 +594,10 @@ export const RightSidebar = () => {
                     <div className="sidebar-content">
                         <div className="sidebar-avatar-area">
                             <div id="sidebar-avatar-area" className="sidebar-avatar-area-canvas-container"></div>
+                            <div id="sidebar-avatar-area2" className="sidebar-avatar-area-canvas-container">
+                                <canvas id="test-canvas"></canvas>
+                            </div>
+
                             <div className="sidebar-zoom-area-input">
                                 <div className="sidebar-zoom-area-input-label">Time Keeper</div>
                                 <div className="sidebar-zoom-area-input-setter-container">

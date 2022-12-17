@@ -5,8 +5,8 @@ const webpack = require("webpack");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 module.exports = {
-    // mode: "development",
-    mode: "production",
+    mode: "development",
+    // mode: "production",
     entry: path.resolve(__dirname, "src/index.tsx"),
     output: {
         path: path.resolve(__dirname, "../dist"),
@@ -18,7 +18,8 @@ module.exports = {
         extensions: [".ts", ".tsx", ".js"],
         fallback: {
             buffer: require.resolve("buffer/"),
-            // buffer: false,
+            "crypto": false,
+            "path": false,
         },
     },
     module: {
@@ -39,6 +40,7 @@ module.exports = {
             },
             { test: /\.bin$/, type: "asset/resource" },
             { test: /\.wasm$/, type: "asset/resource" },
+            { test: /\.psd$/, type: "asset/resource" },
             {
                 test: /\.css$/,
                 use: ["style-loader", { loader: "css-loader", options: { importLoaders: 1 } }, "postcss-loader"],
@@ -76,7 +78,7 @@ module.exports = {
             },
         },
         static: {
-            directory: path.join(__dirname, "dist"),
+            directory: path.join(__dirname, "../dist"),
         },
         headers: {
             "Cross-Origin-Opener-Policy": "same-origin",

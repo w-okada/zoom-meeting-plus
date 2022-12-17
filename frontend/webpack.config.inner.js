@@ -1,12 +1,12 @@
 /* eslint @typescript-eslint/no-var-requires: "off" */
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-// const webpack = require("webpack");
+const webpack = require("webpack");
 // const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 module.exports = {
-    // mode: "development",
-    mode: "production",
+    mode: "development",
+    // mode: "production",
     entry: path.resolve(__dirname, "src/inner-index.tsx"),
     output: {
         path: path.resolve(__dirname, "../dist"),
@@ -18,6 +18,10 @@ module.exports = {
         fallback: {
             buffer: require.resolve("buffer/"),
             // buffer: false,
+            "path": false,
+            "fs":false,
+            "crypto": false,
+            
         },
     },
     module: {
@@ -34,6 +38,8 @@ module.exports = {
                     },
                 ],
             },
+            { test: /\.wasm$/, type: "asset/inline" },
+
             // {
             //     test: /\.html$/,
             //     loader: "html-loader",
@@ -44,6 +50,9 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, "public/inner-index.html"),
             filename: "./inner-index.html",
+        }),
+        new webpack.ProvidePlugin({
+            Buffer: ["buffer", "Buffer"],
         }),
         // new webpack.ProvidePlugin({
         //     Buffer: ["buffer", "Buffer"],

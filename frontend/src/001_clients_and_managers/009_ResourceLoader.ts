@@ -1,4 +1,12 @@
 
+export const fetchPSD = async (filename: string) => {
+    const url = `/assets/psd/${filename}`
+    const res = await fetch(url, {
+        method: "GET"
+    });
+    return await res.arrayBuffer()
+}
+
 export const fetchMotion = async (filename: string) => {
     const url = `/assets/motions/${filename}`
     const res = await fetch(url, {

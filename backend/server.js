@@ -13,6 +13,9 @@ const app = express();
 const port = process.env.PORT || 8888;
 app.use(bodyParser.json(), cors());
 
+const sdk_key = process.env.ZOOM_SDK_KEY || "KfaOwGGU9weGVhywxwVNsHI1zI6o4I1xtZEX"
+const secret_key = process.env.ZOOM_SDK_SECRET || "SKM7BPKdxLE6dvPyhaxovYvW8t2NA9ehFKRi"
+
 // 意味不明だ。。。requireの時のみ記載されたファイルからの相対パスになるらしい。https://yinm.info/20201104/
 const setting = require("../dist/assets/setting.json");
 // const setting = fs.readFileSync(`./dist/assets/setting.json`, "utf8");
@@ -120,24 +123,25 @@ app.post("/api/generateSignature", (req, res) => {
     }
 
     const oHeader = { alg: "HS256", typ: "JWT" };
-    console.log("SDK KEY:", process.env.ZOOM_SDK_KEY, req.body, req.body.meetingNumber, req.body.role);
+    console.log("SDK KEY:", sdk_key, req.body, req.body.meetingNumber, req.body.role);
+    console.log("SECRET KEY:", secret, process.env.KEY_GENERATE_SECRET);
     const oPayload = {
-        sdkKey: process.env.ZOOM_SDK_KEY,
+        sdkKey: sdk_key,
         mn: req.body.meetingNumber,
         role: req.body.role,
         iat: iat,
         exp: exp,
-        appKey: process.env.ZOOM_SDK_KEY,
+        appKey: sdk_key,
         tokenExp: iat + 60 * 60 * 2,
     };
 
     const sHeader = JSON.stringify(oHeader);
     const sPayload = JSON.stringify(oPayload);
-    const signature = KJUR.jws.JWS.sign("HS256", sHeader, sPayload, process.env.ZOOM_SDK_SECRET);
+    const signature = KJUR.jws.JWS.sign("HS256", sHeader, sPayload, secret_key);
 
     res.json({
         signature: signature,
-        sdkKey: process.env.ZOOM_SDK_KEY,
+        sdkKey: sdk_key,
     });
 });
 

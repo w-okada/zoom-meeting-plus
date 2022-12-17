@@ -11,6 +11,8 @@ export type ResourceManagerState = {
 }
 
 export type ResourceManagerStateAndMethod = ResourceManagerState & {
+    fetchPSD: (filename: string) => Promise<ArrayBuffer>
+
     fetchMotion: (filename: string) => Promise<any>
     fetchVoice: (filename: string) => Promise<Blob>
 
@@ -29,6 +31,10 @@ export const useResourceManager = (): ResourceManagerStateAndMethod => {
     const [speakersInOpenTTS, setSpeakers] = useState<{ [lang: string]: string[] }>({})
     const [speakersInVoiceVox, setSpeakersInVoiceVox] = useState<{ [name: string]: number }>({})
     const voiceSetting = applicationSetting!.voice_setting
+
+    const fetchPSD = async (filename: string) => {
+        return ResourceLoader.fetchPSD(filename)
+    }
 
     const refreshSpeakersInVoiceVox = async () => {
         const speakers = await ResourceLoader.getSpeakerListFromVoiceVox(voiceSetting.voice_vox_url)
@@ -77,6 +83,7 @@ export const useResourceManager = (): ResourceManagerStateAndMethod => {
         speakersInVoiceVox,
         voiceVoxEnabled,
         openTTSEnabled,
+        fetchPSD,
         setVoiceVoxEnabled,
         setOpenTTSEnabled,
         fetchMotion: ResourceLoader.fetchMotion,

@@ -85,6 +85,7 @@ export const useZoomSDK = (): ZoomSDKStateAndMethod => {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             const ifrm = document.getElementById('inner-index')!.contentWindow;
+            console.log("ZAK:", zak)
             const message: ZoomMeetingPlusJoinEvent = {
                 type: "ZoomMeetingPlusJoinEvent",
                 data: {

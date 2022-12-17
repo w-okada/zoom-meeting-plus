@@ -79,6 +79,7 @@ export const EntranceDialog = () => {
                 await zoomSDKState.initZoomClient();
                 await zoomSDKState.joinZoom(username, meetingNumber, password, signature.signature, signature.sdkKey, zak);
             } catch (error: any) {
+                console.log("JOIN ZOOM EXCEPTION!")
                 console.log(error);
                 frontendManagerState.stateControls.entranceDialogCheckbox.updateState(true);
             }

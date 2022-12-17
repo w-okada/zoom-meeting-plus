@@ -1,9 +1,9 @@
 {
     "app_title": "Zoom Meeting Plus",
     "default_meeting": {
-        "default_username": "",
-        "default_meeting_number": "",
-        "default_meeting_password": "",
+        "default_username": "www",
+        "default_meeting_number": "7176502271",
+        "default_meeting_password": "358414",
         "default_secret": ""
     },
     "vrm_path": "./assets/vrm/AliciaSolid.vrm",
@@ -30,11 +30,11 @@
         }
     ],
     "sign_server": {
-        "use_local_sign_server": false,
+        "use_local_sign_server": true,
         "sign_server_url": "https://zoom-meeting-sdk-demo.herokuapp.com/api/generateSignature"
     },
     "oauth": {
-        "client_id": "",
+        "client_id": "0MV2iz9yTIuW8UZkgn4EQg",
         "redirect_url": "https://zoom-meeting-plus.herokuapp.com/api/redirect"
     },
     "voice_setting": {
@@ -44,5 +44,35 @@
         "open_tts_url": "http://localhost:5500",
         "default_voice_lang": "ja",
         "default_voice_speaker": "四国めたん_ノーマル"
-    }
+    },
+    "psd_animation":[
+        {"mode":"normal", "z_index":0, "number":10, "layer_path":"ROOT_ポニテ？_2"},
+        {"mode":"normal", "z_index":0, "number":10, "layer_path":"ROOT_ポニテ？_1"},
+        {"mode":"normal", "z_index":0, "number":10, "layer_path":"ROOT_ポニテ？_2"},
+
+        {"mode":"normal", "z_index":1, "number":1, "layer_path":"ROOT_体_1"},
+
+        {"mode":"normal", "z_index":2, "number":30, "layer_path":"ROOT_表情_眉_1"},
+        {"mode":"normal", "z_index":2, "number":2, "layer_path":"ROOT_表情_眉_2"},
+
+        {"mode":"normal", "z_index":3, "number":30, "layer_path":"ROOT_表情_口_7"},
+        {"mode":"normal", "z_index":3, "number":2, "layer_path":"ROOT_表情_口_2"},
+        {"mode":"normal", "z_index":3, "number":30, "layer_path":"ROOT_表情_口_7"},
+        {"mode":"normal", "z_index":3, "number":2, "layer_path":"ROOT_表情_口_10"},
+        {"mode":"normal", "z_index":3, "number":30, "layer_path":"ROOT_表情_口_7"},
+
+        {"mode":"normal", "z_index":4, "number":30, "layer_path":"ROOT_表情_目_6"},
+        {"mode":"normal", "z_index":4, "number":1, "layer_path":"ROOT_表情_目_7"},
+        {"mode":"normal", "z_index":4, "number":1, "layer_path":"ROOT_表情_目_9"},
+        {"mode":"normal", "z_index":4, "number":30, "layer_path":"ROOT_表情_目_6"},
+        {"mode":"normal", "z_index":4, "number":2, "layer_path":"ROOT_表情_目_13"},
+        {"mode":"normal", "z_index":4, "number":30, "layer_path":"ROOT_表情_目_6"},
+        {"mode":"normal", "z_index":4, "number":2, "layer_path":"ROOT_表情_目_14"},
+        {"mode":"normal", "z_index":4, "number":5, "layer_path":"ROOT_表情_目_15"},
+
+        {"mode":"normal", "z_index":5, "number":60, "layer_path":"ROOT_耳_3"},
+        {"mode":"normal", "z_index":5, "number":5, "layer_path":"ROOT_耳_2"},
+        {"mode":"normal", "z_index":5, "number":60, "layer_path":"ROOT_耳_3"},
+        {"mode":"normal", "z_index":5, "number":5, "layer_path":"ROOT_耳_1"}
+    ]
 }
