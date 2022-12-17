@@ -1,8 +1,5 @@
 import { StateControlCheckbox, useStateControlCheckbox } from "../100_components/hooks/useStateControlCheckbox";
 
-export type UseFrontendManagerProps = {
-    // setStartTranscribe: (val: boolean) => void
-}
 
 export type StateControls = {
     openRightSidebarCheckbox: StateControlCheckbox
@@ -21,7 +18,7 @@ type FrontendManagerState = {
 export type FrontendManagerStateAndMethod = FrontendManagerState & {
     dummy: string
 }
-export const useFrontendManager = (props: UseFrontendManagerProps): FrontendManagerStateAndMethod => {
+export const useFrontendManager = (): FrontendManagerStateAndMethod => {
     // (1) Controller Switch
     const openRightSidebarCheckbox = useStateControlCheckbox("open-right-sidebar-checkbox", (val: boolean) => {
         const inner = document.getElementById("inner-index-container")

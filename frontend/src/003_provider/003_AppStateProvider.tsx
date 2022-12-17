@@ -52,8 +52,7 @@ export const AppStateProvider = ({ children }: Props) => {
     const zoomSDKState = useZoomSDK();
     const browserProxyState = useBrowserProxy();
     const deviceManagerState = useDeviceManager();
-    const frontendManagerState = useFrontendManager({
-    });
+    const frontendManagerState = useFrontendManager();
     const motionPlayerState = useMotionPlayer({ resourceManagerState });
 
     const providerValue = {
