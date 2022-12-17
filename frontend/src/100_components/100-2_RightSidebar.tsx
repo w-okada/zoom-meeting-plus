@@ -7,7 +7,6 @@ import { Side, TFace, THand, TPose } from "@dannadori/mediapipe-avatar-js/dist/k
 import { useAppSetting } from "../003_provider/001_AppSettingProvider";
 import { SpeachRecognitionLanguagesKeys, useSpeachRecognition } from "./hooks/useSpeachRecognition";
 import { SpeachRecognitionLanguages } from "./hooks/SpeachRecognitherLanguages";
-import { VoskLanguages } from "../002_hooks/302_useVosk";
 import { Header } from "./100-1_Header";
 
 import { generateConfig, OperationParams, WorkerManager } from "@dannadori/psdanimator";
@@ -16,7 +15,7 @@ import { AnimationInfo } from "./100-2_RightSidebarAnimation";
 let GlobalLoopID = 0;
 
 export const RightSidebar = () => {
-    const { frontendManagerState, threeState, timeKeeperState, avatarControlState, browserProxyState, resourceManagerState, deviceManagerState, motionPlayerState, voskState } = useAppState();
+    const { frontendManagerState, threeState, timeKeeperState, avatarControlState, browserProxyState, resourceManagerState, deviceManagerState, motionPlayerState } = useAppState();
     const { applicationSetting } = useAppSetting();
     const voiceSetting = applicationSetting!.voice_setting;
     const [voice, setVoice] = useState<Blob | null>(null);
@@ -27,7 +26,6 @@ export const RightSidebar = () => {
 
     const sidebarAccordionAvatarCheckbox = useStateControlCheckbox("sidebar-accordion-avatar-checkbox");
     const sidebarAccordionAvatarVideoCheckbox = useStateControlCheckbox("sidebar-accordion-avatar-video-checkbox");
-    const sidebarAccordionTranscribeCheckbox = useStateControlCheckbox("sidebar-accordion-Transcribe-checkbox");
 
     const psdAnimator = useMemo(() => {
         return new WorkerManager()
@@ -100,18 +98,6 @@ export const RightSidebar = () => {
         };
         return <HeaderButton {...accodionButtonForAvatarVideoProps}></HeaderButton>;
     }, []);
-    //// (1-3) accordion button for transcribe
-    const accodionButtonForTranscribe = useMemo(() => {
-        const accodionButtonForTranscribeProps: HeaderButtonProps = {
-            stateControlCheckbox: sidebarAccordionTranscribeCheckbox,
-            tooltip: "Open/Close",
-            onIcon: ["fas", "caret-up"],
-            offIcon: ["fas", "caret-up"],
-            animation: AnimationTypes.spinner,
-            tooltipClass: "tooltip-right",
-        };
-        return <HeaderButton {...accodionButtonForTranscribeProps}></HeaderButton>;
-    }, []);
 
     /**
      * (2)According Initial State
@@ -119,7 +105,6 @@ export const RightSidebar = () => {
     useEffect(() => {
         sidebarAccordionAvatarCheckbox.updateState(true);
         sidebarAccordionAvatarVideoCheckbox.updateState(true);
-        sidebarAccordionTranscribeCheckbox.updateState(false);
     }, []);
 
     /**
@@ -489,9 +474,6 @@ export const RightSidebar = () => {
         a.click();
         window.URL.revokeObjectURL(url);
     };
-    // const openMotionDialog = () => {
-    //     console.log("not implemented");
-    // };
 
     // (5) video initialize
     useEffect(() => {
@@ -527,55 +509,6 @@ export const RightSidebar = () => {
         );
         return b;
     }, [motionPlayerState.motions, threeState.character]);
-
-    // (6) Transcription
-    const voskLanguageSelector = useMemo(() => {
-        const keys = Object.keys(VoskLanguages).sort((a, b) => {
-            return a < b ? -1 : 1;
-        });
-        const selector = (
-            <select
-                id="sidebar-vosk-lang-selector "
-                className="sidebar-vosk-lang-selector "
-                onChange={(ev) => {
-                    voskState.setLanguage(ev.target.value as VoskLanguages);
-                }}
-                value={voskState.language}
-            >
-                {keys.map((x) => {
-                    return (
-                        <option key={x} value={x}>
-                            {x}
-                        </option>
-                    );
-                })}
-            </select>
-        );
-        return selector;
-    }, [voskState.language]);
-    const startTranscribe = () => {
-        voskState.setIsTranscribeStated(true);
-    };
-    const stopTranscribe = () => {
-        voskState.setIsTranscribeStated(false);
-    };
-    const clearTranscribeResults = () => {
-        voskState.clearResults();
-    };
-    const transcribeTexts = useMemo(() => {
-        return voskState.results.map((x, index) => {
-            return (
-                <p className="sidebar-transcribe-text-phrase" key={`trans-${index}`}>
-                    {x}
-                </p>
-            );
-        });
-    }, [voskState.results]);
-    useEffect(() => {
-        const obj = document.getElementById("sidebar-transcribe-text-container") as HTMLDivElement;
-        obj.scrollTop = obj.scrollHeight;
-    }, [voskState.results]);
-
 
     //////////////////
     // Rendering   ///
@@ -798,47 +731,6 @@ export const RightSidebar = () => {
                                     }}
                                 >
                                     set
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {sidebarAccordionTranscribeCheckbox.trigger}
-                <div className="sidebar-partition">
-                    <div className="sidebar-header">
-                        <div className="sidebar-header-title"> Transcribe</div>
-                        <div className="sidebar-header-caret"> {accodionButtonForTranscribe}</div>
-                    </div>
-                    <div className="sidebar-content">
-                        <div className="sidebar-zoom-area-input">
-                            <div id="sidebar-transcribe-text-container" className="sidebar-transcribe-text-container">
-                                {transcribeTexts}
-                            </div>
-                        </div>
-                        <div className="sidebar-zoom-area-input">
-                            {voskLanguageSelector}
-                            <div className="sidebar-zoom-area-input-setter-container ">
-                                <input
-                                    id="sidebar-transcribe-start-toggle"
-                                    className="sidebar-zoom-area-input-setter-toggle"
-                                    type="checkbox"
-                                    onClick={() => {
-                                        if (voskState.isTranscribeStated) {
-                                            stopTranscribe();
-                                        } else {
-                                            startTranscribe();
-                                        }
-                                    }}
-                                />
-                                <label htmlFor="sidebar-transcribe-start-toggle" className="sidebar-zoom-area-input-setter-toggle-label" />
-                                <div className="sidebar-zoom-area-input-setter-text">{voskState.isTranscribeStated ? "on" : "off"}</div>
-                                <div
-                                    className="sidebar-zoom-area-input-setter-button1"
-                                    onClick={() => {
-                                        clearTranscribeResults();
-                                    }}
-                                >
-                                    clear
                                 </div>
                             </div>
                         </div>

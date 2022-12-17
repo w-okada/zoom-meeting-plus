@@ -9,7 +9,6 @@ import { ResourceManagerStateAndMethod, useResourceManager } from "../002_hooks/
 import { AvatarControlStateAndMethod, useAvatarControl } from "../002_hooks/111_useAvatarControl";
 import { useZoomSDK, ZoomSDKStateAndMethod } from "../002_hooks/200_useZoomSDK";
 import { BrowserProxyStateAndMethod, useBrowserProxy } from "../002_hooks/300_useBrowserProxy";
-import { useVosk, VoskStateAndMethod } from "../002_hooks/302_useVosk";
 import { MotionPlayerStateAndMethod, useMotionPlayer } from "../002_hooks/303_useMotionPlayer";
 type Props = {
     children: ReactNode;
@@ -25,7 +24,6 @@ interface AppStateValue {
     zoomSDKState: ZoomSDKStateAndMethod;
     browserProxyState: BrowserProxyStateAndMethod;
     deviceManagerState: DeviceManagerStateAndMethod;
-    voskState: VoskStateAndMethod;
     motionPlayerState: MotionPlayerStateAndMethod;
 
     frontendManagerState: FrontendManagerStateAndMethod;
@@ -54,9 +52,7 @@ export const AppStateProvider = ({ children }: Props) => {
     const zoomSDKState = useZoomSDK();
     const browserProxyState = useBrowserProxy();
     const deviceManagerState = useDeviceManager();
-    const voskState = useVosk();
     const frontendManagerState = useFrontendManager({
-        setStartTranscribe: voskState.setIsTranscribeStated,
     });
     const motionPlayerState = useMotionPlayer({ resourceManagerState });
 
@@ -69,7 +65,6 @@ export const AppStateProvider = ({ children }: Props) => {
         timeKeeperState,
         zoomSDKState,
         browserProxyState,
-        voskState,
         motionPlayerState,
         frontendManagerState,
     };

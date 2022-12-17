@@ -1,7 +1,7 @@
 import { StateControlCheckbox, useStateControlCheckbox } from "../100_components/hooks/useStateControlCheckbox";
 
 export type UseFrontendManagerProps = {
-    setStartTranscribe: (val: boolean) => void
+    // setStartTranscribe: (val: boolean) => void
 }
 
 export type StateControls = {
@@ -11,8 +11,6 @@ export type StateControls = {
     timeKeeperSettingDialogCheckbox: StateControlCheckbox
     appInfoDialogCheckbox: StateControlCheckbox
 
-    // (X)
-    startTranscribeCheckbox: StateControlCheckbox
 
 }
 
@@ -44,9 +42,6 @@ export const useFrontendManager = (props: UseFrontendManagerProps): FrontendMana
     const timeKeeperSettingDialogCheckbox = useStateControlCheckbox("time-keeper-setting-dialog-checkbox");
     const appInfoDialogCheckbox = useStateControlCheckbox("app-info-dialog-checkbox");
 
-    // (X)
-    const startTranscribeCheckbox = useStateControlCheckbox("start-transcribe-checkbox", (val: boolean) => { props.setStartTranscribe(val) });
-
 
     const returnValue: FrontendManagerStateAndMethod = {
         stateControls: {
@@ -57,8 +52,6 @@ export const useFrontendManager = (props: UseFrontendManagerProps): FrontendMana
             settingDialogCheckbox,
             timeKeeperSettingDialogCheckbox,
             appInfoDialogCheckbox,
-            // (X)
-            startTranscribeCheckbox,
         },
         dummy: ""
 
