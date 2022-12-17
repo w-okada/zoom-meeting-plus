@@ -24,10 +24,11 @@ export type ApplicationSetting =
             "redirect_url": string,
             "get_zak_url": string,
         },
-        "mmvc_setting": MMVCSetting,
         "voicevox_setting": VoiceVoxSetting,
+        "mmvc_setting": MMVCSetting,
         "psd_animator_setting": PSDAnimatorSetting
     }
+
 
 export const InitialApplicationSetting = require("../../public/assets/setting.json")
 

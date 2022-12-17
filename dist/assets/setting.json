@@ -61,8 +61,8 @@
         }
     },
     "voicevox_setting": {
-        "voice_vox_enabled": true,
-        "voice_vox_url": "http://localhost:50021",
+        "voicevox_enabled": true,
+        "voicevox_url": "http://localhost:50021",
         "open_tts_enabled": true,
         "open_tts_url": "http://localhost:5500",
         "voice_lang": "ja",
