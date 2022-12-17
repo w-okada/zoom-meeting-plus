@@ -1,3 +1,5 @@
+import { PSDAnimatorSetting } from "./000-02_ApplicationSettingLoader_PSDAnimator"
+import { VoiceVoxSetting } from "./000-03_ApplicationSettingLoader_VoiceVox"
 export type ApplicationSetting =
     {
         "app_title": string,
@@ -49,15 +51,8 @@ export type ApplicationSetting =
             "redirect_url": string,
             "get_zak_url": string,
         },
-        "voice_setting": {
-            "default_voice_vox_enabled": boolean,
-            "voice_vox_url": string,
-            "default_open_tts_enabled": boolean,
-            "open_tts_url": string,
-            "default_voice_lang": string,
-            "default_voice_speaker": string
-        }
-        "psd_animation": PSDAnimationFrame[]
+        "voicevox_setting": VoiceVoxSetting,
+        "psd_animator_setting": PSDAnimatorSetting
     }
 
 
@@ -74,16 +69,6 @@ export const VoiceChangerMode = {
 } as const
 export type VoiceChangerMode = typeof VoiceChangerMode[keyof typeof VoiceChangerMode]
 
-export const PSDAnimationMode = {
-    "normal": "normal"
-} as const
-export type PSDAnimationMode = typeof PSDAnimationMode[keyof typeof PSDAnimationMode]
-export type PSDAnimationFrame = {
-    "mode": PSDAnimationMode,
-    "z_index": number,
-    "number": number,
-    "layer_path": string
-}
 
 export const fetchApplicationSetting = async (): Promise<ApplicationSetting> => {
     const url = `/api/setting`

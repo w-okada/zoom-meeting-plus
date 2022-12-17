@@ -14,7 +14,7 @@ import { AnimationInfo } from "./100-2_RightSidebarAnimation";
 export const RightSidebar = () => {
     const { frontendManagerState, browserProxyState, resourceManagerState } = useAppState();
     const { applicationSetting } = useAppSetting();
-    const voiceSetting = applicationSetting!.voice_setting;
+    const voiceSetting = applicationSetting!.voicevox_setting;
     const [voice, setVoice] = useState<Blob | null>(null);
     const { languageKey, recognitionStartSync, setLanguageKey } = useSpeachRecognition();
     const isRecognitionEnabledRef = useRef<boolean>(false);
@@ -142,8 +142,8 @@ export const RightSidebar = () => {
 
     ////// (3-1-1) Speaker Setting
     const [localLangSpeakerMap, setLocalLangSpeakerMap] = useState<{ [lang: string]: string[] }>({});
-    const [selectedLang, setSelectedLang] = useState<string>(voiceSetting.default_voice_lang);
-    const [selectedSpeaker, setSelectedSpeaker] = useState<string>(voiceSetting.default_voice_speaker);
+    const [selectedLang, setSelectedLang] = useState<string>(voiceSetting.voice_lang);
+    const [selectedSpeaker, setSelectedSpeaker] = useState<string>(voiceSetting.voice_speaker);
     useEffect(() => {
         const langSpeakerMap = { ...resourceManagerState.speakersInOpenTTS };
         if (!langSpeakerMap["ja"]) {

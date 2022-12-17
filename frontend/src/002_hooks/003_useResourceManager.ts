@@ -26,18 +26,18 @@ export type ResourceManagerStateAndMethod = ResourceManagerState & {
 }
 export const useResourceManager = (): ResourceManagerStateAndMethod => {
     const { applicationSetting } = useAppSetting()
-    const [voiceVoxEnabled, setVoiceVoxEnabled] = useState<boolean>(applicationSetting!.voice_setting.default_voice_vox_enabled)
-    const [openTTSEnabled, setOpenTTSEnabled] = useState<boolean>(applicationSetting!.voice_setting.default_open_tts_enabled)
+    const [voiceVoxEnabled, setVoiceVoxEnabled] = useState<boolean>(applicationSetting!.voicevox_setting.voicevox_enabled)
+    const [openTTSEnabled, setOpenTTSEnabled] = useState<boolean>(applicationSetting!.voicevox_setting.open_tts_enabled)
     const [speakersInOpenTTS, setSpeakers] = useState<{ [lang: string]: string[] }>({})
     const [speakersInVoiceVox, setSpeakersInVoiceVox] = useState<{ [name: string]: number }>({})
-    const voiceSetting = applicationSetting!.voice_setting
+    const voiceSetting = applicationSetting!.voicevox_setting
 
     const fetchPSD = async (filename: string) => {
         return ResourceLoader.fetchPSD(filename)
     }
 
     const refreshSpeakersInVoiceVox = async () => {
-        const speakers = await ResourceLoader.getSpeakerListFromVoiceVox(voiceSetting.voice_vox_url)
+        const speakers = await ResourceLoader.getSpeakerListFromVoiceVox(voiceSetting.voicevox_url)
         const tmpSpekaers: { [name: string]: number } = {}
         speakers.map((x: any) => {
             const name = x.name as string
@@ -72,7 +72,7 @@ export const useResourceManager = (): ResourceManagerStateAndMethod => {
     }, [])
 
     const generateVoiceWithVoiceVox = (speakerId: number, text: string) => {
-        return ResourceLoader.generateVoiceWithVoiceVox(voiceSetting.voice_vox_url, speakerId, text)
+        return ResourceLoader.generateVoiceWithVoiceVox(voiceSetting.voicevox_url, speakerId, text)
     }
     const generateVoiceWithOpenTTS = (lang: string, speakerId: string, text: string) => {
         return ResourceLoader.generateVoiceWithOpenTTS(voiceSetting.open_tts_url, lang, speakerId, text)
