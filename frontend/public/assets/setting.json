@@ -3,7 +3,7 @@
     "default_meeting": {
         "default_username": "www",
         "default_meeting_number": "7176502271",
-        "default_meeting_password": "358414",
+        "default_meeting_password": "",
         "default_secret": ""
     },
     "majar_mode": "docker",

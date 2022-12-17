@@ -13,8 +13,8 @@ const app = express();
 const port = process.env.PORT || 8888;
 app.use(bodyParser.json(), cors());
 
-const sdk_key = process.env.ZOOM_SDK_KEY || "KfaOwGGU9weGVhywxwVNsHI1zI6o4I1xtZEX"
-const secret_key = process.env.ZOOM_SDK_SECRET || "SKM7BPKdxLE6dvPyhaxovYvW8t2NA9ehFKRi"
+const sdk_key = process.env.ZOOM_SDK_KEY || ""
+const secret_key = process.env.ZOOM_SDK_SECRET || ""
 
 // 意味不明だ。。。requireの時のみ記載されたファイルからの相対パスになるらしい。https://yinm.info/20201104/
 const setting = require("../dist/assets/setting.json");
