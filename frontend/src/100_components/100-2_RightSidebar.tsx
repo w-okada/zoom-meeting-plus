@@ -12,9 +12,9 @@ import { AnimationInfo } from "./100-2_RightSidebarAnimation";
 
 
 export const RightSidebar = () => {
-    const { frontendManagerState, browserProxyState, resourceManagerState, motionPlayerState } = useAppState();
-    const { applicationSetting } = useAppSetting();
-    const voiceSetting = applicationSetting!.voice_setting;
+    const { frontendManagerState, browserProxyState, resourceManagerState } = useAppState();
+    const { applicationSettingState } = useAppSetting();
+    const voiceSetting = applicationSettingState.applicationSetting.voicevox_setting;
     const [voice, setVoice] = useState<Blob | null>(null);
     const { languageKey, recognitionStartSync, setLanguageKey } = useSpeachRecognition();
     const isRecognitionEnabledRef = useRef<boolean>(false);
@@ -31,8 +31,8 @@ export const RightSidebar = () => {
 
     useEffect(() => {
         const load = async () => {
-            const canvasElement = document.getElementById("test-canvas") as HTMLCanvasElement;
-            const psdFile = await resourceManagerState.fetchPSD("zundamonB.psd")
+            const canvasElement = document.getElementById("psd-animation-canvas") as HTMLCanvasElement;
+            const psdFile = await resourceManagerState.fetchPSD(applicationSettingState.applicationSetting.psd_animator_setting.psd_url)
             const config = generateConfig(psdFile, canvasElement, 1024, 960, true)
             // const config = generateConfig(psdFile, canvasElement, 640, 480, false)
             await psdAnimator.init(config)
@@ -142,8 +142,8 @@ export const RightSidebar = () => {
 
     ////// (3-1-1) Speaker Setting
     const [localLangSpeakerMap, setLocalLangSpeakerMap] = useState<{ [lang: string]: string[] }>({});
-    const [selectedLang, setSelectedLang] = useState<string>(voiceSetting.default_voice_lang);
-    const [selectedSpeaker, setSelectedSpeaker] = useState<string>(voiceSetting.default_voice_speaker);
+    const [selectedLang, setSelectedLang] = useState<string>(voiceSetting.voice_lang);
+    const [selectedSpeaker, setSelectedSpeaker] = useState<string>(voiceSetting.voice_speaker);
     useEffect(() => {
         const langSpeakerMap = { ...resourceManagerState.speakersInOpenTTS };
         if (!langSpeakerMap["ja"]) {
@@ -263,7 +263,7 @@ export const RightSidebar = () => {
 
     const motionButtons = useMemo(() => {
         return <></>
-    }, [motionPlayerState.motions]);
+    }, []);
 
     //////////////////
     // Rendering   ///
@@ -281,9 +281,8 @@ export const RightSidebar = () => {
                     </div>
                     <div className="sidebar-content">
                         <div className="sidebar-avatar-area">
-                            <div id="sidebar-avatar-area" className="sidebar-avatar-area-canvas-container"></div>
-                            <div id="sidebar-avatar-area2" className="sidebar-avatar-area-canvas-container">
-                                <canvas id="test-canvas"></canvas>
+                            <div id="sidebar-avatar-area" className="sidebar-avatar-area-canvas-container">
+                                <canvas id="psd-animation-canvas"></canvas>
                             </div>
 
                             <div className="sidebar-zoom-area-input">

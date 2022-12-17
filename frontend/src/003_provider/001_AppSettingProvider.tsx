@@ -1,14 +1,14 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { ReactNode } from "react";
-import { useApplicationSettingManager } from "../002_hooks/000_useApplicationSettingManager";
-import { ApplicationSetting } from "../001_clients_and_managers/000_ApplicationSettingLoader";
+import { ApplicationSettingManagerStateAndMethod, useApplicationSettingManager } from "../002_hooks/000_useApplicationSettingManager";
+import { useIndexedDB } from "../002_hooks/001_useIndexedDB";
+
 type Props = {
     children: ReactNode;
 };
 
 interface AppSettingValue {
-    applicationSetting: ApplicationSetting | null;
-    zak: string;
+    applicationSettingState: ApplicationSettingManagerStateAndMethod
 }
 
 const AppSettingContext = React.createContext<AppSettingValue | null>(null);
@@ -21,12 +21,14 @@ export const useAppSetting = (): AppSettingValue => {
 };
 
 export const AppSettingProvider = ({ children }: Props) => {
-    const { applicationSetting, zak } = useApplicationSettingManager();
-
+    const applicationSettingState = useApplicationSettingManager();
+    const indexedDBState = useIndexedDB();
     const providerValue = {
-        applicationSetting,
-        zak,
+        applicationSettingState
     };
+    useEffect(() => {
+        applicationSettingState.setIndexedDb(indexedDBState);
+    }, [indexedDBState.setItem, indexedDBState.getItem]);
 
     return <AppSettingContext.Provider value={providerValue}>{children}</AppSettingContext.Provider>;
 };
