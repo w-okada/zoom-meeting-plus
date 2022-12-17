@@ -179,5 +179,16 @@ export class MMVCClient {
         this.audioStreamer.setVoiceChangerMode(val)
     }
 
+    // VoicePlayerWorkletNodeのラッパー
+    changeSetting = () => {
+        this.voicePlayerNode.notifyChangeProps({
+            deltaSize: 12,
+            crossFadeOffsetRate: 0.2,
+            crossFadeEndRate: 0.2,
+            crossFadeLowerValue: 0.1,
+            crossFadeType: 2
+        })
+    }
+
 
 }

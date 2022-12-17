@@ -315,6 +315,7 @@ const reconstructAudioInputNode = async (audioInputDeviceId: string | null, audi
         const ms = await getUserMedia({ audio: { deviceId: audioInputDeviceId } });
         await mmvcClient!.connect(ms)
         mmvcClient!.startRealtimeConvert() // TBD: トグルとかで制御。
+        mmvcClient?.changeSetting()
         const mmvcMs = mmvcClient!.getOutputMediaStream()
         srcNodeAudioInput = audioContext.createMediaStreamSource(mmvcMs);
         srcNodeAudioInput.connect(dstNodeForZoom);

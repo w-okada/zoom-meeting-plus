@@ -17,8 +17,8 @@ export class AudioStreamer extends Duplex {
     srcId = 107
     dstId = 100
     gpu = 0
-    prefixChunkSize = 64
-    chunkSize = 64
+    prefixChunkSize = 12
+    chunkSize = 12
     majarMode: MajarModeTypes = "docker"
     voiceChangerMode: VoiceChangerMode = "realtime"
     performanceListener: AudioStreamerPerformanceListener
