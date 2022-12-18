@@ -248,7 +248,7 @@
 }
 .sidebar-content-row-button-activated {
     /* width: 50%; */
-    background: #ae9;
+    background: #1a1;
     color: #000;
 }
 .sidebar-content-row-button-activated:hover {
@@ -257,7 +257,7 @@
 }
 .sidebar-content-row-button,
 .sidebar-content-row-button-stanby {
-    background: #384;
+    background: #262;
 }
 .sidebar-content-row-button:hover,
 .sidebar-content-row-button-stanby:hover {

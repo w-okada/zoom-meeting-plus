@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 export const AvatarSetting = () => {
     // const { frontendManagerState, browserProxyState, resourceManagerState } = useAppState();
@@ -242,6 +242,16 @@ export const AvatarSetting = () => {
     // //////////////////
     // // Rendering   ///
     // //////////////////
+    useEffect(() => {
+        const draw = async () => {
+            const c = document.getElementById("psd-animation-canvas") as HTMLCanvasElement
+            const ctx = c.getContext("2d")!
+            ctx.fillStyle = "rgba(100,100,100,110)"
+            ctx.fillRect(0, 0, c.width, c.height)
+            requestAnimationFrame(draw)
+        }
+        draw()
+    }, [])
     return (
         <>
             <div className="sidebar-content">
