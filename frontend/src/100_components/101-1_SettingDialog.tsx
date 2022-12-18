@@ -116,7 +116,7 @@ export const SettingDialog = () => {
     // (1) States
 
     const [tab, setTab] = useState<TabItems>("audioInput");
-    const [showFileInputForVideo, setShowFileInputForVideo] = useState<boolean>(false);
+    // const [showFileInputForVideo, setShowFileInputForVideo] = useState<boolean>(false);
     // const fileInputState = useFileInput();
     const close = () => {
         frontendManagerState.stateControls.settingDialogCheckbox.updateState(false);
@@ -152,45 +152,45 @@ export const SettingDialog = () => {
     }, [tab]);
 
     //// (2-2) Audio Input
-    const audioInputOptions = useMemo(() => {
-        const options = deviceManagerState.audioInputDevices.map((x) => {
-            return (
-                <option value={x.deviceId} key={x.deviceId}>
-                    {x.label}
-                </option>
-            );
-        });
-        return options;
-    }, [deviceManagerState.audioInputDevices]);
-    const audioInputSelectField = useMemo(() => {
-        // see: https://nessssy.net/blog/2021/01/08/react-select-defaultvalue
-        if (deviceManagerState.audioInputDevices.length == 0) {
-            return <></>;
-        }
-        if (tab != "audioInput") {
-            return <></>;
-        }
-        return (
-            <div className="dialog-input-controls">
-                <div className="dialog-input-description-label">audio device</div>
-                <select
-                    id="setting-dialog-audio-input-select"
-                    className="dialog-input-select"
-                    required
-                    defaultValue={deviceManagerState.audioInputDeviceId || "none"}
-                    onChange={(e) => {
-                        if (e.target.value == "none") {
-                            deviceManagerState.setAudioInputDeviceId(null);
-                        } else {
-                            deviceManagerState.setAudioInputDeviceId(e.target.value);
-                        }
-                    }}
-                >
-                    {audioInputOptions}
-                </select>
-            </div>
-        );
-    }, [deviceManagerState.audioInputDevices, tab]);
+    // const audioInputOptions = useMemo(() => {
+    //     const options = deviceManagerState.audioInputDevices.map((x) => {
+    //         return (
+    //             <option value={x.deviceId} key={x.deviceId}>
+    //                 {x.label}
+    //             </option>
+    //         );
+    //     });
+    //     return options;
+    // }, [deviceManagerState.audioInputDevices]);
+    // const audioInputSelectField = useMemo(() => {
+    //     // see: https://nessssy.net/blog/2021/01/08/react-select-defaultvalue
+    //     if (deviceManagerState.audioInputDevices.length == 0) {
+    //         return <></>;
+    //     }
+    //     if (tab != "audioInput") {
+    //         return <></>;
+    //     }
+    //     return (
+    //         <div className="dialog-input-controls">
+    //             <div className="dialog-input-description-label">audio device</div>
+    //             <select
+    //                 id="setting-dialog-audio-input-select"
+    //                 className="dialog-input-select"
+    //                 required
+    //                 defaultValue={deviceManagerState.audioInputDeviceId || "none"}
+    //                 onChange={(e) => {
+    //                     if (e.target.value == "none") {
+    //                         deviceManagerState.setAudioInputDeviceId(null);
+    //                     } else {
+    //                         deviceManagerState.setAudioInputDeviceId(e.target.value);
+    //                     }
+    //                 }}
+    //             >
+    //                 {audioInputOptions}
+    //             </select>
+    //         </div>
+    //     );
+    // }, [deviceManagerState.audioInputDevices, tab]);
     // const audioConnect = useMemo(() => {
     //     console.log("dialog-enable", deviceManagerState.audioInputEnabled);
     //     if (tab != "audioInput") {
@@ -212,84 +212,84 @@ export const SettingDialog = () => {
     //     );
     // }, [browserProxyState.audioInputEnabled, tab]);
 
-    //// (2-2) Video Input
-    const videoInputOptions = useMemo(() => {
-        const options = deviceManagerState.videoInputDevices.map((x) => {
-            return (
-                <option value={x.deviceId} key={x.deviceId}>
-                    {x.label}
-                </option>
-            );
-        });
-        options.push(
-            <option value="file" key="file">
-                file
-            </option>
-        );
-        return options;
-    }, [deviceManagerState.videoInputDevices]);
+    // //// (2-2) Video Input
+    // const videoInputOptions = useMemo(() => {
+    //     const options = deviceManagerState.videoInputDevices.map((x) => {
+    //         return (
+    //             <option value={x.deviceId} key={x.deviceId}>
+    //                 {x.label}
+    //             </option>
+    //         );
+    //     });
+    //     options.push(
+    //         <option value="file" key="file">
+    //             file
+    //         </option>
+    //     );
+    //     return options;
+    // }, [deviceManagerState.videoInputDevices]);
 
-    const videoInputSelectField = useMemo(() => {
-        // see: https://nessssy.net/blog/2021/01/08/react-select-defaultvalue
-        if (deviceManagerState.videoInputDevices.length == 0) {
-            return <></>;
-        }
-        if (tab != "videoInput") {
-            return <></>;
-        }
+    // const videoInputSelectField = useMemo(() => {
+    //     // see: https://nessssy.net/blog/2021/01/08/react-select-defaultvalue
+    //     if (deviceManagerState.videoInputDevices.length == 0) {
+    //         return <></>;
+    //     }
+    //     if (tab != "videoInput") {
+    //         return <></>;
+    //     }
 
-        return (
-            <>
-                <div className="dialog-input-controls">
-                    <div className="dialog-input-description-label">video device</div>
+    //     return (
+    //         <>
+    //             <div className="dialog-input-controls">
+    //                 <div className="dialog-input-description-label">video device</div>
 
-                    <select
-                        id="setting-dialog-video-input-select"
-                        className="dialog-input-select"
-                        required
-                        defaultValue={deviceManagerState.videoInputDeviceId || "none"}
-                        onChange={(e) => {
-                            if (e.target.value == "none") {
-                                deviceManagerState.setVideoInputDeviceId(null);
-                                setShowFileInputForVideo(false);
-                            } else if (e.target.value == "file") {
-                                deviceManagerState.setVideoInputDeviceId(null);
-                                setShowFileInputForVideo(true);
-                            } else {
-                                deviceManagerState.setVideoInputDeviceId(e.target.value);
-                                setShowFileInputForVideo(false);
-                            }
-                        }}
-                    >
-                        {videoInputOptions}
-                    </select>
-                </div>
-            </>
-        );
-    }, [deviceManagerState.videoInputDevices, tab]);
-    const fileInputButtonForVideo = useMemo(() => {
-        if (!showFileInputForVideo || tab != "videoInput") {
-            return <></>;
-        }
-        // const url = await fileInputState.click("audio.*|video.*");
-        return (
-            <div className="dialog-input-controls">
-                <div className="dialog-input-description-label">Load Movie File</div>
-                <div
-                    className="dialog-input-normal-button"
-                    onClick={() => {
-                        const loadFile = async () => {
-                            // const url = await fileInputState.click("audio.*|video.*");
-                            // deviceManagerState.setVideoFileURL(url);
-                        };
-                        loadFile();
-                    }}
-                >
-                    load file
-                </div>
-            </div>
-        );
-    }, [showFileInputForVideo, tab]);
+    //                 <select
+    //                     id="setting-dialog-video-input-select"
+    //                     className="dialog-input-select"
+    //                     required
+    //                     defaultValue={deviceManagerState.videoInputDeviceId || "none"}
+    //                     onChange={(e) => {
+    //                         if (e.target.value == "none") {
+    //                             deviceManagerState.setVideoInputDeviceId(null);
+    //                             setShowFileInputForVideo(false);
+    //                         } else if (e.target.value == "file") {
+    //                             deviceManagerState.setVideoInputDeviceId(null);
+    //                             setShowFileInputForVideo(true);
+    //                         } else {
+    //                             deviceManagerState.setVideoInputDeviceId(e.target.value);
+    //                             setShowFileInputForVideo(false);
+    //                         }
+    //                     }}
+    //                 >
+    //                     {videoInputOptions}
+    //                 </select>
+    //             </div>
+    //         </>
+    //     );
+    // }, [deviceManagerState.videoInputDevices, tab]);
+    // const fileInputButtonForVideo = useMemo(() => {
+    //     if (!showFileInputForVideo || tab != "videoInput") {
+    //         return <></>;
+    //     }
+    //     // const url = await fileInputState.click("audio.*|video.*");
+    //     return (
+    //         <div className="dialog-input-controls">
+    //             <div className="dialog-input-description-label">Load Movie File</div>
+    //             <div
+    //                 className="dialog-input-normal-button"
+    //                 onClick={() => {
+    //                     const loadFile = async () => {
+    //                         // const url = await fileInputState.click("audio.*|video.*");
+    //                         // deviceManagerState.setVideoFileURL(url);
+    //                     };
+    //                     loadFile();
+    //                 }}
+    //             >
+    //                 load file
+    //             </div>
+    //         </div>
+    //     );
+    // }, [showFileInputForVideo, tab]);
 
     //// (2-2) Audio Output
     const audioOutputOptions = useMemo(() => {
@@ -405,10 +405,10 @@ export const SettingDialog = () => {
                     <div className="dialog-description">{description}</div>
                     <form>
                         <div className="dialog-input-container">
-                            {audioInputSelectField}
+                            {/* {audioInputSelectField} */}
                             {/* {audioConnect} */}
-                            {videoInputSelectField}
-                            {fileInputButtonForVideo}
+                            {/* {videoInputSelectField} */}
+                            {/* {fileInputButtonForVideo} */}
                             {audioOutputSelectField}
                             {/* {fileButtonForAvatar} */}
                             {/* {fileButtonForAvatarMotion} */}
@@ -418,7 +418,7 @@ export const SettingDialog = () => {
                 </div>
             </div>
         );
-    }, [tab, audioInputSelectField, videoInputSelectField, fileInputButtonForVideo, audioOutputSelectField]);
+    }, [tab, audioOutputSelectField]);
 
     return form;
 };

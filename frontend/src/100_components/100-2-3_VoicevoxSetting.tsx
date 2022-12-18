@@ -3,6 +3,7 @@ import { useAppSetting } from "../003_provider/001_AppSettingProvider";
 import { SpeachRecognitionLanguagesKeys, useSpeachRecognition } from "./hooks/useSpeachRecognition";
 import { SpeachRecognitionLanguages } from "./hooks/SpeachRecognitherLanguages";
 import { useAppState } from "../003_provider/003_AppStateProvider";
+import { DeviceSelector } from "./parts/101_DeviceSelector";
 
 
 export const VoicevoxSetting = () => {
@@ -159,7 +160,7 @@ export const VoicevoxSetting = () => {
                 </div>
             </div>
         )
-    }, [])
+    }, [resourceManagerState.speakersInVoiceVox, resourceManagerState.speakersInOpenTTS])
 
     const echoButtonRow = useMemo(() => {
         return (
@@ -264,6 +265,18 @@ export const VoicevoxSetting = () => {
     }, [languageKey, isRecognitionEnableSync])
 
 
+
+    const audioOutputRow = useMemo(() => {
+        return (
+            <div className="sidebar-content-row-3-7">
+                <div className="sidebar-content-row-label">echoback:</div>
+                <div className="sidebar-content-row-select">
+                    <DeviceSelector deviceType={"audiooutput"}></DeviceSelector>
+                </div>
+            </div>
+        );
+    }, []);
+
     //////////////////
     // Rendering   ///
     //////////////////
@@ -274,6 +287,7 @@ export const VoicevoxSetting = () => {
                 {speakerRow}
                 {textInputRow}
                 {echoButtonRow}
+                {audioOutputRow}
                 {recognitionRow}
                 <audio id="sidebar-generate-voice-player"></audio>
             </div>

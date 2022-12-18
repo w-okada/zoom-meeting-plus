@@ -320,8 +320,8 @@ const reconstructAudioInputNode = async (audioInputDeviceId: string | null, audi
     if (audioInputDeviceId && audioInputEnabled) {
         const ms = await getUserMedia({ audio: { deviceId: audioInputDeviceId } });
         await mmvcClient!.connect(ms)
-        mmvcClient!.startRealtimeConvert() // TBD: トグルとかで制御。
-        mmvcClient?.changeSetting()
+        // mmvcClient!.startRealtimeConvert() // TBD: トグルとかで制御。
+        mmvcClient!.changeSetting()
         const mmvcMs = mmvcClient!.getOutputMediaStream()
         srcNodeAudioInput = audioContext.createMediaStreamSource(mmvcMs);
         srcNodeAudioInput.connect(dstNodeForZoom);
@@ -481,8 +481,14 @@ window.isZoomInitialized = isZoomInitialized;
 window.isZoomJoined = isZoomJoined;
 window.playAudio = playAudio;
 window.reconstructAudioInputNode = reconstructAudioInputNode;
-window.startVoiceChanger = () => { console.log("START VC") }
-window.stopVoiceChanger = () => { console.log("STOP VC") }
+window.startVoiceChanger = () => {
+    console.log("START VC")
+    mmvcClient!.startRealtimeConvert()
+}
+window.stopVoiceChanger = () => {
+    console.log("STOP VC")
+    mmvcClient!.pauseRealtimeConvert()
+}
 window.changeVoiceChangerSetting = (
     src_id: number,
     dst_id: number,

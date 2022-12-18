@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useAppSetting } from "../003_provider/001_AppSettingProvider";
 import { useAppState } from "../003_provider/003_AppStateProvider";
 import { ModelProps, uploadModelProps } from "../900_inner_utils/999_Utils";
@@ -6,7 +6,7 @@ import { DeviceSelector } from "./parts/101_DeviceSelector";
 
 
 export const MMVCSetting = () => {
-    const { applicationSettingState } = useAppSetting()
+    const { applicationSettingState, deviceManagerState } = useAppSetting()
     const { frontendManagerState, browserProxyState } = useAppState()
     const [modelProps, setModelProps] = useState<ModelProps>({
         modelFile: null,
@@ -107,33 +107,6 @@ export const MMVCSetting = () => {
         );
     }, [modelProps, modelUploadProgress, modelUploadEnd]);
 
-    // const modeSelectRow = useMemo(() => {
-    //     const options = Object.keys(VoiceChangerMode).map((x) => {
-    //         return (
-    //             <option className="sidebar-content-row-select-option" key={x} value={x}>
-    //                 {x}
-    //             </option>
-    //         );
-    //     });
-    //     const select = (
-    //         <select
-    //             value={applicationSettingState.applicationSetting.mmvc_setting.voice_changer_mode}
-    //             onChange={(e) => {
-    //                 applicationSettingState.setVoiceChangerMode(e.target.value as VoiceChangerMode);
-    //             }}
-    //             className="sidebar-content-row-select-select"
-    //         >
-    //             {options}
-    //         </select>
-    //     );
-
-    //     return (
-    //         <div className="sidebar-content-row-3-7">
-    //             <div className="sidebar-content-row-label">Mode:</div>
-    //             <div className="sidebar-content-row-select">{select}</div>
-    //         </div>
-    //     )
-    // }, [applicationSettingState.applicationSetting.mmvc_setting.voice_changer_mode]);
 
     const audioInputRow = useMemo(() => {
         return (
@@ -145,7 +118,6 @@ export const MMVCSetting = () => {
             </div>
         );
     }, []);
-
 
     const speakerSelectRow = useMemo(() => {
         const srcOptions = applicationSettingState.applicationSetting.mmvc_setting.speakers.map((s) => {
@@ -247,40 +219,6 @@ export const MMVCSetting = () => {
     }, [applicationSettingState.applicationSetting.mmvc_setting.gpu]);
 
 
-    // const prefixChunkRow = useMemo(() => {
-    //     if (applicationSettingState.applicationSetting.mmvc_setting.voice_changer_mode !== "realtime") {
-    //         return <></>;
-    //     }
-
-    //     const input = (
-    //         <input
-    //             type="number"
-    //             value={applicationSettingState.applicationSetting.mmvc_setting.prefix_chunk_size}
-    //             max={240}
-    //             min={1}
-    //             step={1}
-    //             className="sidebar-content-row-input-input"
-    //             onChange={(e) => {
-    //                 let prefixChunkSize = Number(e.target.value);
-    //                 if (prefixChunkSize < applicationSettingState.applicationSetting.mmvc_setting.chunk_size) {
-    //                     // applicationSettingState.setChunkSize(prefixChunkSize); // プレフィックスはデルタサイズ以下にはできない。
-    //                     e.target.value = String(applicationSettingState.applicationSetting.mmvc_setting.chunk_size);
-    //                     return;
-    //                 }
-    //                 applicationSettingState.setPrefixChunkSize(prefixChunkSize);
-    //             }}
-    //         ></input>
-    //     );
-
-    //     return (
-    //         <div className="sidebar-content-row-3-7">
-    //             <div className="sidebar-content-row-label">Prev Size:</div>
-    //             <div className="sidebar-content-row-input">{input}</div>
-    //         </div>
-    //     );
-    // }, [applicationSettingState.applicationSetting.mmvc_setting.voice_changer_mode,
-    // applicationSettingState.applicationSetting.mmvc_setting.prefix_chunk_size,
-    // applicationSettingState.applicationSetting.mmvc_setting.chunk_size]);
 
     const chunkRow = useMemo(() => {
         if (applicationSettingState.applicationSetting.mmvc_setting.voice_changer_mode !== "realtime") {
@@ -355,53 +293,9 @@ export const MMVCSetting = () => {
         );
     }, [voiceChangeEnabled]);
 
-    // const recordingButtonRow = useMemo(() => {
-    //     if (applicationSettingState.applicationSetting?.voice_changer_mode !== "near-realtime") {
-    //         return <></>;
-    //     }
-
-    //     const label = voiceChangerControllerState.isRecording ? "stop" : "start";
-    //     const status = voiceChangerControllerState.isRecording ? "recording..." : "stanby...";
-    //     const className = voiceChangerControllerState.isRecording ? "sidebar-content-row-button-activated" : "sidebar-content-row-button-stanby";
-    //     const onClicked = voiceChangerControllerState.isRecording
-    //         ? () => {
-    //             voiceChangerControllerState.stopRecord();
-    //             voiceChangerControllerState.sendRecordedData();
-    //         }
-    //         : () => {
-    //             voiceChangerControllerState.startRecord();
-    //         };
-
-    //     return (
-    //         <div className="sidebar-content-row-4-3-3">
-    //             <div className="sidebar-content-row-label"></div>
-    //             <div className="sidebar-content-row-label">
-    //                 {status}
-    //             </div>
-    //             <div className={className} onClick={onClicked}>
-    //                 {label}
-    //             </div>
-    //         </div>
-    //     )
-    // }, [applicationSettingState.applicationSetting.voice_changer_mode, voiceChangerControllerState.isRecording]);
-
-    // const performanceRow = useMemo(() => {
-    //     const row = (
-    //         <>
-    //             <div className="sidebar-content-row-5-5">
-    //                 <div className="sidebar-content-row-label pad-left-3">Buffer Time:</div>
-    //                 <div className="sidebar-content-row-label">{voiceChangerControllerState.bufferingTime} ms</div>
-    //             </div>
-
-    //             <div className="sidebar-content-row-5-5">
-    //                 <div className="sidebar-content-row-label pad-left-3">Res Time:</div>
-    //                 <div className="sidebar-content-row-label">{voiceChangerControllerState.responseTime} ms</div>
-    //             </div>
-    //         </>
-    //     );
-    //     return row;
-    // }, [voiceChangerControllerState.responseTime, voiceChangerControllerState.bufferingTime]);
-
+    useEffect(() => {
+        setVoiceChangeEnabled(false)
+    }, [deviceManagerState.audioInputDeviceId])
 
     //////////////////
     // Rendering   ///
