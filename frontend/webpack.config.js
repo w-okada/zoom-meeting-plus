@@ -9,7 +9,7 @@ module.exports = {
     // mode: "production",
     entry: path.resolve(__dirname, "src/index.tsx"),
     output: {
-        path: path.resolve(__dirname, "../dist"),
+        path: path.resolve(__dirname, "../docs"),
         filename: "index.js",
         assetModuleFilename: "assets/tflite/[name][ext]",
     },

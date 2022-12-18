@@ -1,7 +1,7 @@
+import { uploadModelProps, ModelProps } from "@dannadori/mmvc-client-js";
 import React, { useEffect, useMemo, useState } from "react";
 import { useAppSetting } from "../003_provider/001_AppSettingProvider";
 import { useAppState } from "../003_provider/003_AppStateProvider";
-import { ModelProps, uploadModelProps } from "../900_inner_utils/999_Utils";
 import { DeviceSelector } from "./parts/101_DeviceSelector";
 
 

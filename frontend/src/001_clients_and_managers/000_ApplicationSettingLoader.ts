@@ -1,8 +1,8 @@
-import { MMVCSetting } from "./000-01_ApplicationSettingLoader_MMVC"
+import { MMVCSetting } from "@dannadori/mmvc-client-js"
 import { PSDAnimatorSetting } from "./000-02_ApplicationSettingLoader_PSDAnimator"
 import { VoiceVoxSetting } from "./000-03_ApplicationSettingLoader_VoiceVox"
 
-export * from "./000-01_ApplicationSettingLoader_MMVC"
+// export * from "../900_inner_utils/000-01_ApplicationSettingLoader_MMVC"
 export * from "./000-02_ApplicationSettingLoader_PSDAnimator"
 
 export type ApplicationSetting =

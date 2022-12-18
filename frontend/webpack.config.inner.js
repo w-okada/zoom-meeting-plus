@@ -9,7 +9,7 @@ module.exports = {
     // mode: "production",
     entry: path.resolve(__dirname, "src/inner-index.tsx"),
     output: {
-        path: path.resolve(__dirname, "../dist"),
+        path: path.resolve(__dirname, "../docs"),
         filename: "inner-index.js",
     },
     resolve: {
@@ -36,6 +36,7 @@ module.exports = {
                             plugins: ["@babel/plugin-transform-runtime"],
                         },
                     },
+                    
                 ],
             },
             { test: /\.wasm$/, type: "asset/inline" },

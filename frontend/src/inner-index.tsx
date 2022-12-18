@@ -1,10 +1,10 @@
 import { ZoomMeetingPlusInitEvent, ZoomMeetingPlusJoinEvent } from "./sharedTypes";
+import { MMVCClient } from "@dannadori/mmvc-client-js"
 // @ts-ignore
 import wasm from "../resources/converter.wasm";
 
 //@ts-ignore // audio worklet
 import workerjs from "raw-loader!../wasm/dist/index.js";
-import { MMVCClient } from "./900_inner_utils/000_MMVCClient";
 
 export interface Converter extends EmscriptenModule {
     _getInputImageBufferOffset(): number
@@ -87,10 +87,12 @@ const initializeAudio = async () => {
             stateCallback(msg)
         }
     })
+    console.log("[inner] voice-player-worklet-processor is loaeded. start...3")
 
     dummyMediaStream = createDummyMediaStream();
     srcNodeDummyInput = createSrcNodeDummyInput();
 
+    console.log("[inner] voice-player-worklet-processor is loaeded. start...4")
     dstNodeForInternal = createDstNodeForInternal();
     analyzerNode = createAnalyzerNode();
 };

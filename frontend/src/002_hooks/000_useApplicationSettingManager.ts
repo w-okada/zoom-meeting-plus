@@ -1,6 +1,7 @@
+import { MajarModeTypes, VoiceChangerMode } from "@dannadori/mmvc-client-js"
 import { AnimationFrameInfo } from "@dannadori/psdanimator"
 import { useEffect, useMemo, useRef, useState } from "react"
-import { ApplicationSetting, fetchApplicationSetting, InitialApplicationSetting, MajarModeTypes, VoiceChangerMode } from "../001_clients_and_managers/000_ApplicationSettingLoader"
+import { ApplicationSetting, fetchApplicationSetting, InitialApplicationSetting } from "../001_clients_and_managers/000_ApplicationSettingLoader"
 import { IndexedDBStateAndMethod } from "./001_useIndexedDB"
 
 
