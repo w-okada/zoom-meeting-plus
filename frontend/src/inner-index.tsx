@@ -310,6 +310,11 @@ const reconstructAudioInputNode = async (audioInputDeviceId: string | null, audi
         console.warn("disconnect failed. ignore this.", e);
     }
 
+    if (audioInputDeviceId == "none") {
+        console.log(`AudioInputDeviceId: ${audioInputDeviceId}, break`)
+        return
+    }
+
     //再生成
     if (audioInputDeviceId && audioInputEnabled) {
         const ms = await getUserMedia({ audio: { deviceId: audioInputDeviceId } });

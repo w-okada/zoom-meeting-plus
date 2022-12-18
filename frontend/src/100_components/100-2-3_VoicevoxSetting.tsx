@@ -6,7 +6,7 @@ import { useAppState } from "../003_provider/003_AppStateProvider";
 
 
 export const VoicevoxSetting = () => {
-    const { applicationSettingState } = useAppSetting();
+    const { applicationSettingState, deviceManagerState } = useAppSetting();
     const { resourceManagerState, browserProxyState } = useAppState();
     const { languageKey, recognitionStartSync, setLanguageKey } = useSpeachRecognition();
 
@@ -19,6 +19,9 @@ export const VoicevoxSetting = () => {
 
     const [localLangSpeakerMap, setLocalLangSpeakerMap] = useState<{ [lang: string]: string[] }>({});
 
+    useEffect(() => {
+        deviceManagerState.loadedEchobackAudio()
+    }, [])
 
     useEffect(() => {
         if (!voice) {

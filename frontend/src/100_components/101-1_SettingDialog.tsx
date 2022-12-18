@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppState } from "../003_provider/003_AppStateProvider";
+import { useAppSetting } from "../003_provider/001_AppSettingProvider";
 // import { useFileInput } from "./hooks/useFileInput";
 
 const TabItems = {
@@ -110,7 +111,8 @@ const DialogTiles = (props: DialogTilesProps) => {
 };
 
 export const SettingDialog = () => {
-    const { deviceManagerState, frontendManagerState, browserProxyState } = useAppState();
+    const { deviceManagerState, } = useAppSetting()
+    const { frontendManagerState } = useAppState();
     // (1) States
 
     const [tab, setTab] = useState<TabItems>("audioInput");
@@ -175,12 +177,12 @@ export const SettingDialog = () => {
                     id="setting-dialog-audio-input-select"
                     className="dialog-input-select"
                     required
-                    defaultValue={browserProxyState.audioInputDeviceId || "none"}
+                    defaultValue={deviceManagerState.audioInputDeviceId || "none"}
                     onChange={(e) => {
                         if (e.target.value == "none") {
-                            browserProxyState.setAudioInputDeviceId(null);
+                            deviceManagerState.setAudioInputDeviceId(null);
                         } else {
-                            browserProxyState.setAudioInputDeviceId(e.target.value);
+                            deviceManagerState.setAudioInputDeviceId(e.target.value);
                         }
                     }}
                 >
@@ -189,26 +191,26 @@ export const SettingDialog = () => {
             </div>
         );
     }, [deviceManagerState.audioInputDevices, tab]);
-    const audioConnect = useMemo(() => {
-        console.log("dialog-enable", browserProxyState.audioInputEnabled);
-        if (tab != "audioInput") {
-            return <></>;
-        }
-        return (
-            <div className="dialog-input-controls">
-                <div className="dialog-input-description-label">connect</div>
-                <input
-                    id="dialog-input-connect-audio-toggle"
-                    className="dialog-input-toggle"
-                    type="checkbox"
-                    onClick={(e) => {
-                        browserProxyState.setAudioInputEnabled(e.currentTarget.checked);
-                    }}
-                />
-                <label htmlFor="dialog-input-connect-audio-toggle" className="dialog-input-toggle-label" />
-            </div>
-        );
-    }, [browserProxyState.audioInputEnabled, tab]);
+    // const audioConnect = useMemo(() => {
+    //     console.log("dialog-enable", deviceManagerState.audioInputEnabled);
+    //     if (tab != "audioInput") {
+    //         return <></>;
+    //     }
+    //     return (
+    //         <div className="dialog-input-controls">
+    //             <div className="dialog-input-description-label">connect</div>
+    //             <input
+    //                 id="dialog-input-connect-audio-toggle"
+    //                 className="dialog-input-toggle"
+    //                 type="checkbox"
+    //                 onClick={(e) => {
+    //                     browserProxyState.setAudioInputEnabled(e.currentTarget.checked);
+    //                 }}
+    //             />
+    //             <label htmlFor="dialog-input-connect-audio-toggle" className="dialog-input-toggle-label" />
+    //         </div>
+    //     );
+    // }, [browserProxyState.audioInputEnabled, tab]);
 
     //// (2-2) Video Input
     const videoInputOptions = useMemo(() => {
@@ -404,7 +406,7 @@ export const SettingDialog = () => {
                     <form>
                         <div className="dialog-input-container">
                             {audioInputSelectField}
-                            {audioConnect}
+                            {/* {audioConnect} */}
                             {videoInputSelectField}
                             {fileInputButtonForVideo}
                             {audioOutputSelectField}

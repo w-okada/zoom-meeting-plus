@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import { ReactNode } from "react";
-import { DeviceManagerStateAndMethod, useDeviceManager } from "../002_hooks/301_useDeviceManager";
 import { BackendManagerStateAndMethod, useBackendManager } from "../002_hooks/002_useBackendManager";
 import { FrontendManagerStateAndMethod, useFrontendManager } from "../002_hooks/100_useFrontendManager";
 import { ResourceManagerStateAndMethod, useResourceManager } from "../002_hooks/003_useResourceManager";
@@ -13,11 +12,8 @@ type Props = {
 interface AppStateValue {
     backendManagerState: BackendManagerStateAndMethod;
     resourceManagerState: ResourceManagerStateAndMethod;
-
     zoomSDKState: ZoomSDKStateAndMethod;
     browserProxyState: BrowserProxyStateAndMethod;
-    deviceManagerState: DeviceManagerStateAndMethod;
-
     frontendManagerState: FrontendManagerStateAndMethod;
 }
 
@@ -36,11 +32,10 @@ export const AppStateProvider = ({ children }: Props) => {
     const resourceManagerState = useResourceManager();
     const zoomSDKState = useZoomSDK();
     const browserProxyState = useBrowserProxy();
-    const deviceManagerState = useDeviceManager();
+    // const deviceManagerState = useDeviceManager();
     const frontendManagerState = useFrontendManager();
 
     const providerValue = {
-        deviceManagerState,
         backendManagerState,
         resourceManagerState,
         zoomSDKState,

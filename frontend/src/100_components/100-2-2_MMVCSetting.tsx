@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useAppSetting } from "../003_provider/001_AppSettingProvider";
 import { useAppState } from "../003_provider/003_AppStateProvider";
 import { ModelProps, uploadModelProps } from "../900_inner_utils/999_Utils";
-// import { DeviceSelector } from "./parts/101_DeviceSelector";
+import { DeviceSelector } from "./parts/101_DeviceSelector";
 
 
 export const MMVCSetting = () => {
@@ -135,16 +135,16 @@ export const MMVCSetting = () => {
     //     )
     // }, [applicationSettingState.applicationSetting.mmvc_setting.voice_changer_mode]);
 
-    // const audioInputRow = useMemo(() => {
-    //     return (
-    //         <div className="sidebar-content-row-3-7">
-    //             <div className="sidebar-content-row-label">Mic:</div>
-    //             <div className="sidebar-content-row-select">
-    //                 <DeviceSelector deviceType={"audioinput"}></DeviceSelector>
-    //             </div>
-    //         </div>
-    //     );
-    // }, []);
+    const audioInputRow = useMemo(() => {
+        return (
+            <div className="sidebar-content-row-3-7">
+                <div className="sidebar-content-row-label">Mic:</div>
+                <div className="sidebar-content-row-select">
+                    <DeviceSelector deviceType={"audioinput"}></DeviceSelector>
+                </div>
+            </div>
+        );
+    }, []);
 
 
     const speakerSelectRow = useMemo(() => {
@@ -410,7 +410,7 @@ export const MMVCSetting = () => {
         <>
             <div className="sidebar-content">
                 {modelInput}
-                {/* {audioInputRow} */}
+                {audioInputRow}
                 {speakerSelectRow}
                 {gpuRow}
                 {/* {prefixChunkRow} */}

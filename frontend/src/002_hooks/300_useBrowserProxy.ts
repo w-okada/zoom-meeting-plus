@@ -2,23 +2,18 @@ import { useEffect, useState } from "react";
 import { useAppSetting } from "../003_provider/001_AppSettingProvider";
 
 export type BrowserProxyState = {
-    audioInputDeviceId: string | null
-    audioInputEnabled: boolean
     voiceValue: number
 }
 export type BrowserProxyStateAndMethod = BrowserProxyState & {
     playAudio: (audioData: ArrayBuffer, callback?: ((diff: number) => void) | undefined) => Promise<void>
-    setAudioInputDeviceId: (deviceId: string | null) => void
-    setAudioInputEnabled: (val: boolean) => void
-
     startVoiceChanger: () => Promise<void>
     stopVoiceChanger: () => Promise<void>
 }
 export const useBrowserProxy = (): BrowserProxyStateAndMethod => {
-    const { applicationSettingState } = useAppSetting()
+    const { applicationSettingState, deviceManagerState } = useAppSetting()
     const [voiceValue, setVoiceValue] = useState<number>(0)
-    const [audioInputDeviceId, setAudioInputDeviceId] = useState<string | null>(null)
-    const [audioInputEnabled, setAudioInputEnabled] = useState<boolean>(false)
+    // const [audioInputDeviceId, setAudioInputDeviceId] = useState<string | null>(null)
+    // const [audioInputEnabled, setAudioInputEnabled] = useState<boolean>(false)
 
 
     // Audio Inputが更新されたとき
@@ -29,8 +24,8 @@ export const useBrowserProxy = (): BrowserProxyStateAndMethod => {
         if (typeof ifrm.reconstructAudioInputNode !== "function") {
             return
         }
-        ifrm.reconstructAudioInputNode(audioInputDeviceId, audioInputEnabled);
-    }, [audioInputDeviceId, audioInputEnabled])
+        ifrm.reconstructAudioInputNode(deviceManagerState.audioInputDeviceId, true);
+    }, [deviceManagerState.audioInputDeviceId])
     useEffect(() => {
         const setVoiceCallback = async () => {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -51,6 +46,9 @@ export const useBrowserProxy = (): BrowserProxyStateAndMethod => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const ifrm = document.getElementById('inner-index')!.contentWindow as Window;
+        if (typeof ifrm.playAudio !== "function") {
+            return
+        }
         ifrm.playAudio(audioData);
     }
 
@@ -58,7 +56,7 @@ export const useBrowserProxy = (): BrowserProxyStateAndMethod => {
     const startVoiceChanger = async () => {
         // @ts-ignore
         const ifrm = document.getElementById('inner-index')!.contentWindow as Window;
-        if (typeof ifrm.reconstructAudioInputNode !== "function") {
+        if (typeof ifrm.startVoiceChanger !== "function") {
             return
         }
         ifrm.startVoiceChanger()
@@ -66,7 +64,7 @@ export const useBrowserProxy = (): BrowserProxyStateAndMethod => {
     const stopVoiceChanger = async () => {
         // @ts-ignore
         const ifrm = document.getElementById('inner-index')!.contentWindow as Window;
-        if (typeof ifrm.reconstructAudioInputNode !== "function") {
+        if (typeof ifrm.stopVoiceChanger !== "function") {
             return
         }
         ifrm.stopVoiceChanger()
@@ -75,7 +73,7 @@ export const useBrowserProxy = (): BrowserProxyStateAndMethod => {
     useEffect(() => {
         // @ts-ignore
         const ifrm = document.getElementById('inner-index')!.contentWindow as Window;
-        if (typeof ifrm.reconstructAudioInputNode !== "function") {
+        if (typeof ifrm.changeVoiceChangerSetting !== "function") {
             return
         }
         ifrm.changeVoiceChangerSetting(
@@ -94,13 +92,9 @@ export const useBrowserProxy = (): BrowserProxyStateAndMethod => {
     ])
 
     const retVal: BrowserProxyStateAndMethod = {
-        audioInputDeviceId,
-        audioInputEnabled,
         voiceValue,
 
         playAudio,
-        setAudioInputDeviceId,
-        setAudioInputEnabled,
 
         startVoiceChanger,
         stopVoiceChanger

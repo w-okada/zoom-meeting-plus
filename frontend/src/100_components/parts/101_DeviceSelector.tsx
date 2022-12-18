@@ -1,5 +1,5 @@
 import React, { Suspense, useMemo } from "react";
-import { useAppState } from "../../003_provider/003_AppStateProvider";
+import { useAppSetting } from "../../003_provider/001_AppSettingProvider";
 
 export const DeviceType = {
     audioinput: "audioinput",
@@ -13,7 +13,7 @@ export type DeviceManagerProps = {
 };
 
 export const DeviceSelector = (props: DeviceManagerProps) => {
-    const { deviceManagerState } = useAppState();
+    const { deviceManagerState } = useAppSetting();
 
     const targetDevices = useMemo(() => {
         if (props.deviceType === "audioinput") {

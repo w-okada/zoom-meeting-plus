@@ -19,6 +19,7 @@ export type DeviceManagerStateAndMethod = DeviceManagerState & {
     // setVideoFileURL: (val: string) => void
     setAudioInputDeviceId: (val: string | null) => void
     setAudioOutputDeviceId: (val: string | null) => void
+    loadedEchobackAudio: () => Promise<void>
 
 }
 export const useDeviceManager = (): DeviceManagerStateAndMethod => {
@@ -73,7 +74,8 @@ export const useDeviceManager = (): DeviceManagerStateAndMethod => {
         echobackAudio.setSinkId(val)
         _setAudioOutputDeviceId(val)
     }
-    useEffect(() => {
+
+    const loadedEchobackAudio = async () => {
         const audioOutputDeviceId = localStorage.audioOutputDevice || null
         const echobackAudio = document.getElementById("sidebar-generate-voice-player") as HTMLAudioElement;
 
@@ -81,7 +83,16 @@ export const useDeviceManager = (): DeviceManagerStateAndMethod => {
         // @ts-ignore
         echobackAudio.setSinkId(audioOutputDeviceId)
         _setAudioOutputDeviceId(audioOutputDeviceId)
-    }, [])
+    }
+    // useEffect(() => {
+    //     const audioOutputDeviceId = localStorage.audioOutputDevice || null
+    //     const echobackAudio = document.getElementById("sidebar-generate-voice-player") as HTMLAudioElement;
+
+    //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //     // @ts-ignore
+    //     echobackAudio.setSinkId(audioOutputDeviceId)
+    //     _setAudioOutputDeviceId(audioOutputDeviceId)
+    // }, [])
 
     return {
         lastUpdateTime,
@@ -97,5 +108,6 @@ export const useDeviceManager = (): DeviceManagerStateAndMethod => {
         setAudioInputDeviceId,
         setVideoInputDeviceId,
         setAudioOutputDeviceId,
+        loadedEchobackAudio,
     }
 }

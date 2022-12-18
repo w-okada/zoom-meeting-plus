@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { ReactNode } from "react";
 import { ApplicationSettingManagerStateAndMethod, useApplicationSettingManager } from "../002_hooks/000_useApplicationSettingManager";
 import { useIndexedDB } from "../002_hooks/001_useIndexedDB";
+import { DeviceManagerStateAndMethod, useDeviceManager } from "../002_hooks/301_useDeviceManager";
 
 type Props = {
     children: ReactNode;
@@ -9,6 +10,8 @@ type Props = {
 
 interface AppSettingValue {
     applicationSettingState: ApplicationSettingManagerStateAndMethod
+    deviceManagerState: DeviceManagerStateAndMethod;
+
 }
 
 const AppSettingContext = React.createContext<AppSettingValue | null>(null);
@@ -23,8 +26,10 @@ export const useAppSetting = (): AppSettingValue => {
 export const AppSettingProvider = ({ children }: Props) => {
     const applicationSettingState = useApplicationSettingManager();
     const indexedDBState = useIndexedDB();
+    const deviceManagerState = useDeviceManager();
     const providerValue = {
-        applicationSettingState
+        applicationSettingState,
+        deviceManagerState
     };
     useEffect(() => {
         applicationSettingState.setIndexedDb(indexedDBState);
