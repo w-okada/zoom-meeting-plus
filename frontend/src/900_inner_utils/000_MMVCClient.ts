@@ -22,6 +22,7 @@ export class MMVCClient {
     vf: VoiceFocusDeviceTransformer | null = null
     currentDevice: VoiceFocusTransformDevice | null = null
 
+
     constructor(audioContext: AudioContext, vfEnable: boolean) {
         this.audioContext = audioContext
         this.vfEnable = vfEnable

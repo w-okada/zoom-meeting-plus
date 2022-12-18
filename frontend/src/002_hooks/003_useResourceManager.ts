@@ -72,6 +72,7 @@ export const useResourceManager = (): ResourceManagerStateAndMethod => {
     }, [])
 
     const generateVoiceWithVoiceVox = (speakerId: number, text: string) => {
+        console.log("generateVoiceWithVoiceVox")
         return ResourceLoader.generateVoiceWithVoiceVox(voiceSetting.voicevox_url, speakerId, text)
     }
     const generateVoiceWithOpenTTS = (lang: string, speakerId: string, text: string) => {

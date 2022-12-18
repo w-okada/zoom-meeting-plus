@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { StateControlCheckbox, useStateControlCheckbox } from "../100_components/hooks/useStateControlCheckbox";
 
 
@@ -5,10 +6,8 @@ export type StateControls = {
     openRightSidebarCheckbox: StateControlCheckbox
     entranceDialogCheckbox: StateControlCheckbox
     settingDialogCheckbox: StateControlCheckbox
-    timeKeeperSettingDialogCheckbox: StateControlCheckbox
     appInfoDialogCheckbox: StateControlCheckbox
-
-
+    speakerSettingDialogCheckbox: StateControlCheckbox
 }
 
 type FrontendManagerState = {
@@ -36,8 +35,13 @@ export const useFrontendManager = (): FrontendManagerStateAndMethod => {
 
     const settingDialogCheckbox = useStateControlCheckbox("setting-dialog-checkbox");
 
-    const timeKeeperSettingDialogCheckbox = useStateControlCheckbox("time-keeper-setting-dialog-checkbox");
     const appInfoDialogCheckbox = useStateControlCheckbox("app-info-dialog-checkbox");
+
+    const speakerSettingDialogCheckbox = useStateControlCheckbox("speaker-setting-dialog-checkbox");
+
+    useEffect(() => {
+        speakerSettingDialogCheckbox.updateState(false)
+    }, [])
 
 
     const returnValue: FrontendManagerStateAndMethod = {
@@ -47,8 +51,8 @@ export const useFrontendManager = (): FrontendManagerStateAndMethod => {
             // (2) Dialog
             entranceDialogCheckbox,
             settingDialogCheckbox,
-            timeKeeperSettingDialogCheckbox,
             appInfoDialogCheckbox,
+            speakerSettingDialogCheckbox,
         },
         dummy: ""
 
