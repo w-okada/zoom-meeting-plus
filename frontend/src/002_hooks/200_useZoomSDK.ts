@@ -7,7 +7,7 @@ export type ZoomSDKStateAndMethod = {
     joinZoom: (username: string, meetingNumber: string, password: string, signature: string, sdkKey: string, zak: string) => Promise<void>
 }
 export const useZoomSDK = (): ZoomSDKStateAndMethod => {
-    const { deviceManagerState } = useAppSetting()
+    const { deviceManagerState, applicationSettingState } = useAppSetting()
     const initZoomClient = useMemo(() => {
         return async () => {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -37,6 +37,14 @@ export const useZoomSDK = (): ZoomSDKStateAndMethod => {
 
             console.log("Initial DeviceID setting.")
             ifrm.reconstructAudioInputNode(deviceManagerState.audioInputDeviceId, true);
+            console.log("Initial MMVC setting.")
+            ifrm.changeVoiceChangerSetting(
+                applicationSettingState.applicationSetting.mmvc_setting.src_id,
+                applicationSettingState.applicationSetting.mmvc_setting.dst_id,
+                applicationSettingState.applicationSetting.mmvc_setting.gpu,
+                applicationSettingState.applicationSetting.mmvc_setting.prefix_chunk_size,
+                applicationSettingState.applicationSetting.mmvc_setting.chunk_size
+            )
         }
     }, [])
 

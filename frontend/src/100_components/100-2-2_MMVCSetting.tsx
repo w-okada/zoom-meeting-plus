@@ -266,7 +266,7 @@ export const MMVCSetting = () => {
         }
 
         const label = voiceChangeEnabled ? "stop" : "start";
-        const status = voiceChangeEnabled ? "converting..." : "stanby...";
+        const status = voiceChangeEnabled ? browserProxyState.mmvcState.length == 0 ? "converting..." : `${browserProxyState.mmvcState}` : "stanby...";
         // const reciveDataStatus = voiceChangerControllerState.receivedDataStatus === "good" ? "" : "convert error"
         const className = voiceChangeEnabled ? "sidebar-content-row-button-activated" : "sidebar-content-row-button-stanby";
         const onClicked = voiceChangeEnabled
@@ -291,7 +291,27 @@ export const MMVCSetting = () => {
 
 
         );
-    }, [voiceChangeEnabled]);
+    }, [voiceChangeEnabled, browserProxyState.mmvcState]);
+
+    const performanceRow = (
+        <div className="sidebar-content-row-2-2-2-2-2 ">
+            <div className="sidebar-content-row-label">
+            </div>
+            <div className="sidebar-content-row-label">
+                buf:
+            </div>
+            <div className="sidebar-content-row-label">
+                {browserProxyState.mmvcSendBufferingTime}
+            </div>
+            <div className="sidebar-content-row-label">
+                res:
+            </div>
+            <div className="sidebar-content-row-label">
+                {browserProxyState.mmvcResponseTime}
+            </div>
+        </div>
+    )
+
 
     useEffect(() => {
         setVoiceChangeEnabled(false)
@@ -307,9 +327,9 @@ export const MMVCSetting = () => {
                 {audioInputRow}
                 {speakerSelectRow}
                 {gpuRow}
-                {/* {prefixChunkRow} */}
                 {chunkRow}
                 {realtimePlayButtonRow}
+                {performanceRow}
             </div>
         </>
     );

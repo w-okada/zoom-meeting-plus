@@ -6,7 +6,7 @@ import { postVoice } from "../001_clients_and_managers/009_ResourceLoader";
 
 
 
-type AudioStreamerPerformanceListener = {
+export type AudioStreamerPerformanceListener = {
     notifySendBufferingTime: (time: number) => void
     notifyResponseTime: (time: number) => void
 }

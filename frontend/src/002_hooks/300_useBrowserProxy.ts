@@ -3,6 +3,9 @@ import { useAppSetting } from "../003_provider/001_AppSettingProvider";
 
 export type BrowserProxyState = {
     voiceValue: number
+    mmvcState: string
+    mmvcResponseTime: number
+    mmvcSendBufferingTime: number
 }
 export type BrowserProxyStateAndMethod = BrowserProxyState & {
     playAudio: (audioData: ArrayBuffer, callback?: ((diff: number) => void) | undefined) => Promise<void>
@@ -12,8 +15,32 @@ export type BrowserProxyStateAndMethod = BrowserProxyState & {
 export const useBrowserProxy = (): BrowserProxyStateAndMethod => {
     const { applicationSettingState, deviceManagerState } = useAppSetting()
     const [voiceValue, setVoiceValue] = useState<number>(0)
+    const [mmvcState, setMmvcState] = useState<string>("")
+    const [mmvcResponseTime, setMmvcResponseTime] = useState<number>(0)
+    const [mmvcSendBufferingTime, setMmvcSendBufferingTime] = useState<number>(0)
     // const [audioInputDeviceId, setAudioInputDeviceId] = useState<string | null>(null)
     // const [audioInputEnabled, setAudioInputEnabled] = useState<boolean>(false)
+
+    useEffect(() => {
+        const setMonitors = () => {
+            // @ts-ignore
+            const ifrm = document.getElementById('inner-index')!.contentWindow as Window;
+            if (typeof ifrm.setStateCallback !== "function") {
+                setTimeout(setMonitors, 1000)
+                return
+            }
+            ifrm.setStateCallback((msg: string) => {
+                setMmvcState(msg)
+            })
+            ifrm.setResponseTimeCallback((val: number) => {
+                setMmvcResponseTime(val)
+            })
+            ifrm.setSendBufferingTimeCallback((val: number) => {
+                setMmvcSendBufferingTime(val)
+            })
+        }
+        setMonitors()
+    }, [])
 
 
     // Audio Inputが更新されたとき
@@ -94,7 +121,9 @@ export const useBrowserProxy = (): BrowserProxyStateAndMethod => {
 
     const retVal: BrowserProxyStateAndMethod = {
         voiceValue,
-
+        mmvcState,
+        mmvcResponseTime,
+        mmvcSendBufferingTime,
         playAudio,
 
         startVoiceChanger,

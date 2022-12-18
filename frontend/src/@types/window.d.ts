@@ -6,6 +6,9 @@ declare global {
         isZoomInitialized: () => void
         isZoomJoined: () => void
         setVoiceCallback: (callback: (val: number) => void) => void
+        setStateCallback: (callback: (msg: string) => void) => void
+        setResponseTimeCallback: (callback: (val: number) => void) => void
+        setSendBufferingTimeCallback: (callback: (val: number) => void) => void
         playAudio: (audioData: ArrayBuffer) => Promise<void>
         reconstructAudioInputNode: (audioInputDeviceId: string | null, audioInputEnabled: boolean) => Promise<void>
 

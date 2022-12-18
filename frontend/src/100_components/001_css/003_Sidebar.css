@@ -180,7 +180,32 @@
         width: 20%;
     }
 }
-
+.sidebar-content-row-2-2-2-2-2 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 20%;
+    }
+    & > div:nth-child(2) {
+        left: 20%;
+        width: 40%;
+    }
+    & > div:nth-child(3) {
+        left: 40%;
+        width: 20%;
+    }
+    & > div:nth-child(4) {
+        left: 60%;
+        width: 20%;
+    }
+    & > div:nth-child(5) {
+        left: 80%;
+        width: 20%;
+    }
+}
 
 /***** Divider  *****/
 .sidebar-content-row-dividing {

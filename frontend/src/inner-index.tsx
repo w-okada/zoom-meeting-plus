@@ -76,7 +76,17 @@ const initializeAudio = async () => {
     console.log("[inner] voice-player-worklet-processor is loaeded.", audioContext!.audioWorklet)
     // MMVCClient
     console.log("[inner] voice-player-worklet-processor is loaeded. start...2")
-    mmvcClient = new MMVCClient(audioContext, true)
+    mmvcClient = new MMVCClient(audioContext, true, {
+        notifyResponseTime: (_time: number) => {
+            responseTimeCallback(_time)
+        },
+        notifySendBufferingTime: (_time: number) => {
+            sendBufferingTimeCallback(_time)
+        },
+        notifyErrorStatus: (msg) => {
+            stateCallback(msg)
+        }
+    })
 
     dummyMediaStream = createDummyMediaStream();
     srcNodeDummyInput = createSrcNodeDummyInput();
@@ -321,7 +331,7 @@ const reconstructAudioInputNode = async (audioInputDeviceId: string | null, audi
         const ms = await getUserMedia({ audio: { deviceId: audioInputDeviceId } });
         await mmvcClient!.connect(ms)
         // mmvcClient!.startRealtimeConvert() // TBD: トグルとかで制御。
-        mmvcClient!.changeSetting()
+        // mmvcClient!.changeSetting()
         const mmvcMs = mmvcClient!.getOutputMediaStream()
         srcNodeAudioInput = audioContext.createMediaStreamSource(mmvcMs);
         srcNodeAudioInput.connect(dstNodeForZoom);
@@ -472,10 +482,12 @@ export const isZoomJoined = () => {
 let voiceCallback: (val: number) => void = (val: number) => {
     console.warn("voice callback is not set", val);
 };
-
 export const setVoiceCallback = (callback: (val: number) => void) => {
     voiceCallback = callback;
 };
+let stateCallback = (_msg: string) => { }
+let responseTimeCallback = (_val: number) => { }
+let sendBufferingTimeCallback = (_val: number) => { }
 
 window.isZoomInitialized = isZoomInitialized;
 window.isZoomJoined = isZoomJoined;
@@ -497,10 +509,17 @@ window.changeVoiceChangerSetting = (
     chunk_size: number
 ) => {
     console.log("voice chnager setting chnaged:", src_id, dst_id, gpu, prefix_chunk_size, chunk_size)
+    mmvcClient?.setChunkSize(chunk_size)
+    mmvcClient?.setDstId(dst_id)
+    mmvcClient?.setSrcId(src_id)
+    mmvcClient?.setGpu(gpu)
 }
 
 
 window.setVoiceCallback = setVoiceCallback;
+window.setStateCallback = (callback: (msg: string) => void) => { stateCallback = callback }
+window.setResponseTimeCallback = (callback: (val: number) => void) => { responseTimeCallback = callback }
+window.setSendBufferingTimeCallback = (callback: (val: number) => void) => { sendBufferingTimeCallback = callback }
 window.getDstNodeForInternal = () => {
     return dstNodeForInternal;
 };

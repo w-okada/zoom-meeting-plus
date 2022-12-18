@@ -2,8 +2,14 @@ import { VoiceFocusDeviceTransformer, VoiceFocusTransformDevice } from "amazon-c
 import MicrophoneStream from "microphone-stream"
 import { MajarModeTypes, VoiceChangerMode } from "../001_clients_and_managers/000_ApplicationSettingLoader"
 import { VoicePlayerWorkletNode } from "./001_VoicePlayerWorkletNode"
-import { AudioStreamer } from "./002_AudioStreamer"
+import { AudioStreamer, AudioStreamerPerformanceListener } from "./002_AudioStreamer"
 import { createDummyMediaStream } from "./999_Utils"
+export type { AudioStreamerPerformanceListener }
+
+
+export type MMVCClientListener = AudioStreamerPerformanceListener & {
+    notifyErrorStatus: (msg: string) => void
+}
 
 export class MMVCClient {
     audioContext: AudioContext
@@ -23,7 +29,7 @@ export class MMVCClient {
     currentDevice: VoiceFocusTransformDevice | null = null
 
 
-    constructor(audioContext: AudioContext, vfEnable: boolean) {
+    constructor(audioContext: AudioContext, vfEnable: boolean, listener: MMVCClientListener) {
         this.audioContext = audioContext
         this.vfEnable = vfEnable
         this.outputNode = audioContext.createMediaStreamDestination();
@@ -44,18 +50,20 @@ export class MMVCClient {
 
         this.voicePlayerNode = new VoicePlayerWorkletNode(audioContext);
         this.voicePlayerNode.connect(this.outputNode) // PlayerからOutputノードへ
-        this.audioStreamer = this._createAudiaStreamer(this.voicePlayerNode) // AudioStreamerからPlayerへ
+        this.audioStreamer = this._createAudiaStreamer(this.voicePlayerNode, listener) // AudioStreamerからPlayerへ
 
         this.micStream.pipe(this.audioStreamer) // MicStreamからAudioStreamerへ
     }
-    _createAudiaStreamer = (voicePlayerNode: VoicePlayerWorkletNode) => {
+    _createAudiaStreamer = (voicePlayerNode: VoicePlayerWorkletNode, listener: MMVCClientListener) => {
         return new AudioStreamer("docker", "http://localhost:18888/test", (voiceChangerMode: VoiceChangerMode, data: ArrayBuffer) => {
             // 1chunk以下のデータが返ってきたときは何か問題が起こっている。
             if (data.byteLength < 512) {
                 console.log("Invalid Response Recieved", data)
+                listener.notifyErrorStatus("Invalid Response Recieved, please check model is correctly loaded.")
                 // setReceivedDataStatus(ReceivedDataStatus.invalid)
                 return
             } else {
+                listener.notifyErrorStatus("")
                 // setReceivedDataStatus(ReceivedDataStatus.good)
             }
 
@@ -84,18 +92,7 @@ export class MMVCClient {
 
             source.start();
             source.connect(this.outputNode)
-        }, {
-            notifyResponseTime: (_time: number) => {
-                // responseTimesRef.current.push(time)
-                // const avr = calcAverage(responseTimesRef.current)
-                // setResponseTime(avr)
-            },
-            notifySendBufferingTime: (_time: number) => {
-                // bufferingTimesRef.current.push(time)
-                // const avr = calcAverage(bufferingTimesRef.current)
-                // setBufferingTime(avr)
-            },
-        }, { objectMode: true, })
+        }, listener, { objectMode: true, })
 
     }
 
@@ -170,25 +167,19 @@ export class MMVCClient {
     setGpu = (id: number) => {
         this.audioStreamer.setGpu(id)
     }
-    setPrefixChunkSize = (size: number) => {
-        this.audioStreamer.setPrefixChunkSize(size)
-    }
     setChunkSize = (size: number) => {
         this.audioStreamer.setChunkSize(size)
-    }
-    setVoiceChangerMode = (val: VoiceChangerMode) => {
-        this.audioStreamer.setVoiceChangerMode(val)
-    }
-
-    // VoicePlayerWorkletNodeのラッパー
-    changeSetting = () => {
+        this.audioStreamer.setPrefixChunkSize(size)
         this.voicePlayerNode.notifyChangeProps({
-            deltaSize: 12,
-            crossFadeOffsetRate: 0.2,
-            crossFadeEndRate: 0.2,
+            deltaSize: size,
+            crossFadeOffsetRate: 0.4,
+            crossFadeEndRate: 0.4,
             crossFadeLowerValue: 0.1,
             crossFadeType: 2
         })
+    }
+    setVoiceChangerMode = (val: VoiceChangerMode) => {
+        this.audioStreamer.setVoiceChangerMode(val)
     }
 
 
