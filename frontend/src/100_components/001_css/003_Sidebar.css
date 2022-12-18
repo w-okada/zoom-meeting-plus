@@ -258,6 +258,25 @@
 }
 
 /* Button */
+.sidebar-content-row-buttons{
+    display:flex;    
+}
+.sidebar-content-row-buttons-button,
+.sidebar-content-row-buttons-button-active{
+    margin:0px, 2px,0px, 2px;
+    padding:0px, 2px,0px, 2px;
+    /* padding:2px; */
+    border:solid 1px #222
+}
+
+.sidebar-content-row-buttons-button{
+    background:#333
+}
+.sidebar-content-row-buttons-button-active{
+    background:#383
+}
+
+
 .sidebar-content-row-button,
 .sidebar-content-row-button-activated,
 .sidebar-content-row-button-stanby {

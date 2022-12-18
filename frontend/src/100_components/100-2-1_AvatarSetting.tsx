@@ -1,5 +1,5 @@
 import { generateConfig, OperationParams, WorkerManager } from "@dannadori/psdanimator";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useAppSetting } from "../003_provider/001_AppSettingProvider";
 import { useAppState } from "../003_provider/003_AppStateProvider";
 
@@ -7,6 +7,7 @@ export const AvatarSetting = () => {
     const { resourceManagerState, browserProxyState } = useAppState();
     const { applicationSettingState } = useAppSetting();
 
+    const [motion, setMotion] = useState<string>("normal")
     const psdAnimator = useMemo(() => {
         return new WorkerManager()
     }, [])
@@ -28,7 +29,7 @@ export const AvatarSetting = () => {
         } else {
             const p2: OperationParams = {
                 type: "SWITCH_MOTION_MODE",
-                motionMode: "normal",
+                motionMode: motion,
             }
             psdAnimator.execute(p2)
         }
@@ -76,11 +77,18 @@ export const AvatarSetting = () => {
     const motionButtons = useMemo(() => {
 
         const b = motionNames.map((m) => {
+            const className = motion == m ? "sidebar-content-row-buttons-button-active" : "sidebar-content-row-buttons-button"
             const button = (
                 <div
                     key={m}
-                    className="sidebar-zoom-area-motion-button"
+                    className={className}
                     onClick={async () => {
+                        setMotion(m)
+                        const p2: OperationParams = {
+                            type: "SWITCH_MOTION_MODE",
+                            motionMode: m,
+                        }
+                        psdAnimator.execute(p2)
                     }}
                 >
                     {m}
@@ -89,7 +97,7 @@ export const AvatarSetting = () => {
             return button;
         });
         return (<>{b}</>)
-    }, [motionNames])
+    }, [motionNames, motion])
 
 
     return (
@@ -102,7 +110,8 @@ export const AvatarSetting = () => {
 
                     <div className="sidebar-content-row-3-7">
                         <div className="sidebar-content-row-label">motions</div>
-                        {motionButtons}
+                        <div className="sidebar-content-row-buttons">{motionButtons}</div>
+
                     </div>
                     <div className="sidebar-content-row-3-7">
                         <div className="sidebar-content-row-label">voice val</div>
