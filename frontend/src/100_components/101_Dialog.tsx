@@ -11,7 +11,6 @@ export const Dialog = () => {
         <div>
             {frontendManagerState.stateControls.entranceDialogCheckbox.trigger}
             {frontendManagerState.stateControls.settingDialogCheckbox.trigger}
-            {frontendManagerState.stateControls.timeKeeperSettingDialogCheckbox.trigger}
             {frontendManagerState.stateControls.appInfoDialogCheckbox.trigger}
 
             <div className="dialog-container">

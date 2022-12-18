@@ -9,21 +9,23 @@ type DeviceManagerState = {
     audioOutputDevices: DeviceInfo[]
 
     videoInputDeviceId: string | null
+    audioInputDeviceId: string | null
     audioOutputDeviceId: string | null
 }
 export type DeviceManagerStateAndMethod = DeviceManagerState & {
     reloadDevices: () => Promise<void>
-    setVideoElement: (elem: HTMLVideoElement) => Promise<void>
+    // setVideoElement: (elem: HTMLVideoElement) => Promise<void>
     setVideoInputDeviceId: (val: string | null) => void
-    setVideoFileURL: (val: string) => void
+    // setVideoFileURL: (val: string) => void
+    setAudioInputDeviceId: (val: string | null) => void
     setAudioOutputDeviceId: (val: string | null) => void
 
 }
 export const useDeviceManager = (): DeviceManagerStateAndMethod => {
     const [lastUpdateTime, setLastUpdateTime] = useState(0)
-    const [videoInputDeviceId, _setVideoInputDeviceId] = useState<string | null>(null)
-    const [videoElement, _setVideoElement] = useState<HTMLVideoElement | null>(null)
     const [audioOutputDeviceId, _setAudioOutputDeviceId] = useState<string | null>(null)
+    const [audioInputDeviceId, _setAudioInputDeviceId] = useState<string | null>(null)
+    const [videoInputDeviceId, _setVideoInputDeviceId] = useState<string | null>(null)
 
     const deviceManager = useMemo(() => {
         const manager = new DeviceManager()
@@ -43,38 +45,24 @@ export const useDeviceManager = (): DeviceManagerStateAndMethod => {
         }
     }, [])
 
-    // () set video
-    const setVideoElement = async (elem: HTMLVideoElement) => {
-        if (videoInputDeviceId) {
-            const ms = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    deviceId: videoInputDeviceId
-                }
-            })
-            elem.srcObject = ms
-        }
-        _setVideoElement(elem)
+
+    const setAudioInputDeviceId = async (val: string | null) => {
+        localStorage.audioInputDevice = val;
+        _setAudioInputDeviceId(val)
     }
+    useEffect(() => {
+        const audioInputDeviceId = localStorage.audioInputDevice || null
+        _setAudioInputDeviceId(audioInputDeviceId)
+    }, [])
+
     const setVideoInputDeviceId = async (val: string | null) => {
-        if (val && videoElement) {
-            const ms = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    deviceId: val
-                }
-            })
-            videoElement.srcObject = ms
-        } else if (videoElement) {
-            videoElement.srcObject = null
-        }
+        localStorage.videoInputDevice = val;
         _setVideoInputDeviceId(val)
     }
-
-    const setVideoFileURL = (url: string) => {
-        if (videoElement) {
-            videoElement.src = url
-        }
-    }
-
+    useEffect(() => {
+        const videoInputDeviceId = localStorage.videoInputDevice || null
+        _setVideoInputDeviceId(videoInputDeviceId)
+    }, [])
 
     const setAudioOutputDeviceId = async (val: string | null) => {
         localStorage.audioOutputDevice = val;
@@ -101,12 +89,13 @@ export const useDeviceManager = (): DeviceManagerStateAndMethod => {
         videoInputDevices: deviceManager.realVideoInputDevices,
         audioOutputDevices: deviceManager.realAudioOutputDevices,
 
+        // videoInputDeviceId,
+        audioInputDeviceId,
         videoInputDeviceId,
         audioOutputDeviceId,
         reloadDevices,
-        setVideoElement,
+        setAudioInputDeviceId,
         setVideoInputDeviceId,
-        setVideoFileURL,
         setAudioOutputDeviceId,
     }
 }

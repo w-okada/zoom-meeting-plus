@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppState } from "../003_provider/003_AppStateProvider";
-import { useFileInput } from "./hooks/useFileInput";
+// import { useFileInput } from "./hooks/useFileInput";
 
 const TabItems = {
     audioInput: "audioInput",
@@ -115,7 +115,7 @@ export const SettingDialog = () => {
 
     const [tab, setTab] = useState<TabItems>("audioInput");
     const [showFileInputForVideo, setShowFileInputForVideo] = useState<boolean>(false);
-    const fileInputState = useFileInput();
+    // const fileInputState = useFileInput();
     const close = () => {
         frontendManagerState.stateControls.settingDialogCheckbox.updateState(false);
     };
@@ -277,8 +277,8 @@ export const SettingDialog = () => {
                     className="dialog-input-normal-button"
                     onClick={() => {
                         const loadFile = async () => {
-                            const url = await fileInputState.click("audio.*|video.*");
-                            deviceManagerState.setVideoFileURL(url);
+                            // const url = await fileInputState.click("audio.*|video.*");
+                            // deviceManagerState.setVideoFileURL(url);
                         };
                         loadFile();
                     }}
