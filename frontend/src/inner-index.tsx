@@ -475,6 +475,19 @@ window.isZoomInitialized = isZoomInitialized;
 window.isZoomJoined = isZoomJoined;
 window.playAudio = playAudio;
 window.reconstructAudioInputNode = reconstructAudioInputNode;
+window.startVoiceChanger = () => { console.log("START VC") }
+window.stopVoiceChanger = () => { console.log("STOP VC") }
+window.changeVoiceChangerSetting = (
+    src_id: number,
+    dst_id: number,
+    gpu: number,
+    prefix_chunk_size: number,
+    chunk_size: number
+) => {
+    console.log("voice chnager setting chnaged:", src_id, dst_id, gpu, prefix_chunk_size, chunk_size)
+}
+
+
 window.setVoiceCallback = setVoiceCallback;
 window.getDstNodeForInternal = () => {
     return dstNodeForInternal;

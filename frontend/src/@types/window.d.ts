@@ -9,6 +9,17 @@ declare global {
         playAudio: (audioData: ArrayBuffer) => Promise<void>
         reconstructAudioInputNode: (audioInputDeviceId: string | null, audioInputEnabled: boolean) => Promise<void>
 
+        startVoiceChanger: () => void
+        stopVoiceChanger: () => void
+
+        changeVoiceChangerSetting: (
+            src_id: number,
+            dst_id: number,
+            gpu: number,
+            prefix_chunk_size: number,
+            chunk_size: number
+        ) => void
+
         getDstNodeForInternal: () => MediaStreamAudioDestinationNode | null
         getAudioContext: () => AudioContext | null
         getReferableAudios: () => ReferableAudio[]
