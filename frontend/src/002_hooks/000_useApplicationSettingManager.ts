@@ -1,5 +1,6 @@
+import { AnimationFrameInfo } from "@dannadori/psdanimator"
 import { useEffect, useMemo, useRef, useState } from "react"
-import { ApplicationSetting, fetchApplicationSetting, InitialApplicationSetting, MajarModeTypes, PSDAnimationFrame, VoiceChangerMode } from "../001_clients_and_managers/000_ApplicationSettingLoader"
+import { ApplicationSetting, fetchApplicationSetting, InitialApplicationSetting, MajarModeTypes, VoiceChangerMode } from "../001_clients_and_managers/000_ApplicationSettingLoader"
 import { IndexedDBStateAndMethod } from "./001_useIndexedDB"
 
 
@@ -29,7 +30,7 @@ export type ApplicationSettingManagerStateAndMethod = {
     setVoiceChangerServerUrl: (url: string) => void
 
 
-    setPSDAnimationFrame: (animation: PSDAnimationFrame[]) => void
+    setPSDAnimationFrame: (animation: AnimationFrameInfo[]) => void
     setPSDUrl: (url: string) => void
 
     setVoiceVoxLang: (lang: string) => void
@@ -187,7 +188,7 @@ export const useApplicationSettingManager = (): ApplicationSettingManagerStateAn
     }
 
     /** (3-3) PSD Animator */
-    const setPSDAnimationFrame = (animation: PSDAnimationFrame[]) => {
+    const setPSDAnimationFrame = (animation: AnimationFrameInfo[]) => {
         applicationSettingRef.current.psd_animator_setting.psd_animation = animation
         updateApplicationSetting()
     }

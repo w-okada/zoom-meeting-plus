@@ -2,7 +2,7 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import { AppStateProvider } from "./003_provider/003_AppStateProvider";
-import { AppSettingProvider } from "./003_provider/001_AppSettingProvider";
+import { AppSettingProvider, useAppSetting } from "./003_provider/001_AppSettingProvider";
 import { AppRootStateProvider } from "./003_provider/002_AppRootStateProvider";
 import { useMemo } from "react";
 
@@ -46,7 +46,7 @@ const NormalFrontPageDescription = () => {
 
 const AppRootStateProviderWrapper = () => {
     const [firstTach, setFirstTouch] = React.useState<boolean>(false);
-
+    const { applicationSettingState } = useAppSetting()
     // useEffect(() => {
     //     if (DEBUG) {
     //         setFirstTouch(true);
@@ -70,6 +70,13 @@ const AppRootStateProviderWrapper = () => {
     }, [])
 
     if (!firstTach) {
+        const clearSetting = () => {
+            const result = window.confirm('設定を初期化します。');
+            if (result) {
+                applicationSettingState.clearSetting()
+                location.reload()
+            }
+        }
         return (
             <div className="front-container">
                 <div className="front-title">{applicationTitle}</div>
@@ -87,7 +94,9 @@ const AppRootStateProviderWrapper = () => {
 
                 <div className="front-note">確認動作環境:Windows 11 + Chrome</div>
                 <div className="front-disclaimer">免責：本ソフトウェアの使用または使用不能により生じたいかなる直接損害・間接損害・波及的損害・結果的損害 または特別損害についても、一切責任を負いません。</div>
-
+                <div className="front-clear-setting" onClick={clearSetting}>
+                    Clear Setting
+                </div>
             </div>
         );
     } else {
