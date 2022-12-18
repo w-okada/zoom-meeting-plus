@@ -53,17 +53,37 @@ $ docker run --rm --gpus all --entrypoint="" -p 50021:50021 voicevox/voicevox_en
 
 [Zoom Meeting Plus](https://w-okada.github.io/zoom-meeting-plus/)
 
-下記の画面が出てきたらClick to startを押してください。
+下の画面が出てきたらClick to startを押してください。
 
 ![image](https://user-images.githubusercontent.com/48346627/208299383-4cd84c8e-74be-4459-84ea-1f6044e5cac7.png)
 
 
-この画面に遷移したら「会議室でのユーザ名」「ミーティング番号」「ミーティングのパスワード」「SDK Key(前述したもの)」「SDK Secret(前述したもの)」を入力してEnterを押してください。
+下の画面に遷移したら「会議室でのユーザ名」「ミーティング番号」「ミーティングのパスワード」「SDK Key(前述したもの)」「SDK Secret(前述したもの)」を入力してEnterを押してください。
+
+![image](https://user-images.githubusercontent.com/48346627/208299820-f92bf2bf-df07-473f-92af-b469af708277.png)
 
 
-![image](https://user-images.githubusercontent.com/48346627/208299439-c073a759-d238-4773-b0a2-1243ac9d7c49.png)
+
+下の画面が出たらjoinボタンを押してください。Zoom会議に参加できます。
+
+![image](https://user-images.githubusercontent.com/48346627/208299866-5959a910-be52-4180-bd3d-db57d768a866.png)
 
 
+画面右側のパネルでは各種操作が可能になっています。
+
+下の部分では、Zoomミーティングに送信される画面が表示されています。画像下のボタンでアバターの動作を変えることができます。また、音声を発しているときには自動的にtalkin状態になります。
+
+![image](https://user-images.githubusercontent.com/48346627/208299933-7ef76e13-0d0e-4321-9fce-6afc4d2c69ed.png)
+
+
+下の図ではVC Trainer And Player for MMVCの各種制御が行えます。
+
+![image](https://user-images.githubusercontent.com/48346627/208300257-84eeca50-d4b9-4c39-ba41-07eb86315dd2.png)
+
+
+下の部分ではVoicevoxの各種制御が行えます。またGoogle Speechによる音声認識＋Voicevoxでの音声発話も可能です。
+
+![image](https://user-images.githubusercontent.com/48346627/208300432-275029c1-52c6-4ff2-98df-f73d406e0655.png)
 
 
 # 謝辞
