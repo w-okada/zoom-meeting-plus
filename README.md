@@ -1,3 +1,79 @@
+Zoom Meeting Plus
+-------
+Zoom Meeting Plusは、お好みのキャラクターでZoomミーティングを簡単に行えるアプリケーションです。
+
+現在は、ずんだもんがサポートされています。
+
+![zumudamon](https://user-images.githubusercontent.com/48346627/208299239-1c299f26-e22e-45e8-8d77-24bca96b1a30.png)
+
+
+ちなみに、こちらの絵はAIに書いてもらったZoomを使うずんだもん（＝ずむだもん）です。
+
+
+
+# 使用方法
+
+## 前提
+- Docker
+
+## 前作業
+[こちらの記事](https://qiita.com/yosuke-sawamura/items/de69e73e47335cd61d68)を参考にZoomのSDK KeyとSDK Secretを取得してください。
+
+## 音声サーバの起動
+本アプリは二つの音声サーバをサポートします。
+
+- VC Trainer & Player for MMVC
+- Voicevox
+
+
+### VC Trainer & Player for MMVCの起動方法
+
+[MMVC公式ページ](https://github.com/isletennos/MMVC_Trainer)
+
+[VC Trainer & Player 公式ページ](https://github.com/w-okada/voice-changer)
+
+VC Trainer & PlayerはAIを用いたリアルタイムボイスチェンジャーMMVCのヘルパーアプリケーションです。次のコマンドでサーバとして起動させることができます。ポート番号は18888の部分を変えることで変更できます。(２か所は連動して同じ値にすること)
+```
+$ docker run --rm --gpus all --shm-size=128M -e EX_IP="`hostname -I`" -e EX_PORT=18888 -p 18888:8080 dannadori/voice-changer:20221214_053733 MMVC
+```
+
+### Voicevox起動方法
+
+[公式ページ](https://github.com/VOICEVOX/voicevox_engine)
+
+公式の標準の起動方法ではgithub pagesからのアクセスができません。`--cors_policy_mode all`をつけて起動するようにします。どのサーバのウェブページであってもローカルのVoicevoxにアクセスするような処理を記述するとアクセスできるようになります。これは悪意のあるサーバのページでも同じです。不要な時にはコンテナをシャットダウンするなど、対策を行うことをお勧めします。
+
+```
+$ docker run --rm --gpus all --entrypoint="" -p 50021:50021 voicevox/voicevox_engine:nvidia-ubuntu20.04-latest gosu user /opt/python/bin/python3 ./run.py --use_gpu --voicelib_dir /opt/voicevox_core/ --runtime_dir /opt/onnxruntime/lib --host 0.0.0.0 --cors_policy_mode all
+```
+
+## アプリケーションの起動と操作方法
+
+次のページにアクセスしてください。
+
+[Zoom Meeting Plus](https://w-okada.github.io/zoom-meeting-plus/)
+
+下記の画面が出てきたらClick to startを押してください。
+
+![image](https://user-images.githubusercontent.com/48346627/208299383-4cd84c8e-74be-4459-84ea-1f6044e5cac7.png)
+
+
+この画面に遷移したら「会議室でのユーザ名」「ミーティング番号」「ミーティングのパスワード」「SDK Key(前述したもの)」「SDK Secret(前述したもの)」を入力してEnterを押してください。
+
+
+![image](https://user-images.githubusercontent.com/48346627/208299439-c073a759-d238-4773-b0a2-1243ac9d7c49.png)
+
+
+
+
+# 謝辞
+- [MMVC様](https://github.com/isletennos/MMVC_Trainer)
+- [Voicevox様](https://github.com/VOICEVOX/voicevox_engine)
+- [akihiyo様](https://seiga.nicovideo.jp/user/illust/20132633)
+
+
+古い記事
+-------
 # Zoom Meeting Plus
 You can join the zoom meeting with avatar as you like.
 
