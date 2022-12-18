@@ -16,6 +16,29 @@ export const MMVCSetting = () => {
     const [modelUploadEnd, setModelUploadEnd] = useState<boolean>(true)
     const [voiceChangeEnabled, setVoiceChangeEnabled] = useState<boolean>(false)
 
+    const serverUrlRow = useMemo(() => {
+        const cliecked = () => {
+            const textInput = document.getElementById("sidebar-mmvc-server-url-text") as HTMLInputElement
+            applicationSettingState.setVoiceChangerServerUrl(textInput.value)
+        }
+        return (
+            <div className="sidebar-content-row-3-5-2">
+                <div className="sidebar-content-row-label">MMVC url</div>
+                <div className="sidebar-content-row-input">
+                    <input type="text" className="sidebar-content-row-input-input" id="sidebar-mmvc-server-url-text" defaultValue={applicationSettingState.applicationSetting.mmvc_setting.voice_changer_server_url} />
+                </div>
+                <div className="sidebar-content-row-label">
+                    <div
+                        className="sidebar-content-row-button"
+                        onClick={cliecked}
+                    >
+                        set
+                    </div>
+
+                </div>
+            </div>
+        )
+    }, [])
     const modelInput = useMemo(() => {
         const onLoadModelClicked = () => {
             const fileChooser = document.createElement("input")
@@ -323,6 +346,7 @@ export const MMVCSetting = () => {
     return (
         <>
             <div className="sidebar-content">
+                {serverUrlRow}
                 {modelInput}
                 {audioInputRow}
                 {speakerSelectRow}

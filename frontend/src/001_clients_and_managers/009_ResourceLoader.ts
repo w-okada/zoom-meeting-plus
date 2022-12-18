@@ -102,24 +102,26 @@ export const generateVoiceWithVoiceVox = async (voiceVoxUrl: string, speakerId: 
 
 
 // OpenTTS
-export const getLanguageListFromOpenTTS = async (openTtsUrl: string) => {
-    const url = `${openTtsUrl}/api/languages`
-    const res = await fetch(url, {
-        method: "GET"
-    });
-    const json = await res.json()
+export const getLanguageListFromOpenTTS = async (_openTtsUrl: string) => {
+    // const url = `${openTtsUrl}/api/languages`
+    // const res = await fetch(url, {
+    //     method: "GET"
+    // });
+    // const json = await res.json()
+    const json = ["dummy"]
     // console.log(json)
     return json;
 }
 
-export const getSpeakerListFromOpenTTS = async (openTtsUrl: string, lang: string) => {
+export const getSpeakerListFromOpenTTS = async (_openTtsUrl: string, _lang: string) => {
 
-    const url = `${openTtsUrl}/api/voices?language=${lang}`
-    const res = await fetch(url, {
-        method: "GET"
-    });
-    const json = await res.json()
+    // const url = `${openTtsUrl}/api/voices?language=${lang}`
+    // const res = await fetch(url, {
+    //     method: "GET"
+    // });
+    // const json = await res.json()
     // console.log(json)
+    const json = ["dummy"]
     return json;
 }
 

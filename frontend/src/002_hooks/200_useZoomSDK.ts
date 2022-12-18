@@ -21,9 +21,12 @@ export const useZoomSDK = (): ZoomSDKStateAndMethod => {
 
             const p = new Promise<void>((resolve) => {
                 const checkZoomInitialized = () => {
+                    console.log("[Zoom Initialized] outer: checking")
                     if (ifrm.isZoomInitialized()) {
+                        console.log("[Zoom Initialized] outer: checking.. initialized")
                         resolve()
                     } else {
+                        console.log("[Zoom Initialized] outer: checking.. not retry")
                         setTimeout(() => {
                             checkZoomInitialized()
                         }, 200)
@@ -38,6 +41,7 @@ export const useZoomSDK = (): ZoomSDKStateAndMethod => {
             console.log("Initial DeviceID setting.")
             ifrm.reconstructAudioInputNode(deviceManagerState.audioInputDeviceId, true);
             console.log("Initial MMVC setting.")
+            ifrm.setVoiceChangerURL(applicationSettingState.applicationSetting.mmvc_setting.voice_changer_server_url)
             ifrm.changeVoiceChangerSetting(
                 applicationSettingState.applicationSetting.mmvc_setting.src_id,
                 applicationSettingState.applicationSetting.mmvc_setting.dst_id,

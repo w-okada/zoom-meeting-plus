@@ -104,6 +104,17 @@ export const useBrowserProxy = (): BrowserProxyStateAndMethod => {
         if (typeof ifrm.changeVoiceChangerSetting !== "function") {
             return
         }
+        ifrm.setVoiceChangerURL(applicationSettingState.applicationSetting.mmvc_setting.voice_changer_server_url)
+    }, [
+        applicationSettingState.applicationSetting.mmvc_setting.voice_changer_server_url
+    ])
+
+    useEffect(() => {
+        // @ts-ignore
+        const ifrm = document.getElementById('inner-index')!.contentWindow as Window;
+        if (typeof ifrm.changeVoiceChangerSetting !== "function") {
+            return
+        }
         ifrm.changeVoiceChangerSetting(
             applicationSettingState.applicationSetting.mmvc_setting.src_id,
             applicationSettingState.applicationSetting.mmvc_setting.dst_id,

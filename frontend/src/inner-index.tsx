@@ -501,6 +501,9 @@ window.stopVoiceChanger = () => {
     console.log("STOP VC")
     mmvcClient!.pauseRealtimeConvert()
 }
+window.setVoiceChangerURL = (url: string) => {
+    mmvcClient?.setServerUrl(url)
+}
 window.changeVoiceChangerSetting = (
     src_id: number,
     dst_id: number,
@@ -539,6 +542,7 @@ window.addEventListener("message", function (event: MessageEvent<any>) {
             console.log("event:", zoomData.type);
             await initializeAudio();
             await initZoomClient();
+            console.log("[Zoom Initialized] inner")
             zoomInitCompleted = true;
         } else if (data.type === "ZoomMeetingPlusJoinEvent") {
             const zoomData = data as ZoomMeetingPlusJoinEvent;

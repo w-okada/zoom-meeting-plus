@@ -14,7 +14,7 @@ declare global {
 
         startVoiceChanger: () => void
         stopVoiceChanger: () => void
-
+        setVoiceChangerURL: (url: string) => void
         changeVoiceChangerSetting: (
             src_id: number,
             dst_id: number,
