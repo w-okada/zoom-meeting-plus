@@ -37,7 +37,7 @@ export const postVoice = async (url: string, gpu: number, srcId: number, dstId: 
 
 
 export const fetchPSD = async (filename: string) => {
-    const url = `/assets/psd/${filename}`
+    const url = `${filename}`
     const res = await fetch(url, {
         method: "GET"
     });

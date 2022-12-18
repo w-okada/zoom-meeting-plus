@@ -78,7 +78,7 @@ module.exports = {
             },
         },
         static: {
-            directory: path.join(__dirname, "../dist"),
+            directory: path.join(__dirname, "../docs"),
         },
         headers: {
             "Cross-Origin-Opener-Policy": "same-origin",

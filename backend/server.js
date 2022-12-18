@@ -17,7 +17,7 @@ const sdk_key = process.env.ZOOM_SDK_KEY || ""
 const secret_key = process.env.ZOOM_SDK_SECRET || ""
 
 // 意味不明だ。。。requireの時のみ記載されたファイルからの相対パスになるらしい。https://yinm.info/20201104/
-const setting = require("../dist/assets/setting.json");
+const setting = require("../docs/assets/setting.json");
 // const setting = fs.readFileSync(`./dist/assets/setting.json`, "utf8");
 console.log(setting);
 
@@ -41,7 +41,7 @@ if (process.env.OAUTH_REDIRECT_URL) {
 // app.use("/", express.static("dist"));
 app.use(
     "/",
-    express.static("dist", {
+    express.static("docs", {
         setHeaders: function (res, path) {
             res.set("Cross-Origin-Opener-Policy", "same-origin");
             res.set("Cross-Origin-Embedder-Policy", "require-corp");
