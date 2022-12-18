@@ -139,6 +139,6 @@
             {"mode":"sleep", "z_index":5, "number":600, "layer_path":"ROOT_耳_3"},
             {"mode":"sleep", "z_index":5, "number":5, "layer_path":"ROOT_耳_1"}
         ],
-        "psd_url":"./zundamonB.psd"
+        "psd_url":"./assets/psd/zundamonB.psd"
     }
 }
