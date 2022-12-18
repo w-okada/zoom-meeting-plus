@@ -26,6 +26,7 @@ export const useBrowserProxy = (): BrowserProxyStateAndMethod => {
         }
         ifrm.reconstructAudioInputNode(deviceManagerState.audioInputDeviceId, true);
     }, [deviceManagerState.audioInputDeviceId])
+
     useEffect(() => {
         const setVoiceCallback = async () => {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment

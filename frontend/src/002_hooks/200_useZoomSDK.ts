@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useAppSetting } from "../003_provider/001_AppSettingProvider";
 import { ZoomMeetingPlusInitEvent, ZoomMeetingPlusJoinEvent } from "../sharedTypes";
 
 export type ZoomSDKStateAndMethod = {
@@ -6,7 +7,7 @@ export type ZoomSDKStateAndMethod = {
     joinZoom: (username: string, meetingNumber: string, password: string, signature: string, sdkKey: string, zak: string) => Promise<void>
 }
 export const useZoomSDK = (): ZoomSDKStateAndMethod => {
-
+    const { deviceManagerState } = useAppSetting()
     const initZoomClient = useMemo(() => {
         return async () => {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -33,6 +34,9 @@ export const useZoomSDK = (): ZoomSDKStateAndMethod => {
             await p
 
             console.log("init_zoom", origin)
+
+            console.log("Initial DeviceID setting.")
+            ifrm.reconstructAudioInputNode(deviceManagerState.audioInputDeviceId, true);
         }
     }, [])
 

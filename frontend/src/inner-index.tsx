@@ -309,6 +309,7 @@ const reconstructAudioInputNode = async (audioInputDeviceId: string | null, audi
     } catch (e) {
         console.warn("disconnect failed. ignore this.", e);
     }
+    console.log(`AudioInputDeviceId: ${audioInputDeviceId}....`)
 
     if (audioInputDeviceId == "none") {
         console.log(`AudioInputDeviceId: ${audioInputDeviceId}, break`)
