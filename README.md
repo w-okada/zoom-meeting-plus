@@ -11,9 +11,12 @@ Zoom Meeting Plusは、お好みのキャラクターでZoomミーティング�
 
 # デモ
 
+## リアルタイムボイスチェンジャ(MMVC)
 https://user-images.githubusercontent.com/48346627/208338019-b73bdc03-5319-423e-b891-314a05097e45.mp4
 
 
+## Text-to-Speech（Voicevox)
+https://user-images.githubusercontent.com/48346627/208339120-8aa7c4ac-7d67-4ec1-8d99-8ade1b1607f1.mp4
 
 # 使用方法
 
