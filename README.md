@@ -7,7 +7,11 @@ Zoom Meeting Plusは、お好みのキャラクターでZoomミーティング�
 ![zumudamon](https://user-images.githubusercontent.com/48346627/208299239-1c299f26-e22e-45e8-8d77-24bca96b1a30.png)
 
 
-ちなみに、こちらの絵はAIに書いてもらったZoomを使うずんだもん（＝ずむだもん）です。
+上の絵、こちらの絵はAIに書いてもらったZoomを使うずんだもん（＝ずむだもん）です。
+
+# デモ
+
+https://user-images.githubusercontent.com/48346627/208338019-b73bdc03-5319-423e-b891-314a05097e45.mp4
 
 
 
@@ -34,7 +38,9 @@ Zoom Meeting Plusは、お好みのキャラクターでZoomミーティング�
 
 VC Trainer & PlayerはAIを用いたリアルタイムボイスチェンジャーMMVCのヘルパーアプリケーションです。次のコマンドでサーバとして起動させることができます。ポート番号は18888の部分を変えることで変更できます。(２か所は連動して同じ値にすること)
 ```
-$ docker run --rm --gpus all --shm-size=128M -e EX_IP="`hostname -I`" -e EX_PORT=18888 -p 18888:8080 dannadori/voice-changer:20221214_053733 MMVC
+$ git clone --depth 1  https://github.com/w-okada/voice-changer.git -b z001_qiita_advent_calendar_2022_zoom
+$ cd voice-changer
+$ bash start2.sh MMVC
 ```
 
 ### Voicevox起動方法
