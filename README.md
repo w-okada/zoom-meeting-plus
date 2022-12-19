@@ -46,6 +46,13 @@ $ cd voice-changer
 $ bash start2.sh MMVC
 ```
 
+GPUが無い環境で起動させる場合は、最後の行を次のように置き換えてください。
+
+```
+$ USE_GPU=off bash start2.sh MMVC
+```
+
+
 ### Voicevox起動方法
 
 [公式ページ](https://github.com/VOICEVOX/voicevox_engine)
@@ -55,6 +62,13 @@ $ bash start2.sh MMVC
 ```
 $ docker run --rm --gpus all --entrypoint="" -p 50021:50021 voicevox/voicevox_engine:nvidia-ubuntu20.04-latest gosu user /opt/python/bin/python3 ./run.py --use_gpu --voicelib_dir /opt/voicevox_core/ --runtime_dir /opt/onnxruntime/lib --host 0.0.0.0 --cors_policy_mode all
 ```
+
+GPUが無い環境で起動させる場合は、次のコマンドで実行してください。
+
+```
+$ docker run --rm -it --entrypoint="" -p '50021:50021' voicevox/voicevox_engine:cpu-ubuntu20.04-latest gosu user /opt/python/bin/python3 ./run.py --voicelib_dir /opt/voicevox_core/ --runtime_dir /opt/onnxruntime/lib --host 0.0.0.0 --cors_policy_mode all
+```
+
 
 ## アプリケーションの起動と操作方法
 
@@ -93,6 +107,10 @@ $ docker run --rm --gpus all --entrypoint="" -p 50021:50021 voicevox/voicevox_en
 下の部分ではVoicevoxの各種制御が行えます。またGoogle Speechによる音声認識＋Voicevoxでの音声発話も可能です。
 
 ![image](https://user-images.githubusercontent.com/48346627/208300432-275029c1-52c6-4ff2-98df-f73d406e0655.png)
+
+## 操作動画
+
+https://user-images.githubusercontent.com/48346627/208342144-688e7119-9bfb-4bee-b6cc-a4b2c794a151.mp4
 
 
 # 謝辞
